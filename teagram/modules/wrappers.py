@@ -1,4 +1,4 @@
-from asyncio import wrap_future, iscoroutine
+from asyncio import iscoroutine, wrap_future
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps as _wraps
 from inspect import iscoroutinefunction

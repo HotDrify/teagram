@@ -1,11 +1,11 @@
-import sys
+from sys import version_info
 
-if sys.version_info < (3, 8, 0):
+if version_info < (3, 8, 0):
     print("Требуется Python 3.8 или выше\nNeeds Python 3.8 or above")
-    sys.exit(1)
+    exit(1)
 
 
-import argparse
+from argparse import ArgumentParser
 import asyncio
 
 try:
@@ -19,7 +19,7 @@ from . import main
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         prog="teagram"
     )
 
