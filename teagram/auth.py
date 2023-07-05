@@ -32,11 +32,11 @@ def colored_input(prompt: str = "", hide: bool = False) -> str:
 class Auth:
     """Авторизация в аккаунт"""
 
-    def __init__(self, session_name: str = "../material") -> None:
+    def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
         self.app = Client(
             session_name=session_name, config_file="./config.ini",
-            parse_mode="html", app_version=f"Material v{__version__}"
+            parse_mode="html", app_version=f"teagram v{__version__}"
         )
 
     def _check_api_tokens(self) -> bool:
@@ -104,7 +104,7 @@ class Auth:
             if not logged:
                 me = await self.enter_2fa()
         except errors.SessionRevoked:
-            logging.error("Сессия была сброшена, введи rm sh1t-ub.session и заново введи команду запуска")
+            logging.error("Сессия была сброшена, введи rm teagram.session и заново введи команду запуска")
             await self.app.disconnect()
             return sys.exit(64)
 
