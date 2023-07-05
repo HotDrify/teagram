@@ -1,8 +1,3 @@
-"""
-тут находится бд
-
-    """
-
 import json
 
 def save_db(api_id: int, hash_id: str, token: str, prefix: str = '.', modules: dict = None):
