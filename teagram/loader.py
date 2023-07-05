@@ -9,7 +9,7 @@ import string
 import random
 
 import requests
-import inspect
+from inspect import getmodule
 
 from importlib.abc import SourceLoader
 from importlib.machinery import ModuleSpec
@@ -244,11 +244,10 @@ class ModulesManager:
         self.bot_manager = bot.BotManager(app, self._db, self)
         await self.bot_manager.load()
 
-
         for local_module in filter(
-            lambda file_name: file_name.endswith(".py")
-                and not file_name.startswith("_"), os.listdir(self._local_modules_path)
-        ):
+                lambda file_name: file_name.endswith(".py")
+                and not file_name.startswith("_"),
+                os.listdir(self._local_modules_path)):
             module_name = f"sh1t-ub.modules.{local_module[:-3]}"
             file_path = os.path.join(
                 os.path.abspath("."), self._local_modules_path, local_module
@@ -314,7 +313,8 @@ class ModulesManager:
                 self.inline_handlers.update(instance.inline_handlers)
 
         if not instance:
-            logging.error("Не удалось найти класс модуля заканчивающийся на `Mod`")
+            logging.error(
+                "Не удалось найти класс модуля заканчивающийся на `Mod`")
 
         return instance
 
@@ -390,7 +390,8 @@ class ModulesManager:
 
         return True
 
-    def unload_module(self, module_name: str = None, is_replace: bool = False) -> str:
+    def unload_module(
+            self, module_name: str = None, is_replace: bool = False) -> str:
         """Выгружает загруженный (если он загружен) модуль"""
         if is_replace:
             module = module_name
@@ -398,10 +399,10 @@ class ModulesManager:
             if not (module := self.get_module(module_name)):
                 return False
 
-            if (get_module := inspect.getmodule(module)).__spec__.origin != "<string>":
+            if (get_module := getmodule(module)).__spec__.origin != "<string>":
                 set_modules = set(self._db.get(__name__, "modules", []))
                 self._db.set("teagram.loader", "modules",
-                            list(set_modules - {get_module.__spec__.origin}))
+                             list(set_modules - {get_module.__spec__.origin}))
 
             for alias, command in self.aliases.copy().items():
                 if command in module.command_handlers:
@@ -410,18 +411,18 @@ class ModulesManager:
 
         self.modules.remove(module)
         self.command_handlers = dict(
-            set(self.command_handlers.items()) ^ set(module.command_handlers.items())
-        )
+            set(self.command_handlers.items()) ^
+            set(module.command_handlers.items()))
         self.watcher_handlers = list(
             set(self.watcher_handlers) ^ set(module.watcher_handlers)
         )
 
         self.inline_handlers = dict(
-            set(self.inline_handlers.items()) ^ set(module.inline_handlers.items())
-        )
+            set(self.inline_handlers.items()) ^
+            set(module.inline_handlers.items()))
         self.callback_handlers = dict(
-            set(self.callback_handlers.items()) ^ set(module.callback_handlers.items())
-        )
+            set(self.callback_handlers.items()) ^
+            set(module.callback_handlers.items()))
 
         return module.name
 
