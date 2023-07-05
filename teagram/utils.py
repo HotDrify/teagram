@@ -8,7 +8,7 @@ import functools
 import random
 import string
 from types import FunctionType
-from typing import Any, List, Literal, Tuple, Union
+from typing import Any, List, Dict, Literal, Tuple, Union
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
 from pyrogram.types import Chat, Message, User
