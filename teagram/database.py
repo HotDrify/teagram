@@ -54,7 +54,7 @@ def load_db():
                 global api_id, api_hash
 
                 api_id = int(input('Введите api_id: ').strip())
-                if len(api_id) != 8:
+                if len(str(api_id)) != 8:
                     raise ValueError()
 
                 api_hash = input('Введите api_hash: ').strip()
