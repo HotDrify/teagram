@@ -17,20 +17,6 @@ from . import __version__
 Session.notice_displayed = True
 data = database.load_db()
 
-
-def colored_input(prompt: str = "", hide: bool = False) -> str:
-    """Цветной инпут"""
-    frame = sys._getframe(1)
-    return (input if not hide else getpass)(
-        "\x1b[32m{time:%Y-%m-%d %H:%M:%S}\x1b[0m | "
-        "\x1b[1m{level: <8}\x1b[0m | "
-        "\x1b[36m{name}\x1b[0m:\x1b[36m{function}\x1b[0m:\x1b[36m{line}\x1b[0m - \x1b[1m{prompt}\x1b[0m".format(
-            time=datetime.now(), level="INPUT", name=frame.f_globals["__name__"],
-            function=frame.f_code.co_name, line=frame.f_lineno, prompt=prompt
-        )
-    )
-
-
 class Auth:
     """Авторизация в аккаунт"""
 
@@ -46,8 +32,8 @@ class Auth:
         config = configparser.ConfigParser()
         if not config.read("./config.ini"):
             config["pyrogram"] = {
-                "api_id": colored_input("Введи API ID: "),
-                "api_hash": colored_input("Введи API hash: ")
+                "api_id": data.get('api_id'),
+                "api_hash": data.get('api_hash')
             }
 
             with open("./config.ini", "w") as file:
@@ -61,7 +47,7 @@ class Auth:
             error_text: str = None
 
             try:
-                phone = colored_input("Введи номер телефона: ")
+                phone = input("Введи номер телефона: ")
                 return phone, (await self.app.send_code(phone)).phone_code_hash
             except errors.PhoneNumberInvalid:
                 error_text = "Неверный номер телефона, попробуй ещё раз"
@@ -80,7 +66,7 @@ class Auth:
     async def enter_code(self, phone: str, phone_code_hash: str) -> Union[types.User, bool]:
         """Ввести код подтверждения"""
         try:
-            code = colored_input("Введи код подтверждения: ")
+            code = input("Введи код подтверждения: ")
             return await self.app.sign_in(phone, phone_code_hash, code)
         except errors.SessionPasswordNeeded:
             return False
@@ -89,7 +75,7 @@ class Auth:
         """Ввести код двухфакторной аутентификации"""
         while True:
             try:
-                passwd = colored_input("Введи пароль двухфакторной аутентификации: ", True)
+                passwd = getpass("Введи пароль двухфакторной аутентификации: ")
                 return await self.app.check_password(passwd)
             except errors.BadRequest:
                 logging.error("Неверный пароль, попробуй снова")
