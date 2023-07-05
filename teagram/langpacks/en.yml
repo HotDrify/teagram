@@ -1,0 +1,4 @@
+Help:
+  command: "🍵 In total {} commands."
+  no_command: "<emoji document_id=5210952531676504517>🚫</emoji> <b>Command</b> <code>{}</code> <b> not found!</b>"
+  no_modules: "<emoji document_id=5210952531676504517>🚫</emoji> There is no module in repo.!"
