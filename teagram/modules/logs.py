@@ -6,8 +6,9 @@ from .. import database
 
 prefix = database.load_db().get('prefix')
 
+
 @loader.module(name="Logging")
-class Logging(loader.Module):
+class LoggingModule(loader.Module):
     """Simple logging with teagram"""
 
     async def on_load(self, app: Client):
@@ -15,12 +16,12 @@ class Logging(loader.Module):
 
         try:
             await app.send_message('Teagram Logs', f'[INFO] 🍵 {self.name} loaded')
-        except:
+        except Exception:
             utils.create_channel(app, 'Teagram Logs')
 
             await app.send_message('Teagram Logs', f'[INFO] 🍵 {self.name} loaded')
-    
-    #logging messages    
+
+    # logging messages
     @loader.on(lambda _, __, message: not message.from_user.is_self)
     async def watcher_messages(self, app: Client, message: types.Message):
         return await app.send_message(
@@ -31,7 +32,7 @@ class Logging(loader.Module):
             )
         )
 
-    #logging commands
+    # logging commands
     @loader.on(lambda _, __, message: message.text.startswith(prefix))
     async def watcher_commands(self, app: Client, message: types.Message):
         return await app.send_message(
@@ -40,5 +41,4 @@ class Logging(loader.Module):
                 message.from_user.first_name,
                 message.text.split()
             )
-        )       
-    
+        )
