@@ -14,4 +14,4 @@ def load_db():
     with open('config.json', 'r') as file:
         data = json.loads(file.read())
     
-    return json.dumps(data, indent=4)
+    return data
