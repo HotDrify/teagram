@@ -1,7 +1,7 @@
 import sys
 
 if sys.version_info < (3, 8, 0):
-    print("Требуется Python 3.8 или выше")
+    print("Требуется Python 3.8 или выше\nNeeds Python 3.8 or above")
     sys.exit(1)
 
 
