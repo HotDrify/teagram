@@ -12,6 +12,7 @@ from typing import Any, List, Dict, Literal, Tuple, Union
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
 from pyrogram.types import Chat, Message, User
+from pyrogram import Client
 
 from . import database
 

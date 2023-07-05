@@ -23,7 +23,10 @@ from typing import Union, List, Dict, Any
 from types import FunctionType, LambdaType
 
 from pyrogram import Client, types, filters
-from . import dispatcher, utils, database, bot
+from . import dispatcher, utils, database
+from .inline import core
+
+bot = core.Client
 
 VALID_URL = r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
 VALID_PIP_PACKAGES = re.compile(
@@ -215,7 +218,7 @@ class ModulesManager:
     def __init__(
         self,
         app: Client,
-        db: database.Database,
+        db,
         me: types.User
     ) -> None:
         self.modules: List[Module] = []
