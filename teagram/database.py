@@ -19,8 +19,17 @@ def save_db(api_id: int, hash_id: str, token: str = None, prefix: str = '.', mod
         'modules': modules
     }
 
+<<<<<<< Updated upstream
     with open('config.json', 'w') as file:
         json.dump(data, file, indent=4)
+=======
+    try:
+        with open('./inline/config.json', 'w') as file:
+            json.dump(data, file, indent=4)
+    except:
+        with open('./teagram/inline/config.json', 'w') as file:
+            json.dump(data, file, indent=4)
+>>>>>>> Stashed changes
 
 
 def load_db():
@@ -29,7 +38,27 @@ def load_db():
     Returns:
         dict: The loaded database data.
     """
+<<<<<<< Updated upstream
     with open('config.json', 'r') as file:
         data = json.loads(file.read())
+=======
+    try:
+        with open('./teagram/inline/config.json', 'r') as file:
+            data = file.read()
+    except:
+        with open('./inline/config.json', 'r') as file:
+            data = file.read()
+
+    if not data:
+        data = {
+            'api_id': None,
+            'api_hash': None,
+            'token': None,
+            'prefix': '.',
+            'modules': None
+        }    
+    else:
+        data = json.loads(data)
+>>>>>>> Stashed changes
 
     return data
