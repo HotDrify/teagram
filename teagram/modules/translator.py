@@ -12,10 +12,17 @@ class Translator(loader.Module):
         logging.info(f"[INFO] 🍵 {self.name} loaded")
 
     async def translate(self, app: Client, message: types.Message, args: str):
+        await utils.answer(message,"☕")
         tr = Translator()
         translated = tr.translate(args[0], dest=args[1:])
-        
         await utils.answer(
             message,
-            f'Перевод с {translated.src} на {translated.dest}\nПеревод: {translated.text}\nПроизношение: {translated.pronunciation}'
+            f"""
+🍵 `Teagram | UserBot`
+Переведено с **{translated.src}** на **{translated.dest}**
+**Перевод:**
+`{translated.text}`
+**Произношение:**
+`{translated.pronunciation}`
+            """
         )
