@@ -3,6 +3,7 @@ import logging
 import sys
 import configparser
 
+from . import database
 from datetime import datetime
 from getpass import getpass
 
@@ -14,6 +15,7 @@ from pyrogram.session.session import Session
 from . import __version__
 
 Session.notice_displayed = True
+data = database.load_db()
 
 
 def colored_input(prompt: str = "", hide: bool = False) -> str:
@@ -35,7 +37,7 @@ class Auth:
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
         self.app = Client(
-            session_name=session_name, config_file="./config.ini",
+            name=session_name, api_id=data.get('api_id'), api_hash=data.get('api_hash'),
             parse_mode="html", app_version=f"teagram v{__version__}"
         )
 

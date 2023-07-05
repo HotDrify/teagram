@@ -1,19 +1,19 @@
 import json
 
 
-def save_db(api_id: int, hash_id: str, token: str = None, prefix: str = '.', modules: dict = None):
+def save_db(api_id: int, api_hash: str, token: str = None, prefix: str = '.', modules: dict = None):
     """Save database to a JSON file.
 
     Args:
         api_id (int): The API ID.
-        hash_id (str): The hash ID.
+        api_hash (str): The hash ID.
         token (str, optional): The token. Defaults to None.
         prefix (str, optional): The prefix. Defaults to '.'.
         modules (dict, optional): The modules. Defaults to None.
     """
     data = {
         'api_id': api_id,
-        'hash_id': hash_id,
+        'api_hash': api_hash,
         'token': token,
         'prefix': prefix,
         'modules': modules
@@ -41,13 +41,17 @@ def load_db():
             data = file.read()
 
     if not data:
+        api_id = input('Введите api_id: ')
+        api_hash = input('Введите api_hash: ')
         data = {
-            'api_id': None,
-            'api_hash': None,
+            'api_id': api_id,
+            'api_hash': api_hash,
             'token': None,
             'prefix': '.',
             'modules': None
-        }    
+        }
+
+        save_db(api_id, api_hash)
     else:
         data = json.loads(data)
 

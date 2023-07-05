@@ -8,7 +8,7 @@ if sys.version_info < (3, 8, 0):
 import argparse
 import asyncio
 
-from . import logger, main
+from . import main
 
 
 def parse_arguments():
