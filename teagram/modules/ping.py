@@ -5,7 +5,7 @@ from .. import loader, utils
 
 @loader.module(name="ping")
 class PingModule(loader.Module):
-    """🍵 пинг юзербота."""
+    """🍵 Команда пинг"""
 
     async def pingcmd(self, app: Client, message: types.Message, args: str):
         """🍵 команда для просмотра пинга."""
