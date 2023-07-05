@@ -8,7 +8,7 @@ import functools
 import random
 import string
 from types import FunctionType
-from typing import Any, List, Literal, Tuple, Union, Dict
+from typing import Any, List, Dict, Literal, Tuple, Union
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
 from pyrogram.types import Chat, Message, User
@@ -124,7 +124,6 @@ async def answer(
 
     return messages
 
-
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """Запускает асинхронно нон-асинк функцию
 
@@ -205,7 +204,6 @@ def random_id(size: int = 10) -> str:
         for _ in range(size)
     )
 
-
 def get_color(user_id):
     """Возвращает цвет имени пользователя в Telegram.
 
@@ -213,12 +211,10 @@ def get_color(user_id):
         user_id (int): Идентификатор пользователя.
 
     """
-    colors_list = ["red (orange)", "orange", "violet",
-                   "green", "cyan", "blue", "pink"]
+    colors_list = ["red (orange)", "orange", "violet", "green", "cyan", "blue", "pink"]
     name_color = colors_list[user_id % 7]
 
     return name_color
-
 
 def get_raw(api_method: str, params: Dict) -> Dict:
     """Получает JSON-ответ от Telegram API
@@ -232,7 +228,6 @@ def get_raw(api_method: str, params: Dict) -> Dict:
     """
     response = app.send(api_method, params).json
     return response
-
 
 def get_all_users(client: Client, chat_id: int) -> List[User]:
     """Получает список всех пользователей, которые писали в указанный чат.
@@ -254,7 +249,6 @@ def get_all_users(client: Client, chat_id: int) -> List[User]:
 
     return all_users
 
-
 def get_all_chats(client: Client) -> List[Chat]:
     """Получает список всех чатов, в которых состоит бот или пользователь.
 
@@ -271,7 +265,6 @@ def get_all_chats(client: Client) -> List[Chat]:
         all_chats.append(dialog.chat)
 
     return all_chats
-
 
 def create_poll(
     chat_id: int,
