@@ -49,11 +49,11 @@ def load_db():
         def register():
             try:
                 global api_id, api_hash
-                
+
                 api_id = int(input('Введите api_id: ').strip())
                 if len(api_id) != 8:
                     raise ValueError()
-                
+
                 api_hash = input('Введите api_hash: ').strip()
 
             except ValueError:

@@ -4,7 +4,6 @@ from googletrans import Translator
 from pyrogram import Client, types
 from .. import loader, utils
 
-
 @loader.module(name="Translator")
 class Translator(loader.Module):
     """Используйте Google переводчик прямо через 🍵teagram!"""
@@ -26,3 +25,4 @@ class Translator(loader.Module):
 `{translated.pronunciation}`
             """
         )
+        

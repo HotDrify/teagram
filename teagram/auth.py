@@ -17,6 +17,7 @@ from . import __version__
 Session.notice_displayed = True
 data = database.load_db()
 
+
 class Auth:
     """Авторизация в аккаунт"""
 
@@ -75,10 +76,12 @@ class Auth:
         """Ввести код двухфакторной аутентификации"""
         while True:
             try:
-                passwd = getpass("Введи пароль двухфакторной аутентификации: ")
+                passwd = getpass(
+                    "Введи пароль двухфакторной аутентификации: ")
                 return await self.app.check_password(passwd)
             except errors.BadRequest:
-                logging.error("Неверный пароль, попробуй снова")
+                logging.error(
+                    "Неверный пароль, попробуй снова")
 
     async def authorize(self) -> Union[Tuple[types.User, Client], NoReturn]:
         """Процесс авторизации в аккаунт"""
@@ -92,7 +95,8 @@ class Auth:
             if not logged:
                 me = await self.enter_2fa()
         except errors.SessionRevoked:
-            logging.error("Сессия была сброшена, введи rm teagram.session и заново введи команду запуска")
+            logging.error(
+                "Сессия была сброшена, введи rm teagram.session и заново введи команду запуска")
             await self.app.disconnect()
             return sys.exit(64)
 
