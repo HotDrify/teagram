@@ -41,8 +41,22 @@ def load_db():
             data = file.read()
 
     if not data:
-        api_id = input('Введите api_id: ')
-        api_hash = input('Введите api_hash: ')
+        api_id = None
+        api_hash = None
+        
+        def register():
+            api_id = input('Введите api_id: ').strip()
+            api_hash = input('Введите api_hash: ').strip()
+
+            try:
+                api_id = int(api_id)
+            except ValueError:
+                print('Неправильный тип api_id\nПример: 123456\n')
+
+                register()
+        
+        register()
+
         data = {
             'api_id': api_id,
             'api_hash': api_hash,
