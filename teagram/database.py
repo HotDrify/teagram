@@ -1,4 +1,10 @@
+"""
+тут находится бд
+
+    """
+
 import json
+
 
 def save_db(token: str, prefix: str = '.', modules: dict = None):
     """_summary_
@@ -27,4 +33,3 @@ def load_db():
         data = json.loads(file.read())
 
     return data
-
