@@ -17,10 +17,12 @@ class terminal(loader.Module):
         await utils.answer(
           message,
           f"""
-`🍵 teagram | UserBot`
+```
+🍵 teagram | UserBot
 📥 **input**:
-`{args}`
+{args}
 📤 **output**:
-`{output}`
+{output}
+```
           """
         )
