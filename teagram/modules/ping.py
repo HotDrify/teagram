@@ -10,7 +10,7 @@ class ping(loader.Module):
 
     async def pingcmd(self, app: Client, message: types.Message, args: str):
         """🍵 команда для просмотра пинга."""
-        start_ping = time.perf_counter_ns()
+        start = time.perf_counter_ns()
         await utils.answer(message,"☕")
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
         await utils.answer(
