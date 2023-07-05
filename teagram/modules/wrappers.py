@@ -25,7 +25,7 @@ def wrap_function_to_async(function: Callable) -> Callable:
 
 class WrapModuleToAsync:
     """
-    # Делает то же самое что и wrap_to_async_function, но оборачивает уже целые модули
+    Делает то же самое что и wrap_to_async_function, но оборачивает уже целые модули
     """
 
     def __init__(self, mod: ModuleType):
