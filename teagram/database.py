@@ -15,3 +15,4 @@ def load_db():
         data = json.loads(file.read())
 
     return data
+
