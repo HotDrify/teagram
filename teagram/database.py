@@ -1,7 +1,9 @@
 import json
 
 
-def save_db(api_id: int, api_hash: str, token: str = None, prefix: str = '.', modules: dict = None):
+def save_db(
+        api_id: int, api_hash: str, token: str = None, prefix: str = '.',
+        modules: dict = None):
     """Save database to a JSON file.
 
     Args:
@@ -22,7 +24,7 @@ def save_db(api_id: int, api_hash: str, token: str = None, prefix: str = '.', mo
     try:
         with open('./inline/config.json', 'w') as file:
             json.dump(data, file, indent=4)
-    except:
+    except Exception:
         with open('./teagram/inline/config.json', 'w') as file:
             json.dump(data, file, indent=4)
 
@@ -36,25 +38,28 @@ def load_db():
     try:
         with open('./teagram/inline/config.json', 'r') as file:
             data = file.read()
-    except:
+    except Exception:
         with open('./inline/config.json', 'r') as file:
             data = file.read()
 
     if not data:
         api_id = None
         api_hash = None
-        
-        def register():
-            api_id = input('Введите api_id: ').strip()
-            api_hash = input('Введите api_hash: ').strip()
 
+        def register():
             try:
-                api_id = int(api_id)
+                global api_id
+                api_id = int(input('Введите api_id: ').strip())
+                if len(api_id) != 8:
+                    raise ValueError()
+                global api_hash
+                api_hash = input('Введите api_hash: ').strip()
+
             except ValueError:
-                print('Неправильный тип api_id\nПример: 123456\n')
+                print('Неправильный api_id или api_hash')
 
                 register()
-        
+
         register()
 
         data = {
