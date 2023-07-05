@@ -43,6 +43,12 @@ git clone https://github.com/HotDrify/teagram && cd Teagram
 pip3 install -r requirements.txt
 </pre>
 
+> Также, вы можете установить необязательные зависимости для ускорения работы:
+
+<pre lang="bash">
+pip3 install -r requirements-speedup.txt
+</pre>
+
 
 <h1>Запуск</h1>
 
