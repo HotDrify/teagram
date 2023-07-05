@@ -5,17 +5,19 @@ from .. import loader, utils
 
 @loader.module(name="ping")
 class ping(loader.Module):
-    """Узнайте пинг вашего юзер бота"""
+    """🍵 пинг юзербота."""
 
 
-    async def ping(self, app: Client, message: types.Message, args: str):
-        """Узнайте ваш пинг"""
+    async def pingcmd(self, app: Client, message: types.Message, args: str):
+        """🍵 команда для просмотра пинга."""
         start_ping = time.perf_counter_ns()
-        await utils.answer(message,"⏳")
-        
+        await utils.answer(message,"☕")
+        ping = round((time.perf_counter_ns() - start) / 10**6, 3)
         await utils.answer(
             message,
-            "Твой пинг: " + round((time.perf_counter_ns() - start) / 10**6, 3)
-         
+            f"""
+🍵 `Teagram | UserBot`
+🏓 **Понг!**: `{ping}ms`
+            """
          )
 
