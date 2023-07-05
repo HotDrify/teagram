@@ -39,7 +39,7 @@ apt update && apt upgrade -y && apt install -y openssl git python3 python3-pip
 После этого клонировать репозиторий и установить зависимости:
 
 <pre lang="bash">
-git clone https://github.com/HotDrify/teagram && cd sh1t-ub
+git clone https://github.com/HotDrify/teagram && cd Teagram 
 pip3 install -r requirements.txt
 </pre>
 
