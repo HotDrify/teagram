@@ -1,3 +1,3 @@
-__authors__ = "хз"
+__authors__ = ["HotDrify", "itzLayz", "MuRuLOSE", "y9mphbphh", "codwiz", "y9lavacat"]
 __license__ = "GNU Affero General Public License v3.0"
-__copyright__ = "Copyright (C) 2020-2021 ЧайГрам"
+__copyright__ = "Copyright (C) 2023-2023 TeaGram"
