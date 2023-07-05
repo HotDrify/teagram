@@ -8,6 +8,13 @@ if sys.version_info < (3, 8, 0):
 import argparse
 import asyncio
 
+try:
+    from uvloop import EventLoopPolicy
+    asyncio.set_event_loop_policy(EventLoopPolicy())
+    del EventLoopPolicy
+except ImportError:
+    pass
+
 from . import main
 
 
