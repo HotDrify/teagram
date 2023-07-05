@@ -1,7 +1,3 @@
-"""
-тут находится запуск юб
-
-    """
 import logging
 
 from pyrogram.methods.utilities.idle import idle
