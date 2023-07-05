@@ -18,13 +18,9 @@ class terminal(loader.Module):
           message,
           f"""
 `🍵 teagram | UserBot`
-📥 input:
-`
-{args}
-`
-📤 output:
-`
-{output}
-`
+📥 **input**:
+`{args}`
+📤 **output**:
+`{output}`
           """
         )
