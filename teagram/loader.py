@@ -63,11 +63,16 @@ class Module:
 
     async def on_load(self, app: Client) -> Any:
         """Вызывается при загрузке модуля"""
-        await app.create_channel('Teagram logs')
-        await app.send_message(
-            'Teagram Logs',
-            f'INFO] 🍵 - module {self.name} loaded'
-        )
+        try:
+            await app.send_message(
+                'Teagram Logs',
+                f'INFO] 🍵 - module {self.name} loaded'
+        except:
+            await app.create_channel('Teagram logs')
+            
+            await app.send_message(
+                'Teagram Logs',
+                f'INFO] 🍵 - module {self.name} loaded'
 
 
 class StringLoader(SourceLoader):
