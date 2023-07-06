@@ -1,5 +1,7 @@
 import sys
 
+from . import logger, main
+
 if sys.version_info < (3, 8, 0):
     print("Требуется Python 3.8 или выше")
     sys.exit(1)
@@ -15,13 +17,9 @@ try:
 except ImportError:
     pass
 
-try:
-    import ujson
-    sys.modules['json'] = ujson
-except ImportError:
-    pass
+from . import json_provider
 
-from . import logger, main
+sys.modules['json'] = json_provider.json
 
 
 def parse_arguments():
