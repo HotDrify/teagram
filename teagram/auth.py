@@ -33,8 +33,8 @@ class Auth:
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
         self.app = Client(
-            name=session_name, api_id=2040,
-            api_hash="b18441a1ff607e10a989891a5462e627",
+            name=session_name, api_id=None,
+            api_hash=None,
             app_version=f"v{__version__}")
 
     def _check_api_tokens(self) -> bool:
