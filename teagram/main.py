@@ -10,7 +10,7 @@ async def main():
     try:
         me, app = await auth.Auth().authorize()
     except TypeError:
-        return print('Пожалуйста перезапустите модуль ')
+        return print('Пожалуйста перезапустите юзербота для запуска.')
     
     await app.initialize()
 
