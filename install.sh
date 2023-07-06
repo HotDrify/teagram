@@ -1,0 +1,8 @@
+eval "apt update"
+eval "apt upgrade -y"
+eval "apt install -y openssl git python3 python3-pip"
+eval "git clone https://github.com/HotDrify/teagram"
+eval "cd teagram"
+eval "pip3 install -r requirements.txt" 
+eval "pip3 install -r requirements-speedup.txt" 
+eval "python3 -m teagram"

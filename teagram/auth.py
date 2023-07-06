@@ -32,9 +32,9 @@ class Auth:
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
         self.app = Client(
-            name=session_name, api_id=2040, api_hash="b18441a1ff607e10a989891a5462e627",
-            app_version=f"v{__version__}"
-        )
+            name=session_name, api_id=2040,
+            api_hash="b18441a1ff607e10a989891a5462e627",
+            app_version=f"v{__version__}")
 
     def _check_api_tokens(self) -> bool:
         """Проверит установлены ли токены, если нет, то начинает установку"""
@@ -84,7 +84,8 @@ class Auth:
         """Ввести код двухфакторной аутентификации"""
         while True:
             try:
-                passwd = colored_input("Введи пароль двухфакторной аутентификации: ", True)
+                passwd = colored_input(
+                    "Введи пароль двухфакторной аутентификации: ", True)
                 return await self.app.check_password(passwd)
             except errors.BadRequest:
                 logging.error("Неверный пароль, попробуй снова")
@@ -100,6 +101,8 @@ class Auth:
             logged = await self.enter_code(phone, phone_code_hash)
             if not logged:
                 me = await self.enter_2fa()
+            else:
+                me = await self.app.get_me()
         except errors.SessionRevoked:
             logging.error("Сессия была сброшена, удали teagram.session и заново введи команду запуска")
             await self.app.disconnect()
