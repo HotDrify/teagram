@@ -67,7 +67,7 @@ def load_db():
         register()
 
         data = {
-            'api_id': api_id,
+            'api_id': str(api_id),
             'api_hash': api_hash,
             'token': None,
             'prefix': '.',
