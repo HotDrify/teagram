@@ -3,7 +3,7 @@ import logging
 import sys
 import configparser
 
-from . import database
+from . import db
 from datetime import datetime
 from getpass import getpass
 
@@ -15,7 +15,7 @@ from pyrogram.session.session import Session
 from . import __version__
 
 Session.notice_displayed = True
-data = database.load_db()
+data = db.load_db()
 
 api_id = str(data.get('api_id'))
 api_hash = data.get('api_hash')

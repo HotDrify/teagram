@@ -1,7 +1,7 @@
 from pyrogram import Client
-from .. import database
+from .. import db
 
-_db = database.load_db()
+_db = db.load_db()
 
 client = Client(
     name='Teagram',
