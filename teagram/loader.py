@@ -74,7 +74,7 @@ class Module:
             await app.send_message(
                 'Teagram Logs',
                 f'INFO] 🍵 - module {self.name} loaded'
-
+            )
 
 class StringLoader(SourceLoader):
     """Загружает модуль со строки"""
