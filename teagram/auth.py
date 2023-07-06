@@ -17,6 +17,8 @@ from . import __version__
 Session.notice_displayed = True
 data = database.load_db()
 
+api_id = str(data.get('api_id'))
+api_hash = data.get('api_hash')
 
 class Auth:
     """Авторизация в аккаунт"""
@@ -24,7 +26,7 @@ class Auth:
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
         self.app = Client(
-            name=session_name, api_id=data.get('api_id'), api_hash=data.get('api_hash'),
+            name=session_name, api_id=api_id, api_hash=api_hash,
             parse_mode="html", app_version=f"teagram v{__version__}"
         )
 
@@ -33,8 +35,8 @@ class Auth:
         config = configparser.ConfigParser()
         if not config.read("./config.ini"):
             config["pyrogram"] = {
-                "api_id": data.get('api_id'),
-                "api_hash": data.get('api_hash')
+                "api_id": api_id,
+                "api_hash": api_hash
             }
 
             with open("./config.ini", "w") as file:

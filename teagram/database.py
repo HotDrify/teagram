@@ -3,7 +3,6 @@ try:
 except ImportError:
     import json
 
-
 def save_db(
         api_id: int, api_hash: str, token: str = None, prefix: str = '.',
         modules: dict = None):
@@ -51,7 +50,8 @@ def load_db():
 
         def register():
             try:
-                global api_id, api_hash
+                global api_id
+                global api_hash
 
                 api_id = int(input('Введите api_id: ').strip())
                 if len(str(api_id)) != 8:
@@ -59,6 +59,7 @@ def load_db():
 
                 api_hash = input('Введите api_hash: ').strip()
 
+                save_db(str(api_id), api_hash)
             except ValueError:
                 print('Неправильный api_id или api_hash')
 
@@ -67,14 +68,13 @@ def load_db():
         register()
 
         data = {
-            'api_id': str(api_id),
+            'api_id': api_id,
             'api_hash': api_hash,
             'token': None,
             'prefix': '.',
             'modules': None
         }
-
-        save_db(str(api_id), api_hash)
+        print(data)
     else:
         data = json.loads(data)
 
