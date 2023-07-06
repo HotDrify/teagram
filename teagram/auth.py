@@ -101,7 +101,7 @@ class Auth:
             if not logged:
                 me = await self.enter_2fa()
         except errors.SessionRevoked:
-            logging.error("Сессия была сброшена, введи rm sh1t-ub.session и заново введи команду запуска")
+            logging.error("Сессия была сброшена, удали teagram.session и заново введи команду запуска")
             await self.app.disconnect()
             return sys.exit(64)
 
