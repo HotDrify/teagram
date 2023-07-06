@@ -36,10 +36,6 @@ async def execute_python_code(code, env: dict = {}):
 @loader.module(name="Eval")
 class EvalModule(loader.Module):
     """Используйте eval прямо через 🍵teagram!"""
-    async def on_load(self, app: Client):
-        logging.info(f"[INFO] 🍵 {self.name} loaded")
-        await app.send_message('Teagram Logs', f"[INFO] 🍵 {self.name} loaded")
-
     async def e(self, app: Client, message: types.Message, args: str):
         result = await execute_python_code(
             args,

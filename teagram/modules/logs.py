@@ -10,17 +10,7 @@ prefix = database.load_db().get('prefix')
 @loader.module(name="Logging")
 class LoggingModule(loader.Module):
     """Simple logging with teagram"""
-
-    async def on_load(self, app: Client):
-        logging.info(f"[INFO] 🍵 {self.name} loaded")
-
-        try:
-            await app.send_message('Teagram Logs', f'[INFO] 🍵 {self.name} loaded')
-        except Exception:
-            utils.create_channel(app, 'Teagram Logs')
-
-            await app.send_message('Teagram Logs', f'[INFO] 🍵 {self.name} loaded')
-
+    
     # logging messages
     @loader.on(lambda _, __, message: not message.from_user.is_self)
     async def watcher_messages(self, app: Client, message: types.Message):

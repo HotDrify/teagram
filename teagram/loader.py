@@ -66,6 +66,14 @@ class Module:
 
     async def on_load(self, app: Client) -> Any:
         """Вызывается при загрузке модуля"""
+        logging.info(f"[INFO] 🍵 {self.name} loaded")
+
+        try:
+            await app.send_message('Teagram Logs', f'[INFO] 🍵 {self.name} loaded')
+        except Exception:
+            utils.create_channel(app, 'Teagram Logs')
+
+            await app.send_message('Teagram Logs', f'[INFO] 🍵 {self.name} loaded')
 
 
 class StringLoader(SourceLoader):

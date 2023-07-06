@@ -8,9 +8,6 @@ from .. import loader, utils
 @loader.module(name="Translator")
 class TranslatorModule(loader.Module):
     """Используйте Google переводчик прямо через 🍵teagram!"""
-    async def on_load(self, app: Client):
-        logging.info(f"[INFO] 🍵 {self.name} loaded")
-
     async def translate(self, app: Client, message: types.Message, args: str):
         await utils.answer(message, "☕")
         tr = Translator()

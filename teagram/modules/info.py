@@ -16,7 +16,7 @@ def byter(num: float, suffix: str = "B") -> str:
 @loader.module(name="UserBot")
 class AboutModule(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
-    async def infocmd(self app: Client, message: types.Message):
+    async def infocmd(self, app: Client, message: types.Message):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
         me = app.get_me()
@@ -46,8 +46,7 @@ class AboutModule(loader.Module):
 **Процессор**: `{platform.processor()}`
 **Имя хоста**: `{socket.gethostname()}`
 **Работает с**: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
-          """
-        )
+          """)
         
     async def ubcmd(self, app: Client, message: types.Message, args: str):
         """информация о UserBot"""
