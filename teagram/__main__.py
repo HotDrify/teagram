@@ -8,12 +8,25 @@ if sys.version_info < (3, 8, 0):
 import argparse
 import asyncio
 
+try:
+    from uvloop import EventLoopPolicy
+    asyncio.set_event_loop_policy(EventLoopPolicy())
+    del EventLoopPolicy
+except ImportError:
+    pass
+
+try:
+    import ujson
+    sys.modules['json'] = ujson
+except ImportError:
+    pass
+
 from . import logger, main
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog="tagram", description="Userbot",
+        prog="teagram", description="Userbot",
         epilog="Канал: ", add_help=False
     )
     return parser.parse_args()
