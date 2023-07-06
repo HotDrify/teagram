@@ -3,17 +3,19 @@ try:
 except ImportError:
     import json
 
+from typing import Union
+
 def save_db(
-        api_id: int, api_hash: str, token: str = None, prefix: str = '.',
-        modules: dict = None):
+        api_id: Union[int, str], api_hash: str, token: str = '', prefix: str = '.',
+        modules: dict = {}):
     """Save database to a JSON file.
 
     Args:
-        api_id (int): The API ID.
+        api_id (Union[int, str]): The API ID.
         api_hash (str): The hash ID.
-        token (str, optional): The token. Defaults to None.
+        token (str, optional): The token. Defaults to ''.
         prefix (str, optional): The prefix. Defaults to '.'.
-        modules (dict, optional): The modules. Defaults to None.
+        modules (dict, optional): The modules. Defaults to {}.
     """
     data = {
         'api_id': api_id,
@@ -24,10 +26,10 @@ def save_db(
     }
 
     try:
-        with open('./inline/config.json', 'w') as file:
+        with open('./config.json', 'w') as file:
             json.dump(data, file, indent=4)
     except Exception:
-        with open('./teagram/inline/config.json', 'w') as file:
+        with open('./teagram/config.json', 'w') as file:
             json.dump(data, file, indent=4)
 
 
@@ -38,10 +40,10 @@ def load_db():
         dict: The loaded database data.
     """
     try:
-        with open('./teagram/inline/config.json', 'r') as file:
+        with open('./teagram/config.json', 'r') as file:
             data = file.read()
     except Exception:
-        with open('./inline/config.json', 'r') as file:
+        with open('./config.json', 'r') as file:
             data = file.read()
 
     if not data:
