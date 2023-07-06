@@ -74,7 +74,7 @@ def load_db():
             'modules': None
         }
 
-        save_db(api_id, api_hash)
+        save_db(str(api_id), api_hash)
     else:
         data = json.loads(data)
 
