@@ -74,7 +74,6 @@ def load_db():
             'prefix': '.',
             'modules': None
         }
-        print(data)
     else:
         data = json.loads(data)
 
