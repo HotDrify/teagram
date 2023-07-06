@@ -32,9 +32,13 @@ class Auth:
 
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
+
+        config = configparser.ConfigParser()
+        config.read('./config.ini')
+
         self.app = Client(
-            name=session_name, api_id=None,
-            api_hash=None,
+            name=session_name, api_id=config.get('pyrogram', 'api_id'),
+            api_hash=config.get('pyrogram', 'api_hash'),
             app_version=f"v{__version__}")
 
     def _check_api_tokens(self) -> bool:
@@ -57,7 +61,16 @@ class Auth:
             error_text: str = ""
 
             try:
-                phone = colored_input("Введи номер телефона: ")
+                config = configparser.ConfigParser()
+                config.read('./config.ini')
+                try:
+                    phone = config.get('pyrogram', 'phone_number')
+                except:
+                    phone = colored_input("Введи номер телефона: ")
+                    config.set('pyrogram', 'phone_number', phone)
+                    with open('./config.ini', 'w') as file:
+                        config.write(file)
+
                 return phone, (await self.app.send_code(phone)).phone_code_hash
             except errors.PhoneNumberInvalid:
                 error_text = "Неверный номер телефона, попробуй ещё раз"
@@ -84,12 +97,25 @@ class Auth:
     async def enter_2fa(self) -> types.User:
         """Ввести код двухфакторной аутентификации"""
         while True:
+            config = configparser.ConfigParser()
+            config.read('./config.ini')
+
             try:
-                passwd: str = colored_input(
-                    "Введи пароль двухфакторной аутентификации: ", True)
-                return await self.app.check_password(passwd)
+                try:
+                    password = config.get('pyrogram', '2fa_password')
+                except:
+                    password = colored_input("Введи пароль двухфакторной аутентификации: ", True)
+                    config.set('pyrogram', '2fa_password', password)
+                    with open('./config.ini', 'w') as file:
+                        config.write(file)
+
+                return await self.app.check_password(password)
             except errors.BadRequest:
                 logging.error("Неверный пароль, попробуй снова")
+                config.remove_option('pyrogram', '2fa_password')
+
+                with open('./config.ini', 'w') as file:
+                    config.write(file)
 
     async def authorize(self) -> Union[Tuple[types.User, Client], NoReturn]:
         """Процесс авторизации в аккаунт"""
