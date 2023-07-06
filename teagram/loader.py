@@ -222,7 +222,7 @@ class ModulesManager:
         self.inline_handlers: Dict[str, FunctionType] = {}
         self.callback_handlers: Dict[str, FunctionType] = {}
 
-        self._local_modules_path: str = "material/modules/"
+        self._local_modules_path: str = "./teagram/modules"
 
         self._app = app
         self._db = db
@@ -283,18 +283,17 @@ class ModulesManager:
         sys.modules[module.__name__] = module
         spec.loader.exec_module(module)
 
+
         instance = None
         for key, value in vars(module).items():
             if key.endswith("Mod") and issubclass(value, Module):
-                value: Module
-
                 for module in self.modules:
                     if module.__class__.__name__ == value.__name__:
                         self.unload_module(module, True)
 
                 value.db = self._db
                 value.all_modules = self
-                value.bot = self.bot_manager.bot
+                value.bot = self.bot_manager
 
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)

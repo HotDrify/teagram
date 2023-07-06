@@ -19,7 +19,7 @@ class CloudDatabase:
         """Информация о чате с данными"""
         if not self.data_chat:
             chat = [
-                dialog.chat async for dialog in self._app.iter_dialogs()
+                dialog.chat async for dialog in self._app.get_dialogs()
                 if dialog.chat.title == f"teagram-{self._me.id}-data"
                 and dialog.chat.type == "supergroup"
             ]

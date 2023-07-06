@@ -17,7 +17,7 @@ def byter(num: float, suffix: str = "B") -> str:
     return "%.1f%s%s" % (num, "Yi", suffix)
 
 @loader.module(name="UserBot")
-class AboutModule(loader.Module):
+class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
     
     async def infocmd(self, app: Client, message: types.Message):

@@ -4,11 +4,11 @@ from pyrogram import Client, types
 
 from .. import database, loader, utils
 
-prefix = database.load_db().get('prefix')
+prefix = '.'
 
 
 @loader.module(name="Logging")
-class LoggingModule(loader.Module):
+class LoggingMod(loader.Module):
     """Simple logging with teagram"""
     
     # logging messages

@@ -7,7 +7,7 @@ from .. import loader, utils
 
 
 @loader.module(name="Terminal")
-class TerminalModule(loader.Module):
+class TerminalMod(loader.Module):
     """Используйте терминал BASH прямо через 🍵teagram!"""
     async def terminal(self, app: Client, message: types.Message, args: str):
         await utils.answer(message, "☕")

@@ -7,7 +7,7 @@ from .. import loader, utils
 
 
 @loader.module(name="Translator")
-class TranslatorModule(loader.Module):
+class TranslatorMod(loader.Module):
     """Используйте Google переводчик прямо через 🍵teagram!"""
 
     async def translate(self, app: Client, message: types.Message, args: str):

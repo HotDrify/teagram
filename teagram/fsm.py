@@ -116,16 +116,18 @@ class Conversation:
                 Время ожидания ответа
         """
         responses = self.app.get_chat_history(self.chat_id, limit=1)
-        while responses[0].from_user.is_self:
-            timeout -= 1
-            if not timeout:
-                raise RuntimeError("Истекло время ожидания ответа")
+        async for response in responses:
+            if response.from_user.is_self:
+                timeout -= 1
+                if timeout == 0:
+                    raise RuntimeError("Истекло время ожидания ответа")
 
-            await asyncio.sleep(1)
-            responses = await self.app.get_history(self.chat_id, limit=1)
+                await asyncio.sleep(1)
+                responses = self.app.get_chat_history(self.chat_id, limit=1)
 
-        self.messagee_to_purge.append(responses[0])
-        return responses[0]
+        self.messagee_to_purge.append(response)
+        return response
+
 
     async def _purge(self) -> bool:
         """Удалить все отправленные и полученные сообщения"""
