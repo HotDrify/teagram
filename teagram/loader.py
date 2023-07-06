@@ -67,9 +67,10 @@ class Module:
             await app.send_message(
                 'Teagram Logs',
                 f'INFO] 🍵 - module {self.name} loaded'
+            )
         except:
             await app.create_channel('Teagram logs')
-            
+
             await app.send_message(
                 'Teagram Logs',
                 f'INFO] 🍵 - module {self.name} loaded'
