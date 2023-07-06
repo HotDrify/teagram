@@ -1,10 +1,12 @@
-from pyrogram import Client, types
-from .. import loader, utils
-from .. import __version__
-import psutil
 import platform
 import socket
 from datetime import datetime
+
+import psutil
+from pyrogram import Client, types
+
+from .. import __version__, loader, utils
+
 
 def byter(num: float, suffix: str = "B") -> str:
     for unit in ["B", "K", "M", "G", "T", "P", "E", "Z"]:
@@ -13,9 +15,11 @@ def byter(num: float, suffix: str = "B") -> str:
         num /= 1024.0
 
     return "%.1f%s%s" % (num, "Yi", suffix)
+
 @loader.module(name="UserBot")
 class AboutModule(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
+    
     async def infocmd(self, app: Client, message: types.Message):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
@@ -23,9 +27,9 @@ class AboutModule(loader.Module):
         boot = psutil.boot_time()
         bt = datetime.fromtimestamp(boot)
         await utils.answer(
-          message,
-          f"""
-`🍵teagram | UserBot`
+            message,
+            f"""
+`🍵 teagram | UserBot`
 
 `💻 UserBot`
 **Владелец**: `{me.username}`
@@ -46,9 +50,9 @@ class AboutModule(loader.Module):
 **Процессор**: `{platform.processor()}`
 **Имя хоста**: `{socket.gethostname()}`
 **Работает с**: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
-          """)
+            """)
         
-    async def ubcmd(self, app: Client, message: types.Message, args: str):
+    async def ubinfocmd(self, app: Client, message: types.Message, args: str):
         """информация о UserBot"""
         await utils.answer(message, "☕")
         await utils.answer(message, '''🤔 <b>Что такое юзербот?</b>

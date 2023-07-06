@@ -7,11 +7,7 @@ from . import auth, database, loader
 
 async def main():
     """Основной цикл юзербота"""
-    try:
-        me, app = await auth.Auth().authorize()
-    except TypeError:
-        return print('Пожалуйста перезапустите юзербота для запуска.')
-    
+    me, app = await auth.Auth().authorize()
     await app.initialize()
 
     db = database.db

@@ -1,4 +1,4 @@
-from logging import basicConfig, DEBUG
+from logging import DEBUG, basicConfig
 
 basicConfig(
     filename="logs/debug.log",

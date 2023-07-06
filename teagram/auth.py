@@ -1,24 +1,29 @@
-import logging
-
-import sys
 import configparser
-
-from . import db
+import logging
+import sys
 from datetime import datetime
 from getpass import getpass
+from typing import NoReturn, Tuple, Union
 
-from typing import Union, Tuple, NoReturn
-
-from pyrogram import Client, types, errors
+from pyrogram import Client, errors, types
 from pyrogram.session.session import Session
 
 from . import __version__
 
 Session.notice_displayed = True
-data = db.load_db()
 
-api_id = str(data.get('api_id'))
-api_hash = data.get('api_hash')
+
+def colored_input(prompt: str = "", hide: bool = False) -> str:
+    """Цветной инпут"""
+    frame = sys._getframe(1)
+    return (input if not hide else getpass)(
+        "\x1b[32m{time:%Y-%m-%d %H:%M:%S}\x1b[0m | "
+        "\x1b[1m{level: <8}\x1b[0m | "
+        "\x1b[36m{name}\x1b[0m:\x1b[36m{function}\x1b[0m:\x1b[36m{line}\x1b[0m - \x1b[1m{prompt}\x1b[0m".format(
+            time=datetime.now(), level="INPUT", name=frame.f_globals["__name__"],
+            function=frame.f_code.co_name, line=frame.f_lineno, prompt=prompt
+        )
+    )
 
 
 class Auth:
@@ -27,8 +32,8 @@ class Auth:
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
         self.app = Client(
-            name=session_name, api_id=api_id, api_hash=api_hash,
-            parse_mode="html", app_version=f"teagram v{__version__}"
+            name=session_name, api_id=2040, api_hash="b18441a1ff607e10a989891a5462e627",
+            app_version=f"v{__version__}"
         )
 
     def _check_api_tokens(self) -> bool:
@@ -36,8 +41,8 @@ class Auth:
         config = configparser.ConfigParser()
         if not config.read("./config.ini"):
             config["pyrogram"] = {
-                "api_id": api_id,
-                "api_hash": api_hash
+                "api_id": colored_input("Введи API ID: "),
+                "api_hash": colored_input("Введи API hash: ")
             }
 
             with open("./config.ini", "w") as file:
@@ -51,21 +56,18 @@ class Auth:
             error_text: str = None
 
             try:
-                phone = input(
-                    "Введи номер телефона\nEnter phone number: ")
+                phone = colored_input("Введи номер телефона: ")
                 return phone, (await self.app.send_code(phone)).phone_code_hash
             except errors.PhoneNumberInvalid:
-                error_text = "Неверный номер телефона, попробуй ещё раз\nWrong phone number, try again"
+                error_text = "Неверный номер телефона, попробуй ещё раз"
             except errors.PhoneNumberBanned:
-                error_text = "Номер телефона заблокирован\nPhone number banned"
-            except errors.PhoneNumberFlood as e:
-                seconds = e.seconds
-                error_text = f"Слишком много попыток входа, пожалуйста подождите {e.seconds}\n\
-                    Too many login attempts, please wait {e.seconds}"
+                error_text = "Номер телефона заблокирован"
+            except errors.PhoneNumberFlood:
+                error_text = "На номере телефона флудвейт"
             except errors.PhoneNumberUnoccupied:
-                error_text = "Номер не зарегистрирован\nNumber not registered"
+                error_text = "Номер не зарегистрирован"
             except errors.BadRequest as error:
-                error_text = f"Произошла неизвестная ошибка: {error}\nAn unknown error occurred: {error}"
+                error_text = f"Произошла неизвестная ошибка: {error}"
 
             if error_text:
                 logging.error(error_text)
@@ -73,8 +75,7 @@ class Auth:
     async def enter_code(self, phone: str, phone_code_hash: str) -> Union[types.User, bool]:
         """Ввести код подтверждения"""
         try:
-            code = input(
-                "Введи код подтверждения\nEnter confirmation code: ")
+            code = colored_input("Введи код подтверждения: ")
             return await self.app.sign_in(phone, phone_code_hash, code)
         except errors.SessionPasswordNeeded:
             return False
@@ -83,12 +84,10 @@ class Auth:
         """Ввести код двухфакторной аутентификации"""
         while True:
             try:
-                passwd = getpass(
-                    "Введи пароль двухфакторной аутентификации (2FA PASS): ")
+                passwd = colored_input("Введи пароль двухфакторной аутентификации: ", True)
                 return await self.app.check_password(passwd)
             except errors.BadRequest:
-                logging.error(
-                    "Неверный пароль, попробуй снова\nWrong password, try again")
+                logging.error("Неверный пароль, попробуй снова")
 
     async def authorize(self) -> Union[Tuple[types.User, Client], NoReturn]:
         """Процесс авторизации в аккаунт"""
@@ -102,9 +101,7 @@ class Auth:
             if not logged:
                 me = await self.enter_2fa()
         except errors.SessionRevoked:
-            logging.error(
-                "Сессия была сброшена, удали teagram.session и заново введи команду запуска\n\
-                    Session was revoked, remove teagram.session and restart")
+            logging.error("Сессия была сброшена, введи rm sh1t-ub.session и заново введи команду запуска")
             await self.app.disconnect()
             return sys.exit(64)
 

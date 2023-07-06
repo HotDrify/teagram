@@ -1,7 +1,7 @@
 import asyncio
+from typing import Union
 
 from pyrogram import Client, types
-from typing import Union
 
 
 class CloudDatabase:
@@ -20,12 +20,12 @@ class CloudDatabase:
         if not self.data_chat:
             chat = [
                 dialog.chat async for dialog in self._app.iter_dialogs()
-                if dialog.chat.title == f"material-{self._me.id}-data"
+                if dialog.chat.title == f"teagram-{self._me.id}-data"
                 and dialog.chat.type == "supergroup"
             ]
 
             if not chat:
-                self.data_chat = await self._app.create_supergroup(f"material-{self._me.id}-data")
+                self.data_chat = await self._app.create_supergroup(f"teagram-{self._me.id}-data")
             else:
                 self.data_chat = chat[0]
 

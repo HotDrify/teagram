@@ -1,8 +1,8 @@
 import logging
 
 from pyrogram import Client, types
-from .. import loader, utils
-from .. import database
+
+from .. import database, loader, utils
 
 prefix = database.load_db().get('prefix')
 

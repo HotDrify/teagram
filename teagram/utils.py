@@ -1,18 +1,12 @@
-"""
-тут находится методы для работы с тг протоколм
-
-    """
-
 import asyncio
 import functools
 import random
 import string
 from types import FunctionType
-from typing import Any, List, Dict, Literal, Tuple, Union
+from typing import Any, List, Literal, Tuple, Union
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
 from pyrogram.types import Chat, Message, User
-from pyrogram import Client
 
 from . import database
 
@@ -125,6 +119,7 @@ async def answer(
 
     return messages
 
+
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """Запускает асинхронно нон-асинк функцию
 
@@ -205,86 +200,4 @@ def random_id(size: int = 10) -> str:
         for _ in range(size)
     )
 
-def get_color(user_id):
-    """Возвращает цвет имени пользователя в Telegram.
 
-    Параметры:
-        user_id (int): Идентификатор пользователя.
-
-    """
-    colors_list = ["red (orange)", "orange", "violet", "green", "cyan", "blue", "pink"]
-    name_color = colors_list[user_id % 7]
-
-    return name_color
-
-def get_raw(api_method: str, params: Dict) -> Dict:
-    """Получает JSON-ответ от Telegram API
-
-    Параметры:
-        api_method (str): Метод API для вызова
-        params (Dict): Параметры для запроса
-
-    Возвращает:
-        Dict: JSON-ответ от Telegram API
-    """
-    response = app.send(api_method, params).json
-    return response
-
-def get_all_users(client: Client, chat_id: int) -> List[User]:
-    """Получает список всех пользователей, которые писали в указанный чат.
-
-    Параметры:
-        - client: объект Pyrogram API;
-        - chat_id: идентификатор чата.
-
-    Возвращает:
-        - список пользователей типа List[User].
-    """
-
-    all_users = []
-
-    for message in client.iter_history(chat_id, limit=None):
-        user = message.from_user
-        if user and user not in all_users:
-            all_users.append(user)
-
-    return all_users
-
-def get_all_chats(client: Client) -> List[Chat]:
-    """Получает список всех чатов, в которых состоит бот или пользователь.
-
-    Параметры:
-        - client: объект Pyrogram API.
-
-    Возвращает:
-        - список чатов типа List[Chat].
-    """
-
-    all_chats = []
-
-    for dialog in client.iter_dialogs():
-        all_chats.append(dialog.chat)
-
-    return all_chats
-
-def create_poll(
-    chat_id: int,
-    question: str,
-    options: List[str],
-) -> None:
-    """Создает голосование в чате.
-
-    Параметры:
-        - chat_id: идентификатор чата;
-        - question: текст вопроса в голосовании;
-        - options: список вариантов ответа в голосовании.
-
-    Возвращает:
-        - Ничего не возвращает.
-    """
-    with client:
-        client.send_poll(
-            chat_id=chat_id,
-            question=question,
-            options=options
-        )

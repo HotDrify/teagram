@@ -1,24 +1,21 @@
 import logging
-
 from asyncio import sleep
-from aiogram.types import (
-    Message,
-    CallbackQuery,
-    InlineQuery,
-    InlineQueryResultArticle,
-    InputTextMessageContent,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton
-)
 
+from aiogram.types import (CallbackQuery, InlineKeyboardButton,
+                            InlineKeyboardMarkup, InlineQuery,
+                            InlineQueryResultArticle, InputTextMessageContent,
+                            Message)
 from pyrogram import Client, types
-from .. import loader, utils  # ".." - т.к. модули находятся в папке teagram/modules, то нам нужно на уровень выше
-                              # loader, modules, bot - файлы из папки teagram
+
+from .. import (  # ".." - т.к. модули находятся в папке teagram/modules, то нам нужно на уровень выше
+    loader, utils)
+
+                            # loader, modules, bot - файлы из папки teagram
 
 
 @loader.module(name="Example", author="teagram", version=1)  # name модуля ("name" обязательный аргумент, остальное — нет), author - автор, version - версия
 class ExampleMod(loader.Module):  # Example - название класса модуля
-                                  # Mod в конце названия обязательно
+                                # Mod в конце названия обязательно
     """Описание модуля"""
 
     def __init__(self):
@@ -65,7 +62,7 @@ class ExampleMod(loader.Module):  # Example - название класса мо
             "Ого пример каллбека", show_alert=True)
 
     async def examplecmd(self, app: Client, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
-                                                                                  # args - аргументы после команды. необязательный аргумент
+                                                                            # args - аргументы после команды. необязательный аргумент
         """Описание команды. Использование: example [аргументы]"""
         await utils.answer(  # utils.answer - это отправка сообщений, код можно посмотреть в utils
             message, "Ого пример команды" + (

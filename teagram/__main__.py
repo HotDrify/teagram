@@ -1,28 +1,21 @@
-from sys import version_info
+import sys
 
-if version_info < (3, 8, 0):
-    print("Требуется Python 3.8 или выше\nNeeds Python 3.8 or above")
-    exit(1)
+if sys.version_info < (3, 8, 0):
+    print("Требуется Python 3.8 или выше")
+    sys.exit(1)
 
 
-from argparse import ArgumentParser
+import argparse
 import asyncio
 
-try:
-    from uvloop import EventLoopPolicy
-    asyncio.set_event_loop_policy(EventLoopPolicy())
-    del EventLoopPolicy
-except ImportError:
-    pass
-
-from . import main
+from . import logger, main
 
 
 def parse_arguments():
-    parser = ArgumentParser(
-        prog="teagram"
+    parser = argparse.ArgumentParser(
+        prog="tagram", description="Userbot",
+        epilog="Канал: ", add_help=False
     )
-
     return parser.parse_args()
 
 

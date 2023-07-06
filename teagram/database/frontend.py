@@ -1,7 +1,8 @@
+from typing import KT, VT, Union
+
 from lightdb import LightDB
 from pyrogram import Client, types
 
-from typing import Union, KT, VT
 from . import CloudDatabase
 
 
