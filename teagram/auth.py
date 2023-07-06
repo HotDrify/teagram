@@ -6,11 +6,12 @@ from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
 from pyrogram import Client, errors, types
+from pyrogram.types import User
 from pyrogram.session.session import Session
 
 from . import __version__
 
-Session.notice_displayed = True
+Session.notice_displayed: bool = True
 
 
 def colored_input(prompt: str = "", hide: bool = False) -> str:
@@ -53,7 +54,7 @@ class Auth:
     async def send_code(self) -> Tuple[str, str]:
         """Отправить код подтверждения"""
         while True:
-            error_text: str = None
+            error_text: str = ""
 
             try:
                 phone = colored_input("Введи номер телефона: ")
@@ -75,7 +76,7 @@ class Auth:
     async def enter_code(self, phone: str, phone_code_hash: str) -> Union[types.User, bool]:
         """Ввести код подтверждения"""
         try:
-            code = colored_input("Введи код подтверждения: ")
+            code: str = colored_input("Введи код подтверждения: ")
             return await self.app.sign_in(phone, phone_code_hash, code)
         except errors.SessionPasswordNeeded:
             return False
@@ -84,7 +85,7 @@ class Auth:
         """Ввести код двухфакторной аутентификации"""
         while True:
             try:
-                passwd = colored_input(
+                passwd: str = colored_input(
                     "Введи пароль двухфакторной аутентификации: ", True)
                 return await self.app.check_password(passwd)
             except errors.BadRequest:
@@ -93,18 +94,16 @@ class Auth:
     async def authorize(self) -> Union[Tuple[types.User, Client], NoReturn]:
         """Процесс авторизации в аккаунт"""
         await self.app.connect()
-
         try:
-            me = await self.app.get_me()
-        except errors.AuthKeyUnregistered:
             phone, phone_code_hash = await self.send_code()
-            logged = await self.enter_code(phone, phone_code_hash)
+            logged: User | bool = await self.enter_code(phone, phone_code_hash)
             if not logged:
-                me = await self.enter_2fa()
+                me: User = await self.enter_2fa()
             else:
-                me = await self.app.get_me()
+                me: User = await self.app.get_me()
         except errors.SessionRevoked:
-            logging.error("Сессия была сброшена, удали teagram.session и заново введи команду запуска")
+            logging.error(
+                "Сессия была сброшена, удали teagram.session и заново введи команду запуска")
             await self.app.disconnect()
             return sys.exit(64)
 
