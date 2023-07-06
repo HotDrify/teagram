@@ -25,7 +25,7 @@ def wrap_function_to_async(function: Callable) -> Callable:
 
 
 class WrapModuleToAsync:
-    """Делает то же самое что и wrap_to_async_function, но обворачивает уже целые модули"""
+    """Делает то же самое что и wrap_function_to_async но обворачивает уже целые модули"""
 
     def __init__(self, mod: ModuleType):
         for attr in dir(mod):
@@ -35,3 +35,5 @@ class WrapModuleToAsync:
             if callable(item) and not iscoroutinefunction(item) and not iscoroutine(item):
                 wrapped = wrap_function_to_async(item)
                 setattr(self, attr, wrapped)
+            else:
+                setattr(self, attr, item)
