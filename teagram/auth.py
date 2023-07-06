@@ -56,8 +56,9 @@ class Auth:
                 error_text = "Неверный номер телефона, попробуй ещё раз"
             except errors.PhoneNumberBanned:
                 error_text = "Номер телефона заблокирован"
-            except errors.PhoneNumberFlood:
-                error_text = "На номере телефона флудвейт"
+            except errors.PhoneNumberFlood as e:
+                seconds = e.seconds
+                error_text = f"Слишком много попыток входа, пожалуйста подождите {e.seconds}"
             except errors.PhoneNumberUnoccupied:
                 error_text = "Номер не зарегистрирован"
             except errors.BadRequest as error:
