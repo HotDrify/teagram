@@ -13,25 +13,15 @@ except ImportError:
             import json
 
 _jname: str = json.__name__.lower().strip()
-if _jname != "ujson":
+
+if _jname != "json":
     import json as _json
-
-
-class JSONDecoder:
-    def __init__(self) -> None:
-        if _jname == "ujson":
-            decode: Callable = json.decode
-        else:
-            self.decode: Callable = _json.JSONDecoder().decode
-
-
-class JSONEncoder:
-    def __init__(self) -> None:
-        if _jname == "ujson":
-            self.encode: Callable = json.encode
-        else:
-            self.encode: Callable = _json.JSONEncoder().encode
-
-
-json.JSONEncoder = JSONEncoder
-json.JSONDecoder = JSONDecoder
+    json_attr = dir(json)
+    missing = dir(_json)
+    for i in json_attr:
+        if i in missing:
+            missing.remove(i)
+        
+    for item in missing:
+        json_item = getattr(_json, item)
+        setattr(json, item, json_item)
