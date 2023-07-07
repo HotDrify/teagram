@@ -23,7 +23,7 @@ class ExampleMod(loader.Module):  # Example - название класса мо
 
     async def on_load(self, app: Client):  # Можно считать что это асинхронный __init__
         """Вызывается когда модуль загружен"""
-        # logging.info(f"Модуль {self.name} загружен") # Добавлено автоматически
+        # logging.info(f"Модуль {self.name} загружен")
 
     # Если написать в лс/чате где есть бот "ты дурак?", то он ответит
     @loader.on_bot(lambda self, app, message: message.text and message.text.lower() == "ты дурак?")  # Сработает только если текст сообщения равняется "ты дурак?"

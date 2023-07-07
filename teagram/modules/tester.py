@@ -10,7 +10,6 @@ from .. import loader, logger, utils
 @loader.module(name="Tester", author="teagram")
 class TesterMod(loader.Module):
     """Тест чего-то"""
-
     async def logscmd(self, app: Client, message: types.Message, args: str):
         """Отправляет логи. Использование: logs <уровень>"""
         lvl = 40  # ERROR

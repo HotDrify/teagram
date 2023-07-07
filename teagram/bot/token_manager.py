@@ -83,7 +83,7 @@ class TokenManager(Item):
             await conv.get_response()
 
             await conv.ask("/revoke")
-            response = await conv.get_response()
+            response: types.Message = await conv.get_response()
 
             if "/newbot" in response.text:
                 return logging.error("Нет созданных ботов")
