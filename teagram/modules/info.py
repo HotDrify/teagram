@@ -20,7 +20,7 @@ def byter(num: float, suffix: str = "B") -> str:
 class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
     
-    async def infocmd(self, app: Client, message: types.Message):
+    async def info_cmd(self, app: Client, message: types.Message):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
         me = app.get_me()
@@ -52,7 +52,7 @@ class AboutMod(loader.Module):
 **Работает с**: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
             """)
         
-    async def ubinfocmd(self, app: Client, message: types.Message, args: str):
+    async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
         """информация о UserBot"""
         await utils.answer(message, "☕")
         await utils.answer(message, '''🤔 <b>Что такое юзербот?</b>
