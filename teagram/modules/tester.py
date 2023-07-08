@@ -27,14 +27,15 @@ class TesterMod(loader.Module):
     async def logs_cmd(self, app: Client, message: types.Message, args: str):
         app.me = await app.get_me()
         """Отправляет логи. Использование: logs <уровень>"""
-        lvl = 40  # ERROR
+        lvl = int(args)
 
-        if args and not (lvl := logger.get_valid_level(args)):
+        if not args or lvl < 0 or lvl > 60:
             return await utils.answer(
-                message, "❌ Неверный уровень логов")
+                message, "❌ Вы не указали уровень или указали неверный уровень логов")
 
-        handler: CustomStreamHandler = log.handlers[1]
+        handler: CustomStreamHandler = log.handlers[1] # type: ignore
         logs = '\n'.join(str(error) for error in handler.logs).encode('utf-8')
+        
         if not logs:
             return await utils.answer(
                 message, f"❕ Нет логов на уровне {lvl} ({logging.getLevelName(lvl)})")
