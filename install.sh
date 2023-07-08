@@ -36,7 +36,7 @@ echo "[INFO] updating..."
 eval "$SUDOCMD $UPD"
 echo "[INFO] install 4 packages..." > install.log
 echo "[INFO] install packages..."
-eval "$SUDOCMD $PKGINSTALL git openssl python3 python3-pip"
+eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
 echo "[INFO] cloning https://github.com/HotDrify/teagram..." > install.log
 echo "[INFO] cloning repository..."
 eval "git clone https://github.com/HotDrify/teagram"
