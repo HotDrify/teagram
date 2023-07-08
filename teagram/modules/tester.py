@@ -30,5 +30,5 @@ class TesterMod(loader.Module):
         await message.delete()
         return await utils.answer(
             message, logs, doc=True, quote=False,
-            caption=f"📤 TeagramЛоги с {lvl} ({logging.getLevelName(lvl)}) уровнем"
-        )
+            caption=f"📤 TeaGram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
+            )
