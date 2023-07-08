@@ -17,7 +17,7 @@ class UpdateMod(loader.Module):
             output = check_output('git pull', shell=True).decode()
             
             if 'Already up to date.' in output:
-                return await utils.answer(message, 'У вас установлена последняя версия')
+                return await utils.answer(message, '`🍵 | TeaGram`\n<b>У вас установлена последняя версия</b>')
             
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
