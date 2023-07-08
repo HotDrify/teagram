@@ -36,7 +36,7 @@ async def execute_python_code(code, env: dict = {}):
 @loader.module(name="Eval")
 class EvalMod(loader.Module):
     """Используйте eval прямо через 🍵teagram!"""
-    async def ecmd(self, app: Client, message: types.Message, args: str):
+    async def e_cmd(self, app: Client, message: types.Message, args: str):
         
         result = await execute_python_code(
             args,
