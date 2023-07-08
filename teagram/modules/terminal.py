@@ -18,12 +18,11 @@ class TerminalMod(loader.Module):
         await utils.answer(
             message,
             f"""
-```
-🍵 teagram | UserBot
-📥 **input**:
-{args}
-📤 **output**:
-{output}
+<code>🍵 teagram | UserBot</code>
+📥 <b>input</b>:
+<code>{args}</code>
+📤 <b>output</b>:
+<code>{output}</code>
 ```
         """
         )
