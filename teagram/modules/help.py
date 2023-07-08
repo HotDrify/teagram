@@ -7,7 +7,7 @@ from .. import __version__, loader, utils
 class HelpMod(loader.Module):
     """Помощь по командам 🍵 teagram"""
 
-    async def helpcmd(self, app: Client, message: types.Message, args: str):
+    async def help_cmd(self, app: Client, message: types.Message, args: str):
         """Список всех модулей"""
         if not args:
             text = ""
