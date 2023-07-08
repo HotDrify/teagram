@@ -1,6 +1,7 @@
 import logging
 
 from googletrans import Translator
+from googletrans.models import Translated
 from pyrogram import Client, types
 
 from .. import loader, utils
@@ -13,9 +14,10 @@ class TranslatorMod(loader.Module):
 
     async def translate_cmd(self, app: Client, message: types.Message, args: str):
         await utils.answer(message, "☕")
-        tr = Translator()
-        text = message.text.split()
-        translated = tr.translate(text[2:], text[1])
+        
+        text = message.text.split(' ')
+        translated: Translated = Translator().translate(text=' '.join(text[2:]), dest=str(text[1]))
+
         await utils.answer(
             message,
             f"""
