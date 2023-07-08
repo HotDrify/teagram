@@ -52,8 +52,8 @@ class EvalMod(loader.Module):
             f"""
 `🍵 Teagram | UserBot`
 <b>💻 Code</b>:
-`{args}`
+<code>{args}</code>
 <b>💻 Output</b>:
-`{result}`
+<code>{result}</code>
 """
         )
