@@ -11,8 +11,7 @@ from .. import loader, utils
 class TranslatorMod(loader.Module):
     """Используйте Google переводчик прямо через 🍵teagram!"""
 
-    @loader.on(lambda _, __, message: message.text.startswith('.translate'))
-    async def watcher(self, app: Client, message: types.Message):
+    async def translate_cmd(self, app: Client, message: types.Message, args: str):
         await app.send_message(message.from_chat.id, "☕")
         tr = Translator()
         translated = tr.translate(args[0], dest=args[1:])

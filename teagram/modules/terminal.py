@@ -11,7 +11,7 @@ class TerminalMod(loader.Module):
     """Используйте терминал BASH прямо через 🍵teagram!"""
     async def terminal_cmd(self, app: Client, message: types.Message, args: str):
         await utils.answer(message, "☕")
-        output = check_output(args, shell=True).decode()
+        output = check_output(args.strip(), shell=True).decode()
         await utils.answer(
             message,
             f"""

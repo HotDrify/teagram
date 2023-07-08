@@ -190,7 +190,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
 
-    async def restartcmd(self, app: Client, message: types.Message, update: bool = False):
+    async def restart_cmd(self, app: Client, message: types.Message, update: bool = False):
         """Перезагрузка юзербота"""
         def restart() -> None:
             """Запускает загрузку юзербота"""
@@ -199,7 +199,7 @@ class LoaderMod(loader.Module):
         atexit.register(restart)
         self.db.set(
             "teagram.loader", "restart", {
-                "msg": f"{message.chat.id}:{message.message_id}",
+                "msg": f"{message.chat.id}:{message.id}",
                 "type": "restart"
             }
         )

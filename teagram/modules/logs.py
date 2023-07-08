@@ -15,17 +15,17 @@ class loggingMod(loader.Module):
             'me',
             '[INFO] 🍵 - message from {}: {}'.format(
                 message.from_user.first_name,
-                message.text
+                message.text or message.media
             )
         )
 
     # logging commands
-    @loader.on(lambda _, __, message: message.text.startswith('.'))
+    @loader.on(lambda _, __, message: not message.media and message.text.startswith('.'))
     async def watcher_commands(self, app: Client, message: types.Message):
         return await app.send_message(
             'me',
             '[INFO] 🍵 - command from {}: {}'.format(
                 message.from_user.first_name,
-                message.text.split()
+                message.text.split()[0]
             )
         )
