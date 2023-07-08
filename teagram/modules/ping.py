@@ -9,7 +9,7 @@ from .. import loader, utils
 class PingMod(loader.Module):
     """🍵 Команда пинг"""
 
-    async def pingcmd(self, app: Client, message: types.Message, args: str):
+    async def ping_cmd(self, app: Client, message: types.Message, args: str):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
         await utils.answer(message, "☕")
