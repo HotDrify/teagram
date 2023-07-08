@@ -52,7 +52,7 @@ async def get_git_raw_link(repo_url: str):
 class LoaderMod(loader.Module):
     """Загрузчик модулей"""
 
-    async def dlmodcmd(self, app: Client, message: types.Message, args: str):
+    async def dlmod_cmd(self, app: Client, message: types.Message, args: str):
         """Загрузить модуль по ссылке. Использование: dlmod <ссылка или all или ничего>"""
         modules_repo = self.db.get(
             "teagram.loader", "repo",
@@ -142,7 +142,7 @@ class LoaderMod(loader.Module):
             )
         )
 
-    async def loadmodcmd(self, app: Client, message: types.Message):
+    async def loadmod_cmd(self, app: Client, message: types.Message):
         """Загрузить модуль по файлу. Использование: <реплай на файл>"""
         reply = message.reply_to_message
         file = (
@@ -181,7 +181,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
 
-    async def unloadmodcmd(self, app: Client, message: types.Message, args: str):
+    async def unloadmod_cmd(self, app: Client, message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
         if not (module_name := self.all_modules.unload_module(args)):
             return await utils.answer(
@@ -210,7 +210,7 @@ class LoaderMod(loader.Module):
         return sys.exit(0)
 
 
-    async def dlrepocmd(self, app: Client, message: types.Message, args: str):
+    async def dlrepo_cmd(self, app: Client, message: types.Message, args: str):
         """Установить репозиторий с модулями. Использование: dlrepo <ссылка на репозиторий или reset>"""
         if not args:
             return await utils.answer(
