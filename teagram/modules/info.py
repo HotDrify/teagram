@@ -44,11 +44,14 @@ class AboutMod(loader.Module):
 `🧠 Процессор`
 <b>Использование</b>: `{int(psutil.cpu_percent())}%`
 <b>Ядер</b>: `{psutil.cpu_count()}`
+
 `🗃 ОЗУ`
 <b>Использование</b>: `{byter(psutil.virtual_memory().used)}`/`{byter(psutil.virtual_memory().total)}`
+
 `💾 ПЗУ`
 [/] | <b>Использование</b>: `{byter(psutil.disk_usage("/").used)}`/`{byter(psutil.disk_usage("/").total)}` (`{psutil.disk_usage("/").percent}%`)
-`🖥️ хост`
+
+`🖥️ Хост`
 <b>Система</b>: `{platform.uname().system}`
 <b>Узел</b>: `{platform.uname().node}`
 <b>Релиз</b>: `{platform.uname().release}`
