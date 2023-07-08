@@ -5,7 +5,7 @@ from .. import __version__, loader, utils
 
 @loader.module(name="Help")
 class HelpMod(loader.Module):
-    """Помощь по командам юзербота"""
+    """Помощь по командам 🍵 teagram"""
 
     async def helpcmd(self, app: Client, message: types.Message, args: str):
         """Список всех модулей"""
