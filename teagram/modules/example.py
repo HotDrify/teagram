@@ -76,7 +76,7 @@ class ExampleMod(loader.Module):  # Example - название класса мо
             message, "Прошло 2.5 секунды!")
 
     @loader.on(lambda _, __, m: "тест" in getattr(m, "text", ""))  # Сработает только если есть "тест" в сообщении с командой
-    async def example2cmd(self, app: Client, message: types.Message):
+    async def example2_cmd(self, app: Client, message: types.Message):
         """Описание для второй команды с фильтрами"""
         return await utils.answer(
             message, f"Да, {self.test_attribute = }")
