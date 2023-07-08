@@ -61,7 +61,7 @@ class ExampleMod(loader.Module):  # Example - название класса мо
         return await call.answer(
             "Ого пример каллбека", show_alert=True)
 
-    async def examplecmd(self, app: Client, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
+    async def example_cmd(self, app: Client, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
                                                                             # args - аргументы после команды. необязательный аргумент
         """Описание команды. Использование: example [аргументы]"""
         await utils.answer(  # utils.answer - это отправка сообщений, код можно посмотреть в utils
