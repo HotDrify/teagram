@@ -12,11 +12,12 @@ class TranslatorMod(loader.Module):
     """Используйте Google переводчик прямо через 🍵teagram!"""
 
     async def translate_cmd(self, app: Client, message: types.Message, args: str):
-        await app.send_message(message.from_chat.id, "☕")
+        await utils.answer(message, "☕")
         tr = Translator()
-        translated = tr.translate(args[0], dest=args[1:])
-        await app.send_message(
-            message.from_chat.id,
+        text = message.text.split()
+        translated = tr.translate(text[2:], text[1])
+        await utils.answer(
+            message,
             f"""
 🍵 `Teagram | UserBot`
 Переведено с **{translated.src}** на **{translated.dest}**

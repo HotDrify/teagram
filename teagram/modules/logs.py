@@ -20,7 +20,7 @@ class loggingMod(loader.Module):
         )
 
     # logging commands
-    @loader.on(lambda _, __, message: not message.media and message.text.startswith('.'))
+    @loader.on(lambda _, __, message: not message.media and (message.text.startswith('.') if message.text else False))
     async def watcher_commands(self, app: Client, message: types.Message):
         return await app.send_message(
             'me',
