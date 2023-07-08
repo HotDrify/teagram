@@ -50,12 +50,10 @@ class EvalMod(loader.Module):
         await utils.answer(
             message,
             f"""
-```
-🍵 Teagram | UserBot
-Code 💻:
-{args}
-Output 💻:
-{result}
-```
+`🍵 Teagram | UserBot`
+<b>💻 Code</b>:
+<code>{args}</code>
+<b>💻 Output</b>:
+<code>{result}</code>
 """
         )

@@ -32,24 +32,24 @@ class AboutMod(loader.Module):
 `🍵 teagram | UserBot`
 
 `💻 UserBot`
-**Владелец**: `{me.username}`
-**Версия**: `v{__version__}`
+<b>Владелец</b>: `{me.username}`
+<b>Версия</b>: `v{__version__}`
 `🧠 Процессор`
-**Использование**: `{int(psutil.cpu_percent())}%`
-**Ядер**: `{psutil.cpu_count()}`
+<b>Использование</b>: `{int(psutil.cpu_percent())}%`
+<b>Ядер</b>: `{psutil.cpu_count()}`
 `🗃 ОЗУ`
-**Использование**: `{byter(psutil.virtual_memory().used)}`/`{byter(psutil.virtual_memory().total)}`
+<b>Использование</b>: `{byter(psutil.virtual_memory().used)}`/`{byter(psutil.virtual_memory().total)}`
 `💾 ПЗУ`
-[/] | **Использование**: ``{byter(psutil.disk_usage("/").used)}`/`{byter(psutil.disk_usage("/").total)}` (`{psutil.disk_usage("/").percent}%`)
+[/] | <b>Использование</b>: `{byter(psutil.disk_usage("/").used)}`/`{byter(psutil.disk_usage("/").total)}` (`{psutil.disk_usage("/").percent}%`)
 `🖥️ хост`
-**Система**: `{platform.uname().system}`
-**Узел**: `{platform.uname().node}`
-**Релиз**: `{platform.uname().release}`
-**Версия**: `{platform.uname().version}`
-**Архитектура**: `{platform.machine()}`
-**Процессор**: `{platform.processor()}`
-**Имя хоста**: `{socket.gethostname()}`
-**Работает с**: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
+<b>Система</b>: `{platform.uname().system}`
+<b>Узел</b>: `{platform.uname().node}`
+<b>Релиз</b>: `{platform.uname().release}`
+<b>Версия</b>: `{platform.uname().version}`
+<b>Архитектура</b>: `{platform.machine()}`
+<b>Процессор</b>: `{platform.processor()}`
+<b>Имя хоста</b>: `{socket.gethostname()}`
+<b>Работает с</b>: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
             """)
         
     async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
