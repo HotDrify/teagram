@@ -24,8 +24,12 @@ class AboutMod(loader.Module):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
         me = await app.get_me()
-        boot = psutil.boot_time()
         bt = datetime.fromtimestamp(boot)
+        try:
+            boot = psutil.boot_time()
+        except:
+            psutil_winerr = True
+
         await utils.answer(
             message,
             f"""
@@ -34,7 +38,8 @@ class AboutMod(loader.Module):
 `💻 UserBot`
 <b>Владелец</b>: `{me.username}`
 <b>Версия</b>: `v{__version__}`
-`🧠 Процессор`
+<b>Работает с</b>: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
+            """ + ("""`🧠 Процессор`
 <b>Использование</b>: `{int(psutil.cpu_percent())}%`
 <b>Ядер</b>: `{psutil.cpu_count()}`
 `🗃 ОЗУ`
@@ -48,9 +53,7 @@ class AboutMod(loader.Module):
 <b>Версия</b>: `{platform.uname().version}`
 <b>Архитектура</b>: `{platform.machine()}`
 <b>Процессор</b>: `{platform.processor()}`
-<b>Имя хоста</b>: `{socket.gethostname()}`
-<b>Работает с</b>: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`
-            """)
+<b>Имя хоста</b>: `{socket.gethostname()}`""" if not psutil_winerr else ""))
         
     async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
         """информация о UserBot"""
