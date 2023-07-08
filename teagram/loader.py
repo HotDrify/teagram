@@ -96,7 +96,7 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
         if (
             callable(getattr(instance, method_name))
             and len(method_name) > 4
-            and method_name.endswith("cmd")
+            and method_name.endswith("_cmd")
         )
     }
 
