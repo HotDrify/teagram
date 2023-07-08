@@ -23,7 +23,7 @@ class AboutMod(loader.Module):
     async def info_cmd(self, app: Client, message: types.Message):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
-        me = app.get_me()
+        me = await app.get_me()
         boot = psutil.boot_time()
         bt = datetime.fromtimestamp(boot)
         await utils.answer(
