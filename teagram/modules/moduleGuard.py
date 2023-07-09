@@ -12,7 +12,7 @@ class ModuleGuardMod(loader.Module):
                 {"id": "eval", "name": "Eval"},
                 {"id": "exec", "name": "Exec"}
             ],
-            "critical": [
+            "criticals": [
                 {"id": "other", "name": "other"},
                 {"id": "other", "name": "other"}
             ],
@@ -38,7 +38,7 @@ class ModuleGuardMod(loader.Module):
                     for word in names["warns"]:
                         if word['id'] in content:
                             warns.append(word["name"])
-                    for word in names["critical"]:
+                    for word in names["criticals"]:
                         if word['id'] in content:
                             critical.append(word["name"])
                     for word in names["info"]:
@@ -57,8 +57,11 @@ class ModuleGuardMod(loader.Module):
                 critical_text = ', '.join(critical)
                 info_text = ', '.join(info)
                 message_text += f"{file_name}:\n"
-                message_text += f"warns ➜ {warns_text}\n"
-                message_text += f"criticals ➜ {critical_text}\n"
-                message_text += f"info ➜ {info_text}\n"
+                if warns_text:
+                    message_text += f"warns ➜ {warns_text}\n"
+                if critical_text:
+                    message_text += f"criticals ➜ {critical_text}\n"
+                if info_text:
+                    message_text += f"info ➜ {info_text}\n"
 
         await message.send_message("me", message_text)
