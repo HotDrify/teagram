@@ -8,20 +8,20 @@ class ModuleGuardMod(loader.Module):
     """moduleGuard оповестит вас о вредоносном модуле."""
     async def on_load(self, message: types.Message):
         names = {
-            "warning": [
-              {"id": "subprocess", "name": "commands exec"},
-              {"id": "eval", "name": "exec python code"},
-              {"id": "exec", "name": "exec python code"}
-            ],
             "info": [
-            {"id": "get_me", "name": "get your profile account data"}
+                {"id": "get_me", "name": "get your profile account data"}
+            ],
+            "warning": [
+                {"id": "subprocess", "name": "Subprocess found"},
+                {"id": "eval", "name": "Eval found"},
+                {"id": "exec", "name": "Exec found"}
             ],
             "critical": [
-                {"id": "telethon", "name": "other telegram client"},
-                {"id": "GetAuthorizationsRequest", "name": "get account auth data"},
-                {"id": "sessions", "name": "get sessions data"},
-                {"id": "exit", "name": "stop bot script"},
-                {"id": "config.ini", "name": "access to authorization config"}
+                {"id": "telethon", "name": "Found other telegram client"},
+                {"id": "GetAuthorizationsRequest", "name": "Plugin can get account's auth data"},
+                {"id": "sessions", "name": "Plugin cat get sessions data"},
+                {"id": "exit", "name": "Plugin can stop bot"},
+                {"id": "config.ini", "name": "Plugin have access to authorization config"}
             ]
         }
         critical = []
