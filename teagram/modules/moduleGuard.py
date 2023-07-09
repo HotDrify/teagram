@@ -31,16 +31,19 @@ class ModuleGuardMod(loader.Module):
         file_list = os.listdir("teagram/modules/")
 
         for file_name in file_list:
-            file_path = os.path.join("teagram/modules/", file_name)
-            if os.path.isfile(file_path):
-                with open(file_path, "r") as file:
-                    content = file.read()
-                for word in names["warning"]:
-                    if word['id'] in content:
-                        warning.append({"file": file_name, "found": word["name"]})
-                for word in names["critical"]:
-                    if word['id'] in content:
-                        critical.append({"file": file_name, "found": word["name"]})
+            if 'moduleGuard' in file_name:
+                continue
+            else:
+                file_path = os.path.join("teagram/modules/", file_name)
+                if os.path.isfile(file_path):
+                    with open(file_path, "r") as file:
+                        content = file.read()
+                    for word in names["warning"]:
+                        if word['id'] in content:
+                            warning.append({"file": file_name, "found": word["name"]})
+                    for word in names["critical"]:
+                        if word['id'] in content:
+                            critical.append({"file": file_name, "found": word["name"]})
 
         message_text = """
 <code>🍵teagram | UserBot</code>
