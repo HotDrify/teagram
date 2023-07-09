@@ -14,6 +14,7 @@ class UpdateMod(loader.Module):
 
     async def update_cmd(self, app: Client, message: types.Message):
         try:
+            check_output('git stash', shell=True).decode()
             output = check_output('git pull', shell=True).decode()
             
             if 'Already up to date.' in output:
