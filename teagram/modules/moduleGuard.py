@@ -22,6 +22,11 @@ class ModuleGuardMod(loader.Module):
             ]
         }
 
+        basic_plugins = ['eval.py', 'example.py', 'help.py', 
+                         'info.py', 'loader.py', 'moduleGuard.py',
+                         'terminal.py', 'tester.py', 'translator.py',
+                         'updater.py']
+                         
         critical = []
         warns = []
         info = []
@@ -52,7 +57,7 @@ class ModuleGuardMod(loader.Module):
         for file_name in file_list:
             if not file_name.endswith('.py'):
                 continue
-            if 'moduleGuard' in file_name:
+            if file_name in basic_plugins:
                 continue
             else:
                 warns_text = ', '.join(warns)
