@@ -200,6 +200,7 @@ class LoaderMod(loader.Module):
         self.db.set(
             "teagram.loader", "restart", {
                 "msg": f"{message.chat.id}:{message.id}",
+                "start": time.time(),
                 "type": "restart"
             }
         )

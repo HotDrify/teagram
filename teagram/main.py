@@ -25,7 +25,7 @@ async def main():
             not msg.empty
             and msg.text != (
                 restarted_text := (
-                    "✅ Перезагрузка прошла успешно!"
+                    f"✅ Перезагрузка прошла успешно! ({round(time.time())-int(restart['start'])} сек.)"
                     if restart["type"] == "restart"
                     else f"✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)"
                 )
