@@ -23,7 +23,7 @@ class AboutMod(loader.Module):
     async def info_cmd(self, app: Client, message: types.Message):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
-        me = await app.get_me()
+        me: types.User = await app.get_me()
         psutil_winerr = False
 
         try:
@@ -40,7 +40,7 @@ class AboutMod(loader.Module):
 `💻 UserBot`
 <b>Владелец</b>: `{me.username}`
 <b>Версия</b>: `v{__version__}`
-            """ + (f"""
+""" + (f"""
 `🧠 Процессор`
 <b>Использование</b>: `{int(psutil.cpu_percent())}%`
 <b>Ядер</b>: `{psutil.cpu_count()}`
