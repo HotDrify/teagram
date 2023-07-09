@@ -8,25 +8,22 @@ class ModuleGuardMod(loader.Module):
     """moduleGuard оповестит вас о вредоносном модуле."""
     async def on_load(self, message: types.Message):
         names = {
-            "info": [
-                {"id": "get_me", "name": "get your profile account data"}
-            ],
-            "warning": [
-                {"id": "subprocess", "name": "Subprocess"},
+            "warns": [
                 {"id": "eval", "name": "Eval"},
                 {"id": "exec", "name": "Exec"}
             ],
             "critical": [
-                {"id": "telethon", "name": "other telegram client"},
-                {"id": "GetAuthorizationsRequest", "name": "Plugin can get account's auth data"},
-                {"id": "sessions", "name": "Plugin cat get sessions data"},
-                {"id": "exit", "name": "Plugin can stop bot"},
-                {"id": "config.ini", "name": "Plugin have access to authorization config"}
+                {"id": "other", "name": "other"},
+                {"id": "other", "name": "other"}
+            ],
+            "info": [
+                {"id": "other", "name": "other"},
+                {"id": "other", "name": "other"}
             ]
         }
 
         critical = []
-        warning = []
+        warns = []
         info = []
         file_list = os.listdir("teagram/modules/")
 
@@ -38,22 +35,30 @@ class ModuleGuardMod(loader.Module):
                 if os.path.isfile(file_path):
                     with open(file_path, "r") as file:
                         content = file.read()
-                    for word in names["warning"]:
+                    for word in names["warns"]:
                         if word['id'] in content:
-                            warning.append({"file": file_name, "found": word["name"]})
+                            warns.append(word["name"])
                     for word in names["critical"]:
                         if word['id'] in content:
-                            critical.append({"file": file_name, "found": word["name"]})
+                            critical.append(word["name"])
+                    for word in names["info"]:
+                        if word['id'] in content:
+                            info.append(word["name"])
 
         message_text = """
 <code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
-Найдено:
 """
-        for item in warning:
-            message_text += f"WARNING | File: {item['file']}, Found: {item['found']}\n"
-        for item in critical:
-            message_text += f"CRITICAL | File: {item['file']}, Found: {item['found']}\n"
-        for item in info:
-            message_text += f"INFO | File: {item['file']}, Found: {item['found']}\n"
+        for file_name in file_list:
+            if 'moduleGuard' in file_name:
+                continue
+            else:
+                warns_text = ', '.join(warns)
+                critical_text = ', '.join(critical)
+                info_text = ', '.join(info)
+                message_text += f"{file_name}:\n"
+                message_text += f"warns ➜ {warns_text}\n"
+                message_text += f"criticals ➜ {critical_text}\n"
+                message_text += f"info ➜ {info_text}\n"
+
         await message.send_message("me", message_text)
