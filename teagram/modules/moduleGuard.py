@@ -31,26 +31,27 @@ class ModuleGuardMod(loader.Module):
             if 'moduleGuard' in file_name:
                 continue
             else:
-                if file_name.endswith('.py'):
-                    file_path = os.path.join("teagram/modules/", file_name)
-                    if os.path.isfile(file_path):
-                        with open(file_path, "r") as file:
-                            content = file.read()
-                        for word in names["warns"]:
-                            if word['id'] in content:
-                                warns.append(word["name"])
-                        for word in names["criticals"]:
-                            if word['id'] in content:
-                                critical.append(word["name"])
-                        for word in names["info"]:
-                            if word['id'] in content:
-                                info.append(word["name"])
+                file_path = os.path.join("teagram/modules/", file_name)
+                if os.path.isfile(file_path):
+                    with open(file_path, "r") as file:
+                        content = file.read()
+                    for word in names["warns"]:
+                        if word['id'] in content:
+                            warns.append(word["name"])
+                    for word in names["criticals"]:
+                        if word['id'] in content:
+                            critical.append(word["name"])
+                    for word in names["info"]:
+                        if word['id'] in content:
+                            info.append(word["name"])
 
         message_text = """
 <code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
 """
         for file_name in file_list:
+            if not file_name.endswith('.py'):
+                continue
             if 'moduleGuard' in file_name:
                 continue
             else:
