@@ -33,8 +33,6 @@ class ModuleGuardMod(loader.Module):
             if os.path.isfile(file_path):
                 with open(file_path, "r") as file:
                     content = file.read()
-                if file_name == "moduleGuard.py":
-                    return
                 for word in names["warning"]:
                     if word['id'] in content:
                         warning.append({"file": file_name, "found": word["name"]})
