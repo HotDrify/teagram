@@ -10,7 +10,7 @@ from pyrogram.session.session import Session
 
 from . import __version__
 
-Session.notice_displayed = True
+Session.notice_displayed: bool = True
 
 
 def colored_input(prompt: str = "", hide: bool = False) -> str:
@@ -56,7 +56,7 @@ class Auth:
     async def send_code(self) -> Tuple[str, str]:
         """Отправить код подтверждения"""
         while True:
-            error_text: str = None
+            error_text: str = ""
 
             try:
                 phone = colored_input("Введи номер телефона: ")
@@ -102,9 +102,9 @@ class Auth:
             phone, phone_code_hash = await self.send_code()
             logged = await self.enter_code(phone, phone_code_hash)
             if not logged:
-                me: User = await self.enter_2fa()
+                me: types.User = await self.enter_2fa()
             else:
-                me: User = await self.app.get_me()
+                me: types.User = await self.app.get_me()
         except errors.SessionRevoked:
             logging.error("Сессия была сброшена, удали сессию и заново введи команду запуска")
             await self.app.disconnect()

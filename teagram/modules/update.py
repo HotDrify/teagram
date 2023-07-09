@@ -14,6 +14,8 @@ class UpdateMod(loader.Module):
 
     async def update_cmd(self, app: Client, message: types.Message):
         try:
+            await utils.answer('Попытка обновления...')
+            
             check_output('git stash', shell=True).decode()
             output = check_output('git pull', shell=True).decode()
             
@@ -31,9 +33,9 @@ class UpdateMod(loader.Module):
                 }
             )
 
-            await utils.answer(message, "🔁 Перезагрузка...")
+            await utils.answer(message, "🔁 Обновление...")
 
-            logging.info("Перезагрузка...")
+            logging.info("Обновление...")
             return sys.exit(0)
         except Exception as error:
             await utils.answer(message, f'Произошла ошибка: {error}')
