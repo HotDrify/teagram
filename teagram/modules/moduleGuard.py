@@ -44,7 +44,7 @@ class ModuleGuardMod(loader.Module):
 <code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
 Найдено:
-        """
+"""
         for item in warning:
             message_text += f"WARNING | File: {item['file']}, Found: {item['found']}\n"
         await message.send_message("me", message_text)
