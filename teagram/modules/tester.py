@@ -29,6 +29,9 @@ class TesterMod(loader.Module):
     async def logs_cmd(self, app: Client, message: types.Message, args: str):
         app.me = await app.get_me()
         """Отправляет логи. Использование: logs <уровень>"""
+        if not args:
+            args = "40"
+
         lvl = int(args)
 
         if not args or lvl < 0 or lvl > 60:

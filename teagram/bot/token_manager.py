@@ -3,7 +3,7 @@ import re
 from typing import Union
 
 from loguru import logger
-from pyrogram import errors
+from pyrogram import errors, types
 
 from .. import fsm, utils
 from .types import Item
