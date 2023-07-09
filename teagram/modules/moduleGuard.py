@@ -61,6 +61,8 @@ class ModuleGuardMod(loader.Module):
         for file_name in file_list:
             if not file_name.endswith('.py'):
                 continue
+            if file_name in basic_plugins:
+                continue
             else:
                 warns_text = ', '.join(warns)
                 critical_text = ', '.join(critical)
