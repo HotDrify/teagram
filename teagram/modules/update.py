@@ -14,8 +14,8 @@ class UpdateMod(loader.Module):
 
     async def update_cmd(self, app: Client, message: types.Message):
         try:
-            await utils.answer('Попытка обновления...')
-            
+            await utils.answer(message, 'Попытка обновления...')
+
             check_output('git stash', shell=True).decode()
             output = check_output('git pull', shell=True).decode()
             
