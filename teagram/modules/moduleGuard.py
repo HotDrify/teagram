@@ -30,7 +30,7 @@ class ModuleGuardMod(loader.Module):
         for file_name in file_list:
             if 'moduleGuard' in file_name:
                 continue
-            if not file_name.endswith('.py'):
+            if file_name.endswith('.py'):
                 continue
             else:
                 file_path = os.path.join("teagram/modules/", file_name)
