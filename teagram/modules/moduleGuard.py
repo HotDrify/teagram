@@ -12,12 +12,12 @@ class ModuleGuardMod(loader.Module):
                 {"id": "get_me", "name": "get your profile account data"}
             ],
             "warning": [
-                {"id": "subprocess", "name": "Subprocess found"},
-                {"id": "eval", "name": "Eval found"},
-                {"id": "exec", "name": "Exec found"}
+                {"id": "subprocess", "name": "Subprocess"},
+                {"id": "eval", "name": "Eval"},
+                {"id": "exec", "name": "Exec"}
             ],
             "critical": [
-                {"id": "telethon", "name": "Found other telegram client"},
+                {"id": "telethon", "name": "other telegram client"},
                 {"id": "GetAuthorizationsRequest", "name": "Plugin can get account's auth data"},
                 {"id": "sessions", "name": "Plugin cat get sessions data"},
                 {"id": "exit", "name": "Plugin can stop bot"},
