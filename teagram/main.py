@@ -1,4 +1,5 @@
 import logging
+import time
 
 from pyrogram.methods.utilities.idle import idle
 
@@ -26,7 +27,7 @@ async def main():
                 restarted_text := (
                     "✅ Перезагрузка прошла успешно!"
                     if restart["type"] == "restart"
-                    else "✅ Обновление прошло успешно!"
+                    else f"✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)"
                 )
             )
         ):

@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import atexit
 import logging
 
@@ -29,7 +30,8 @@ class UpdateMod(loader.Module):
             self.db.set(
                 "teagram.loader", "restart", {
                     "msg": f"{message.chat.id}:{message.id}",
-                    "type": "restart"
+                    "start": str(round(time.time())),
+                    "type": "update"
                 }
             )
 
