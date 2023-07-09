@@ -43,6 +43,7 @@ class EvalMod(loader.Module):
             # Env
             {
                 'client': app,
+                'app': app,
                 'message': message, 
                 'args': args
             }
