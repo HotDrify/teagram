@@ -13,8 +13,8 @@ class ModuleGuardMod(loader.Module):
                 {"id": "exec", "name": "Exec"}
             ],
             "criticals": [
-                {"id": "other", "name": "other"},
-                {"id": "other", "name": "other"}
+                {"id": "session", "name": "plugin can get session"},
+                {"id": "config.ini", "name": "plugin can get auth data (config.ini)"}
             ],
             "info": [
                 {"id": "other", "name": "other"},
@@ -33,7 +33,7 @@ class ModuleGuardMod(loader.Module):
         file_list = os.listdir("teagram/modules/")
 
         for file_name in file_list:
-            if 'moduleGuard' in file_name:
+            if file_name in basic_plugins:
                 continue
             else:
                 file_path = os.path.join("teagram/modules/", file_name)
@@ -54,10 +54,12 @@ class ModuleGuardMod(loader.Module):
 <code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
 """
+        basic_text = """
+<code>🍵teagram | UserBot</code>
+<b>ModuleGuard</b>
+"""
         for file_name in file_list:
             if not file_name.endswith('.py'):
-                continue
-            if file_name in basic_plugins:
                 continue
             else:
                 warns_text = ', '.join(warns)
@@ -70,5 +72,8 @@ class ModuleGuardMod(loader.Module):
                     message_text += f"criticals ➜ {critical_text}\n"
                 if info_text:
                     message_text += f"info ➜ {info_text}\n"
+        
+        if message_text == basic_text:
+            message_text += 'Подозрительных плагинов не найдено'
 
         await message.send_message("me", message_text)
