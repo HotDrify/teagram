@@ -47,4 +47,8 @@ class ModuleGuardMod(loader.Module):
 """
         for item in warning:
             message_text += f"WARNING | File: {item['file']}, Found: {item['found']}\n"
+        for item in critical:
+            message_text += f"CRITICAL | File: {item['file']}, Found: {item['found']}\n"
+        for item in info:
+            message_text += f"INFO | File: {item['file']}, Found: {item['found']}\n"
         await message.send_message("me", message_text)
