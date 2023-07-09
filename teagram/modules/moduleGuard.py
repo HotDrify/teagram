@@ -10,8 +10,8 @@ class ModuleGuardMod(loader.Module):
         names = {
             "warning": [
               {"id": "subprocess", "name": "commands exec"},
-              {"id": "eval", "exec python code"},
-              {"id": "exec", "exec python code"}
+              {"id": "eval", "name": "exec python code"},
+              {"id": "exec", "name": "exec python code"}
             ],
             "info": []
             "critical": [
