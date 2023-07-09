@@ -13,10 +13,11 @@ class ModuleGuardMod(loader.Module):
               {"id": "eval", "name": "exec python code"},
               {"id": "exec", "name": "exec python code"}
             ],
-            "info": [],
+            "info": [
+            {"id": "get_me", "name": "get your profile account data"}
+            ],
             "critical": [
                 {"id": "telethon", "name": "other telegram client"},
-                {"id": "get_me", "name": "get your profile account data"},
                 {"id": "GetAuthorizationsRequest", "name": "get account auth data"},
                 {"id": "sessions", "name": "get sessions data"},
                 {"id": "exit", "name": "stop bot script"},
