@@ -33,6 +33,8 @@ class ModuleGuardMod(loader.Module):
             if os.path.isfile(file_path):
                 with open(file_path, "r") as file:
                     content = file.read()
+                if file_name == "moduleGuard.py":
+                    return
                 for word in names["warning"]:
                     if word['id'] in content:
                         warning.append({"file": file_name, "found": word["name"]})
@@ -44,7 +46,7 @@ class ModuleGuardMod(loader.Module):
 <code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
 Найдено:
-        """
+"""
         for item in warning:
             message_text += f"WARNING | File: {item['file']}, Found: {item['found']}\n"
         await message.send_message("me", message_text)
