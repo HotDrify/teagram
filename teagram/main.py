@@ -16,6 +16,8 @@ async def main():
     modules = loader.ModulesManager(app, db, me)
     await modules.load(app)
 
+    print('Юзербот {} включен'.format(me.first_name))
+
     if (restart := db.get("teagram.loader", "restart")):
         msg = await app.get_messages(*map(int, restart["msg"].split(":")))
         if (

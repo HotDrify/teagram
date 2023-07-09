@@ -60,7 +60,7 @@ python3 -m teagram
 
 <h1>Пример модуля</h1>
 
-> Больше примеров функций и полное описание смотри в файле <a href="./sh1t-ub/modules/example.py">example.py</a>
+> Больше примеров функций и полное описание смотри в файле <a href="./teagram/modules/example.py">example.py</a>
 
 <pre lang="python">
 from pyrogram import Client, types
