@@ -313,7 +313,7 @@ class ModulesManager:
                 self.inline_handlers.update(instance.inline_handlers)
 
         if not instance:
-            logging.error("Не удалось найти класс модуля заканчивающийся на `Mod`")
+            logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
 
         return instance
 
