@@ -81,7 +81,7 @@ class ModuleGuardMod(loader.Module):
                     message_text += f"❌ Criticals ➜ {critical_text}\n"
 
                 if not info and not warns and not critical:
-                    message_text += 'Безопасный плагин ✔'
+                    message_text += 'Безопасный плагин ✔\n'
         
         if message_text == basic_text:
             message_text += 'Подозрительных плагинов не найдено'
