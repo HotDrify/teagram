@@ -44,7 +44,7 @@ class ModuleGuardMod(loader.Module):
                     for word in names["warns"]:
                         if word['id'] in content:
                             warns.append(word["name"])
-                            
+
                     for word in names["criticals"]:
                         if word['id'] in content:
                             critical.append(word["name"])
@@ -80,7 +80,7 @@ class ModuleGuardMod(loader.Module):
                 if critical_text:
                     message_text += f"❌ Criticals ➜ {critical_text}\n"
 
-                if not info | warns | critical:
+                if not info and not warns and not critical:
                     message_text += 'Безопасный плагин ✔'
         
         if message_text == basic_text:
