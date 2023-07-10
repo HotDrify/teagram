@@ -8,6 +8,10 @@ class ModuleGuardMod(loader.Module):
     """moduleGuard оповестит вас о вредоносном модуле."""
     async def on_load(self, message: types.Message):
         names = {
+            "info": [
+                {"id": "other", "name": "other"},
+                {"id": "other", "name": "other"}
+            ],
             "warns": [
                 {"id": "eval", "name": "Eval"},
                 {"id": "exec", "name": "Exec"}
@@ -15,10 +19,6 @@ class ModuleGuardMod(loader.Module):
             "criticals": [
                 {"id": "session", "name": "plugin can get session"},
                 {"id": "config.ini", "name": "plugin can get auth data (config.ini)"}
-            ],
-            "info": [
-                {"id": "other", "name": "other"},
-                {"id": "other", "name": "other"}
             ]
         }
 
@@ -40,15 +40,19 @@ class ModuleGuardMod(loader.Module):
                 if os.path.isfile(file_path):
                     with open(file_path, "r") as file:
                         content = file.read()
+
                     for word in names["warns"]:
                         if word['id'] in content:
                             warns.append(word["name"])
+                            
                     for word in names["criticals"]:
                         if word['id'] in content:
                             critical.append(word["name"])
-                    for word in names["info"]:
-                        if word['id'] in content:
-                            info.append(word["name"])
+                    # nothing in names["info"]
+
+                    # for word in names["info"]:
+                    #     if word['id'] in content:
+                    #         info.append(word["name"])
 
         message_text = """
 <code>🍵teagram | UserBot</code>
@@ -64,16 +68,20 @@ class ModuleGuardMod(loader.Module):
             if file_name in basic_plugins:
                 continue
             else:
+                info_text = ', '.join(info)
                 warns_text = ', '.join(warns)
                 critical_text = ', '.join(critical)
-                info_text = ', '.join(info)
                 message_text += f"{file_name}:\n"
-                if warns_text:
-                    message_text += f"warns ➜ {warns_text}\n"
-                if critical_text:
-                    message_text += f"criticals ➜ {critical_text}\n"
+
                 if info_text:
-                    message_text += f"info ➜ {info_text}\n"
+                    message_text += f"❔ Info ➜ {info_text}\n"
+                if warns_text:
+                    message_text += f"❗ Warns ➜ {warns_text}\n"
+                if critical_text:
+                    message_text += f"❌ Criticals ➜ {critical_text}\n"
+
+                if not info | warns | critical:
+                    message_text += 'Безопасный плагин ✔'
         
         if message_text == basic_text:
             message_text += 'Подозрительных плагинов не найдено'
