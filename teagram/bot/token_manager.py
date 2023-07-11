@@ -111,7 +111,5 @@ class TokenManager(Item):
             text = message.text
             token = text.split()[-1]
 
-            self._db.set('teagram.bot', 'token', token)
-
             logger.success("Бот успешно сброшен")
             return token
