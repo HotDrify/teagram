@@ -49,29 +49,38 @@ class BotManager(
         error_text = "Юзерботу необходим бот. Реши проблему создания бота и запускай юзербот заново"
 
         if not self._token:
-            logging.error('Нету токена для инлайн бота, создание токена')
+            logging.error('Нету токена для инлайн бота, запуск без инлайн бота (измените токен в db.json для инлайн бота)')
+            self._db.set("teagram.bot", "token", "")
+            return True
+            
+            # в будущем, т.к. создает слишком много ботов и не получает токен
 
-            self._token = await self._create_bot()
-            if self._token is False:
-                logging.error(error_text)
-                return sys.exit(1)
+            # self._token = await self._create_bot()
+            # if self._token is False:
+            #     logging.error(error_text)
+            #     return sys.exit(1)
 
-            self._db.set("teagram.bot", "token", self._token)
+            # self._db.set("teagram.bot", "token", self._token)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
         except (exceptions.ValidationError, exceptions.Unauthorized):
-            logging.error("Неверный токен. Попытка пересоздать токен")
-         
-            result = await self._revoke_token()
-            if not result:
-                self._token = await self._create_bot()
-                if not self._token:
-                    logging.error(error_text)
-                    return sys.exit(1)
+            logging.error("Неверный токен. Запуск без инлайн бота... (измените токен в db.json для инлайн бота)")
+            self._db.set("teagram.bot", "token", "")
 
-                self._db.set("teagram.bot", "token", self._token)
-                return await self.load()
+            return True
+
+            # revoke_token работает некоректно 
+         
+            # result = await self._revoke_token()
+            # if not result:
+            #     self._token = await self._create_bot()
+            #     if not self._token:
+            #         logging.error(error_text)
+            #         return sys.exit(1)
+
+            #     self._db.set("teagram.bot", "token", self._token)
+            #     return await self.load()
 
         self._dp = Dispatcher(self.bot)
 
