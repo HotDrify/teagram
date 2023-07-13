@@ -30,8 +30,8 @@ VALID_PIP_PACKAGES = re.compile(
 
 def module(
     name: str,
-    author: str = None,
-    version: Union[int, float] = None
+    author: Union[str, None] = None,
+    version: Union[int, float, None] = None
 ) -> FunctionType:
     """Обрабатывает класс модуля
 
