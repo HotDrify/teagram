@@ -1,4 +1,5 @@
 import logging
+import time
 import re
 from typing import Union
 
@@ -33,7 +34,10 @@ class TokenManager(Item):
             ):
                 logging.error("Произошла ошибка при создании бота. Ответ @BotFather:")
                 logging.error(response.text)
-                return False
+
+                if 'too many attempts' in response.text:
+                    seconds = response.text.split()[-2]
+                    logger.error(f'Пожалуйста повторите через {seconds} секунд')
 
             await conv.ask(f"Teagram UserBot of {utils.get_display_name(self._all_modules.me)[:45]}")
             await conv.get_response()
@@ -41,6 +45,8 @@ class TokenManager(Item):
             bot_username = f"teagram_{utils.random_id(6)}_bot"
 
             await conv.ask(bot_username)
+            
+            time.sleep(0.5) 
             response = await conv.get_response()
 
             search = re.search(r"(?<=<code>)(.*?)(?=</code>)", response.text.html)
@@ -50,15 +56,17 @@ class TokenManager(Item):
 
             token = search.group(0)
 
-            await conv.ask("/setuserpic")
-            await conv.get_response()
+# сейчас есть проблема так что без авы (проблема не наша а пирограма)
 
-            await conv.ask("@" + bot_username)
-            await conv.get_response()
+#             await conv.ask("/setuserpic")
+#             await conv.get_response()
 
-            await conv.ask_media("bot_avatar.png", media_type="photo")
-            await conv.get_response()
-# надо аву поставить до папки teagram, нев ней а до нее
+#             await conv.ask("@" + bot_username)
+#             await conv.get_response()
+
+#             await conv.ask_media("bot_avatar.png", media_type="photo")
+#             await conv.get_response()
+# # надо аву поставить до папки teagram, нев ней а до нее
 
             await conv.ask("/setinline")
             await conv.get_response()
@@ -74,7 +82,7 @@ class TokenManager(Item):
 
     async def _revoke_token(self) -> str:
         """Сбросить токен бота"""
-        async with fsm.Conversation(self._app, "@BotFather", True) as conv:
+        async with fsm.Conversation(self._app, "@BotFather") as conv:
             try:
                 await conv.ask("/cancel")
             except errors.UserIsBlocked:
@@ -83,22 +91,37 @@ class TokenManager(Item):
             await conv.get_response()
 
             await conv.ask("/revoke")
-            response: types.Message = await conv.get_response()
+            response = await conv.get_response()
 
             if "/newbot" in response.text:
                 return logging.error("Нет созданных ботов")
+            
+            if not response.reply_markup:
+                logging.warn('reply_markup не найден')
+                time.sleep(1.5)
+                response = await conv.get_response()
 
+            found = False
             for row in response.reply_markup.keyboard:
                 for button in row:
                     search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button)
                     if search:
                         await conv.ask(button)
+                        found = True
                         break
+
+                if found:
+                    break
                 else:
                     return logging.error("Нет созданного material бота")
 
+            time.sleep(1)
             response = await conv.get_response()
             search = re.search(r"\d{1,}:[0-9a-zA-Z_-]{35}", response.text)
 
-            logger.success("Бот успешно сброшен")
-            return search.group(0)
+            if search:
+                logger.success("Бот успешно сброшен")
+                return str(search.group(0))
+            else:
+                token = response.text.split()[-1]
+                return str(token)

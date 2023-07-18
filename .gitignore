@@ -77,3 +77,4 @@ config.ini
 db.json
 teagram.session
 teagram.session-journal
+*.png
