@@ -28,10 +28,13 @@ class HelpMod(loader.Module):
                     f"<code>{inline_command}</code>" for inline_command in module.inline_handlers
                 )
 
-                text += f"\n<b>{module.name}</b> ➜ " + commands + inline
+                if not commands and not inline:
+                    pass
+                else:
+                    text += f"\n<b>{module.name}</b> - " + (commands if commands else '`Команд не найдено`') + inline
 
             return await utils.answer(
-                message, f"🗄 Доступные модули <b>{len(self.all_modules.modules)}</b>\n"
+                message, f"☕️ Доступные модули <b>{len(self.all_modules.modules)}</b>\n"
                         f"{text}"
             )
 
@@ -40,7 +43,7 @@ class HelpMod(loader.Module):
                 message, "❌ Такого модуля нет")
 
         prefix = self.db.get("teagram.loader", "prefixes", ["."])[0]
-        bot_username = (await self.bot.me).username
+        bot_username = (await self.bot.bot.get_me()).username
 
         command_descriptions = "\n".join(
             f"👉 <code>{prefix + command}</code>\n"
