@@ -158,14 +158,12 @@ class LoaderMod(loader.Module):
             return await utils.answer(
                 message, "❌ Нет реплая на файл")
 
-        temp_file = tempfile.NamedTemporaryFile("w")
-        await file.download(temp_file.name)
+        file = await reply.download()
 
         try:
-            with open(temp_file.name, "r", encoding="utf-8") as file:
+            with open(file, "r", encoding="utf-8") as file:
                 module_source = file.read()
         except UnicodeDecodeError:
-            temp_file.close()
             return await utils.answer(
                 message, "❌ Неверная кодировка файла")
 
@@ -178,7 +176,6 @@ class LoaderMod(loader.Module):
             return await utils.answer(
                 message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
 
-        temp_file.close()
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
 
@@ -190,6 +187,40 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
+    
+    async def reloadmod_cmd(self, app: Client, message: types.Message, args: str):
+        try:
+            module = args.split()[0].replace('.py', '')
+
+            if module + '.py' not in os.listdir('teagram/modules'):
+                return await utils.answer(
+                    message,
+                    f'❌ Модуль {module} не найден'
+                )
+            
+            unload = self.all_modules.unload_module(module)
+            with open('teagram/modules/' + module + '.py', 'r', encoding='utf-8') as file:
+                module_source = file.read()
+
+            load = await self.all_modules.load_module(module_source)
+
+            if not load and not unload:
+                logging.error(f'Load: {load}\nUnload:{unload}')
+
+                return await utils.answer(
+                    message,
+                    '❌ Произошла ошибка, пожалуйста проверьте логи'
+                )
+        except Exception as error:
+            logging.error(error)
+            return await utils.answer(
+                message,
+                '❌ Произошла ошибка, пожалуйста проверьте логи'
+            )
+
+
+        return await utils.answer(
+            message, f"✅ Модуль \"<code>{module}</code>\" перезагружен")
 
     async def restart_cmd(self, app: Client, message: types.Message, update: bool = False):
         """Перезагрузка юзербота"""

@@ -17,6 +17,7 @@ from importlib.util import spec_from_file_location, module_from_spec
 
 from typing import Union, List, Dict, Any
 from types import FunctionType, LambdaType
+from loguru import logger
 
 from pyrogram import Client, types, filters
 from . import dispatcher, utils, database, bot
@@ -319,7 +320,7 @@ class ModulesManager:
 
     async def load_module(self, module_source: str, origin: str = "<string>", did_requirements: bool = False) -> str:
         """Загружает сторонний модуль"""
-        module_name = "material.modules." + (
+        module_name = "teagram.modules." + (
             "".join(random.choice(string.ascii_letters + string.digits)
                     for _ in range(10))
         )
@@ -328,19 +329,20 @@ class ModulesManager:
             spec = ModuleSpec(module_name, StringLoader(
                 module_source, origin), origin=origin)
             instance = self.register_instance(module_name, spec=spec)
-        except ImportError:
+        except ImportError as error:
+            logger.error(error)
+
             if did_requirements:
                 return True
-
-            requirements = list(
-                filter(
-                    lambda x: x and x[0] not in ("-", "_", "."),
-                    map(str.strip, VALID_PIP_PACKAGES.search(module_source)[1].split(" ")),
+            try:
+                requirements = list(
+                    filter(
+                        lambda x: x and x[0] not in ("-", "_", "."),
+                        map(str.strip, VALID_PIP_PACKAGES.search(module_source)[1].split(" ")),
+                    )
                 )
-            )
-
-            if not requirements:
-                return logging.error("Не указаны пакеты для установки")
+            except TypeError:
+                return logging.warn("Не указаны пакеты для установки")
 
             logging.info(f"Установка пакетов: {', '.join(requirements)}...")
 
