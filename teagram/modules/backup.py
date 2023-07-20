@@ -22,7 +22,6 @@ def create_backup(src: str, dest: str):
                 for file in files:
                     if name + '.zip' in file or file.startswith('backup'):
                         pass
-
                     else:
                         path = os.path.join(root, file)
                         arcname = os.path.relpath(path, src)
@@ -32,26 +31,29 @@ def create_backup(src: str, dest: str):
     except Exception as error:
         return [str(error), False] 
 
-@loader.module(name="Backuper", author='teagram')
-class BackupMod(loader.Module):
-    async def backup_cmd(self, app: Client, message: types.Message):
-        await utils.answer(
-            message,
-            '👀 Попытка бекапа...'
-        )
+# TODO
+# Пофиксить баг с бесконечным созданием бекапа
 
-        backup = await create_backup('./', '')
+# @loader.module(name="Backuper", author='teagram')
+# class BackupMod(loader.Module):
+#     async def backup_cmd(self, app: Client, message: types.Message):
+#         await utils.answer(
+#             message,
+#             '👀 Попытка бекапа...'
+#         )
 
-        if backup[1]:
-            return await utils.answer(
-                message,
-                f'✅ Успешно сохранено ({backup[0]})'
-            )
-        else:
-            logger.error(backup[0])
+#         backup = await create_backup('./', '')
 
-            return await utils.answer(
-                message,
-                '❌ Ошибка, проверьте логи'
-            )
+#         if backup[1]:
+#             return await utils.answer(
+#                 message,
+#                 f'✅ Успешно сохранено ({backup[0]})'
+#             )
+#         else:
+#             logger.error(backup[0])
+
+#             return await utils.answer(
+#                 message,
+#                 '❌ Ошибка, проверьте логи'
+#             )
         
