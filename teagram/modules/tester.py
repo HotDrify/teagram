@@ -1,5 +1,6 @@
 import time
 import io
+import os
 import logging
 from datetime import datetime
 from logging import StreamHandler
@@ -64,6 +65,26 @@ class TesterMod(loader.Module):
         prefixes = ", ".join(f"<code>{prefix}</code>" for prefix in args)
         return await utils.answer(
             message, f"✅ Префикс был изменен на {prefixes}")
+
+    async def setlang_cmd(self, app: Client, message: types.Message, args: str):
+        """Изменить язык. Использование: setlang <язык>"""
+        args = args.split()
+        
+        language = args[0]
+        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
+        
+        if not args:
+            return await utils.answer(
+                message, "❔ На какой язык нужно изменить?")
+        
+        if language not in languages:
+            langs = ' '.join(languages)
+            return await utils.answer(
+                message, f'❌ Язык не найден. Доступные языки: <code>{langs}</code>')
+
+        self.db.set("teagram.loader", "lang", language)
+        return await utils.answer(
+            message, f"✅ Язык был изменен на {language}")
 
     async def addalias_cmd(self, app: Client, message: types.Message, args: str):
         """Добавить алиас. Использование: addalias <новый алиас> <команда>"""
