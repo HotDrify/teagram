@@ -16,7 +16,7 @@ def byter(num: float, suffix: str = "B") -> str:
 
     return "%.1f%s%s" % (num, "Yi", suffix)
 
-@loader.module(name="UserBot")
+@loader.module(name="UserBot", author='teagram')
 class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
     

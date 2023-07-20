@@ -2,15 +2,14 @@ import time
 import io
 import os
 import logging
-from datetime import datetime
 from logging import StreamHandler
 
 from pyrogram import Client, types
 
-from .. import loader, logger, utils
+from .. import loader, utils
 
 
-class CustomStreamHandler(logging.StreamHandler):
+class CustomStreamHandler(StreamHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logs: list = []
@@ -34,6 +33,7 @@ class TesterMod(loader.Module):
         if not args:
             args = "40"
 
+
         lvl = int(args)
 
         if not args or lvl < 0 or lvl > 60:
@@ -52,7 +52,7 @@ class TesterMod(loader.Module):
 
         return await utils.answer(
             message, logs, doc=True, quote=False,
-            caption=f"📤 TeaGram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
+            caption=f"📤 Teagram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
             )
     
     async def setprefix_cmd(self, app: Client, message: types.Message, args: str):

@@ -3,7 +3,7 @@ from pyrogram import Client, types
 from .. import __version__, loader, utils
 
 
-@loader.module(name="Help")
+@loader.module(name="Help", author='teagram')
 class HelpMod(loader.Module):
     """Помощь по командам 🍵 teagram"""
     async def help_cmd(self, app: Client, message: types.Message, args: str):

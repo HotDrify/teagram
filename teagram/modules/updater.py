@@ -9,7 +9,7 @@ from subprocess import check_output
 from .. import loader, utils
 
 
-@loader.module(name="updater")
+@loader.module(name="Updater", author='teagram')
 class UpdateMod(loader.Module):
     """🍵 Обновление с гита teagram"""
 

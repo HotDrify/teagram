@@ -49,7 +49,7 @@ async def get_git_raw_link(repo_url: str):
     return f"https://raw.githubusercontent.com{repo_path}/{branch}{path or ''}/"
 
 
-@loader.module(name="Loader")
+@loader.module(name="Loader", author='teagram')
 class LoaderMod(loader.Module):
     """Загрузчик модулей"""
 
@@ -175,7 +175,7 @@ class LoaderMod(loader.Module):
         if not module_name:
             return await utils.answer(
                 message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
-
+        
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
 

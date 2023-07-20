@@ -6,7 +6,7 @@ from pyrogram import Client, types
 from .. import loader, utils
 
 
-@loader.module(name="Terminal")
+@loader.module(name="Terminal", author='teagram')
 class TerminalMod(loader.Module):
     """Используйте терминал BASH прямо через 🍵teagram!"""
     async def terminal_cmd(self, app: Client, message: types.Message, args: str):
