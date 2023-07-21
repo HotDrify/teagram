@@ -1,0 +1,16 @@
+version: "3"
+services:
+    main:
+        container_name: "teagram"
+        build:
+            context: .
+        volumes:
+            - main:/data
+        stop_signal: SIGINT
+        restart: unless-stopped
+        command: python3 -m teagram
+        ports:
+            - 4040:4040
+
+volumes:
+    main:
