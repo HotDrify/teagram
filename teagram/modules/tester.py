@@ -50,8 +50,8 @@ class TesterMod(loader.Module):
         logs = io.BytesIO(logs)
         logs.name = "teagram.log"
 
-        return await utils.answer(
-            message, logs, doc=True, quote=False,
+        return await message.reply_document(
+            document=logs,
             caption=f"📤 Teagram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
             )
     
