@@ -7,7 +7,7 @@ services:
         volumes:
             - main:/data
         stop_signal: SIGINT
-        restart: on-failure
+        restart: never
         command: python3 -m teagram
 
 volumes:
