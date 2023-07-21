@@ -1,3 +1,4 @@
+requests
 Pyrogram>=2.0.106
 aiogram>=2.25.1
 googletrans==3.1.0a0
