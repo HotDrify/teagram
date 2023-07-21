@@ -9,12 +9,12 @@ from time import time
 
 @wrappers.wrap_function_to_async
 def create_backup(src: str, dest: str):
+    name = f'backup_{round(time())}'
+    exceptions = [name, 'backup', 'session', 'db', 'config', 'bot_avatar']
+    
+    zipp = os.path.join(dest, f'{name}.zip')
+
     try:
-        name = f'backup_{round(time())}'
-        exceptions = [name, 'backup', 'session', 'db', 'config', 'bot_avatar']
-
-        zipp = os.path.join(dest, f'{name}.zip')
-
         with zipfile.ZipFile(zipp, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(src):
                 for file in files:
@@ -33,7 +33,7 @@ def create_backup(src: str, dest: str):
 
         return [zipp, True]
     except Exception as error:
-        return [str(error), False] 
+        return [str(error), False, zipp] 
 
 @loader.module(name="Backuper", author='teagram')
 class BackupMod(loader.Module):
@@ -55,6 +55,6 @@ class BackupMod(loader.Module):
 
             return await utils.answer(
                 message,
-                '❌ Ошибка, проверьте логи'
+                f'❌ Ошибка, проверьте логи (возможный бекап {backup[2]})'
             )
         
