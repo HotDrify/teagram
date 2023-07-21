@@ -21,9 +21,9 @@ def create_backup(src: str, dest: str):
                     exceptionn = False
 
                     for exception in exceptions:
-                        if exception in file and not exceptionn:
+                        if exception in file:
                             exceptionn = True
-                        else:
+                        elif exceptionn:
                             break
                     
                     if not exceptionn:
