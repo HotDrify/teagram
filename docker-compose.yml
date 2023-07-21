@@ -7,10 +7,8 @@ services:
         volumes:
             - main:/data
         stop_signal: SIGINT
-        restart: unless-stopped
+        restart: on-failure
         command: python3 -m teagram
-        ports:
-            - 4040:4040
 
 volumes:
     main:
