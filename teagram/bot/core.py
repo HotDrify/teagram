@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher, exceptions
 from pyrogram import Client
 
 from typing import Union, NoReturn
+from loguru import logger
 
 from .events import Events
 from .token_manager import TokenManager
@@ -49,38 +50,37 @@ class BotManager(
         error_text = "Юзерботу необходим бот. Реши проблему создания бота и запускай юзербот заново"
 
         if not self._token:
-            logging.error('Нету токена для инлайн бота, запуск без инлайн бота (измените токен в db.json для инлайн бота)')
-            self._db.set("teagram.bot", "token", "")
-            return True
-            
-            # в будущем, т.к. создает слишком много ботов и не получает токен
+            logging.error("Токен не найден. Попытка пересоздать токен")
 
-            # self._token = await self._create_bot()
-            # if self._token is False:
-            #     logging.error(error_text)
-            #     return sys.exit(1)
+            token = await self._create_bot()
+            self._token = token
 
-            # self._db.set("teagram.bot", "token", self._token)
+            if self._token is False:
+                logging.error(error_text)
+                return sys.exit(1)
+
+            self._db.set("teagram.bot", "token", self._token)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
         except (exceptions.ValidationError, exceptions.Unauthorized):
-            logging.error("Неверный токен. Запуск без инлайн бота... (измените токен в db.json для инлайн бота)")
-            self._db.set("teagram.bot", "token", "")
-
-            return True
-
-            # revoke_token работает некоректно 
+            logging.error("Неверный токен. Попытка пересоздать токен")
          
-            # result = await self._revoke_token()
-            # if not result:
-            #     self._token = await self._create_bot()
-            #     if not self._token:
-            #         logging.error(error_text)
-            #         return sys.exit(1)
+            result = await self._revoke_token()
 
-            #     self._db.set("teagram.bot", "token", self._token)
-            #     return await self.load()
+            if not result:
+                self._token = await self._create_bot()
+                if not self._token:
+                    logging.error(error_text)
+                    return sys.exit(1)
+
+                self._db.set("teagram.bot", "token", self._token)
+                return await self.load()
+            else:
+                self._token = result
+                self._db.set("teagram.bot", "token", self._token)
+
+                return await self.load()
 
         self._dp = Dispatcher(self.bot)
 
@@ -100,5 +100,5 @@ class BotManager(
 
         self.bot.manager = self
 
-        logging.info("Менеджер бота успешно загружен")
+        logger.success("Менеджер бота успешно загружен")
         return True

@@ -3,7 +3,7 @@ from .. import loader, utils
 
 import os
 
-@loader.module(name="ModuleGuard")
+@loader.module(name="ModuleGuard", author='teagram')
 class ModuleGuardMod(loader.Module):
     """moduleGuard оповестит вас о вредоносном модуле."""
     async def on_load(self, message: types.Message):
@@ -25,7 +25,7 @@ class ModuleGuardMod(loader.Module):
         basic_plugins = ['eval.py', 'example.py', 'help.py', 
                          'info.py', 'loader.py', 'moduleGuard.py',
                          'terminal.py', 'tester.py', 'translator.py',
-                         'updater.py']
+                         'updater.py', 'backup.py']
                          
         critical = []
         warns = []

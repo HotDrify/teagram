@@ -2,6 +2,7 @@ import asyncio
 import functools
 import random
 import string
+import yaml
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
 
@@ -201,3 +202,13 @@ def random_id(size: int = 10) -> str:
     )
 
 
+def get_langpack() -> Union[Any, List]:
+    if not (lang := database.db.get('teagram.loader', 'lang')):
+        database.db.set('teagram.loader', 'lang', 'en')
+
+        get_langpack()
+    else:
+        with open(f'teagram/langpacks/{lang}.yml') as file:
+            pack = yaml.safe_load(file)
+
+        return pack

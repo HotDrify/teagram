@@ -79,6 +79,7 @@ class Auth:
         """Ввести код подтверждения"""
         try:
             code = colored_input("Введи код подтверждения: ")
+            
             return await self.app.sign_in(phone, phone_code_hash, code)
         except errors.SessionPasswordNeeded:
             return False

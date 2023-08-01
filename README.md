@@ -1,6 +1,6 @@
 <p align="center">
     <br>
-    <b>Teagram UserBot</b> — крутой юзербот написанный на <a href="https://github.com/pyrogram/pyrogram">Pyrogram</a>
+    <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — крутой юзербот написанный на <a href="https://github.com/pyrogram/pyrogram">Pyrogram</a>
     <br>
 </p>
 
@@ -26,9 +26,6 @@ Teagram — это ваш интерактивный многофункцион�
 
 
 <h1>Установка</h1>
-
-
-<h2>Установка</h2>
 
 Для начала нужно установить компоненты:
 

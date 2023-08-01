@@ -1,15 +1,15 @@
 import time
 import io
+import os
 import logging
-from datetime import datetime
 from logging import StreamHandler
 
 from pyrogram import Client, types
 
-from .. import loader, logger, utils
+from .. import loader, utils
 
 
-class CustomStreamHandler(logging.StreamHandler):
+class CustomStreamHandler(StreamHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logs: list = []
@@ -33,6 +33,7 @@ class TesterMod(loader.Module):
         if not args:
             args = "40"
 
+
         lvl = int(args)
 
         if not args or lvl < 0 or lvl > 60:
@@ -49,9 +50,9 @@ class TesterMod(loader.Module):
         logs = io.BytesIO(logs)
         logs.name = "teagram.log"
 
-        return await utils.answer(
-            message, logs, doc=True, quote=False,
-            caption=f"📤 TeaGram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
+        return await message.reply_document(
+            document=logs,
+            caption=f"📤 Teagram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
             )
     
     async def setprefix_cmd(self, app: Client, message: types.Message, args: str):
@@ -64,6 +65,26 @@ class TesterMod(loader.Module):
         prefixes = ", ".join(f"<code>{prefix}</code>" for prefix in args)
         return await utils.answer(
             message, f"✅ Префикс был изменен на {prefixes}")
+
+    async def setlang_cmd(self, app: Client, message: types.Message, args: str):
+        """Изменить язык. Использование: setlang <язык>"""
+        args = args.split()
+        
+        language = args[0]
+        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
+        
+        if not args:
+            return await utils.answer(
+                message, "❔ На какой язык нужно изменить?")
+        
+        if language not in languages:
+            langs = ' '.join(languages)
+            return await utils.answer(
+                message, f'❌ Язык не найден. Доступные языки: <code>{langs}</code>')
+
+        self.db.set("teagram.loader", "lang", language)
+        return await utils.answer(
+            message, f"✅ Язык был изменен на {language}")
 
     async def addalias_cmd(self, app: Client, message: types.Message, args: str):
         """Добавить алиас. Использование: addalias <новый алиас> <команда>"""

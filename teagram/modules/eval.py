@@ -33,7 +33,7 @@ async def execute_python_code(code, env: dict = {}):
         return error
     
 
-@loader.module(name="Eval")
+@loader.module(name="Eval", author='teagram')
 class EvalMod(loader.Module):
     """Используйте eval прямо через 🍵teagram!"""
     async def e_cmd(self, app: Client, message: types.Message, args: str):
