@@ -151,8 +151,8 @@ class TesterMod(loader.Module):
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
         await utils.answer(
             message,
-            f"""
-🍵 `Teagram | UserBot`
-🏓 **Понг!**: `{ping}ms`
+            f""
+🏓 **Скорость отлика Telegram**: `{ping}ms`
             """
         )
+
