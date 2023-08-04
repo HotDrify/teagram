@@ -26,8 +26,6 @@ class AboutMod(loader.Module):
         await utils.answer(
             message,
             f"""
-`🍵 teagram | UserBot`
-
 <b>🧠 CPU</b>: `~{utils.get_cpu()}%`
 <b>💾 RAM<b>: `~{utils.get_ram()}MiB`
 """ if not psutil_winerr else ""))
