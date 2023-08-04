@@ -1,8 +1,5 @@
-import platform
-import socket
-from datetime import datetime
-
 import psutil
+import time
 from pyrogram import Client, types
 
 from .. import __version__, loader, utils
@@ -10,27 +7,30 @@ from .. import __version__, loader, utils
 @loader.module(name="UserBot", author='teagram')
 class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
+    boot_time = time.time()
     
     async def info_cmd(self, app: Client, message: types.Message):
         """информацию о вашем 🍵teagram."""
         await utils.answer(message, "☕")
         me: types.User = await app.get_me()
-        psutil_winerr = False
+        uptime = round(time.time() - self.boot_time)
 
-        try:
-            boot = psutil.boot_time()
-            bt = datetime.fromtimestamp(boot)
-        except:
-            psutil_winerr = True
-
+        if uptime > 60:
+            uptime = str(uptime // 60) + " мин."
+        else:
+            uptime = str(round(uptime, 2)) + " секунд"
+        
         await utils.answer(
             message,
             f"""
-`🍵 teagram | UserBot`
+<b>💎 Владелец</b>:  `{me.username}`
+<b>💻 Версия</b>:  `v{__version__}`
 
-<b>🧠 CPU</b>: `~{utils.get_cpu()}%`
-<b>💾 RAM<b>: `~{utils.get_ram()}MiB`
-""" if not psutil_winerr else ""))
+<b>🧠 CPU</b>:  `{utils.get_cpu()}%`
+<b>💾 RAM</b>:  `{utils.get_ram()}MB`
+
+<b>🕒 Аптайм</b>:  `{uptime}`
+""")
         
     async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
         """информация о UserBot"""
