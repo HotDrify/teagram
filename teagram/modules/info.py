@@ -7,15 +7,6 @@ from pyrogram import Client, types
 
 from .. import __version__, loader, utils
 
-
-def byter(num: float, suffix: str = "B") -> str:
-    for unit in ["B", "K", "M", "G", "T", "P", "E", "Z"]:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
-        num /= 1024.0
-
-    return "%.1f%s%s" % (num, "Yi", suffix)
-
 @loader.module(name="UserBot", author='teagram')
 class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
@@ -37,29 +28,9 @@ class AboutMod(loader.Module):
             f"""
 `🍵 teagram | UserBot`
 
-`💻 UserBot`
-<b>Владелец</b>: `{me.username}`
-<b>Версия</b>: `v{__version__}`
-""" + (f"""
-`🧠 Процессор`
-<b>Использование</b>: `{int(psutil.cpu_percent())}%`
-<b>Ядер</b>: `{psutil.cpu_count()}`
-
-`🗃 ОЗУ`
-<b>Использование</b>: `{byter(psutil.virtual_memory().used)}`/`{byter(psutil.virtual_memory().total)}`
-
-`💾 ПЗУ`
-[/] | <b>Использование</b>: `{byter(psutil.disk_usage("/").used)}`/`{byter(psutil.disk_usage("/").total)}` (`{psutil.disk_usage("/").percent}%`)
-
-`🖥️ Хост`
-<b>Система</b>: `{platform.uname().system}`
-<b>Узел</b>: `{platform.uname().node}`
-<b>Релиз</b>: `{platform.uname().release}`
-<b>Версия</b>: `{platform.uname().version}`
-<b>Архитектура</b>: `{platform.machine()}`
-<b>Процессор</b>: `{platform.processor()}`
-<b>Имя хоста</b>: `{socket.gethostname()}`
-<b>Работает с</b>: `{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}`""" if not psutil_winerr else ""))
+<b>🧠 CPU</b>: `~{utils.get_cpu()}%`
+<b>💾 RAM<b>: `~{utils.get_ram()}MiB`
+""" if not psutil_winerr else ""))
         
     async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
         """информация о UserBot"""
