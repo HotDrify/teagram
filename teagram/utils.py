@@ -188,6 +188,29 @@ def get_display_name(entity: Union[User, Chat]) -> str:
         )
     )
 
+def get_ram() -> float:
+    """Возвращает данные о памяти."""
+    try:
+        import psutil
+        process = psutil.Process(os.getpid())
+        mem = process.memory_info()[0] / 2.0**20
+        for child in process.children(recursive=True):
+            mem += child.memory_info()[0] / 2.0**20
+        return round(mem, 1)
+   except:
+       return 0
+
+def get_cpu() -> float:
+    """Возвращает данные о процессоре."""
+    try:
+        import psutil
+        process = psutil.Process(os.getpid())
+        cpu = process.cpu_percent()
+        for child in current_process.children(recursive=True):
+            cpu += child.cpu_percent()
+        return round(cpu, 1)
+    except:
+        return 0
 
 def random_id(size: int = 10) -> str:
     """Возвращает рандомный идентификатор заданной длины
