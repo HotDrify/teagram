@@ -197,8 +197,8 @@ def get_ram() -> float:
         for child in process.children(recursive=True):
             mem += child.memory_info()[0] / 2.0**20
         return round(mem, 1)
-   except:
-       return 0
+    except:
+        return 0
 
 def get_cpu() -> float:
     """Возвращает данные о процессоре."""
@@ -206,7 +206,7 @@ def get_cpu() -> float:
         import psutil
         process = psutil.Process(os.getpid())
         cpu = process.cpu_percent()
-        for child in current_process.children(recursive=True):
+        for child in process.children(recursive=True):
             cpu += child.cpu_percent()
         return round(cpu, 1)
     except:
