@@ -55,11 +55,9 @@ class ModuleGuardMod(loader.Module):
                     #         info.append(word["name"])
 
         message_text = """
-<code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
 """
         basic_text = """
-<code>🍵teagram | UserBot</code>
 <b>ModuleGuard</b>
 """
         for file_name in file_list:
