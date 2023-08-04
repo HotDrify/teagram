@@ -29,9 +29,9 @@ class TerminalMod(loader.Module):
         await utils.answer(
             message,
             f"""
-<code>🍵 teagram | UserBot</code>
 📥 <b>input</b>:
 <code>{args.strip()}</code>
+
 📤 <b>output</b>:
 <code>{output}</code>
 ```
