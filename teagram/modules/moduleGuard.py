@@ -22,7 +22,7 @@ class ModuleGuardMod(loader.Module):
             ]
         }
 
-        basic_plugins = ['eval.py', 'example.py', 'help.py', 
+        basic_plugins = ['eval.py', '_example.py', 'help.py', 
                          'info.py', 'loader.py', 'moduleGuard.py',
                          'terminal.py', 'tester.py', 'translator.py',
                          'updater.py', 'backup.py']

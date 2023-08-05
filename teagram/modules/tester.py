@@ -152,7 +152,7 @@ class TesterMod(loader.Module):
         await utils.answer(
             message,
             f"""
-🕒 **Скорость отлика Telegram**: `{ping}ms`
+🕒 **Время отлика Telegram**: `{ping}ms`
             """
         )
 
