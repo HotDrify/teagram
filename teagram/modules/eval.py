@@ -3,11 +3,7 @@ import ast
 
 from pyrogram import Client, types
 from .. import loader, utils
-from ..wrappers import wrap_function_to_async
 
-# врапперы для таких штук как, time.sleep и т.д.
-
-@wrap_function_to_async
 def insert_returns(body):
     if isinstance(body[-1], ast.Expr):
         body[-1] = ast.Return(body[-1].value)
