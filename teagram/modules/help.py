@@ -12,7 +12,7 @@ class HelpMod(loader.Module):
 
         if not args:
             text = ""
-            for module in self.all_modules.modules:
+            for module in sorted(self.all_modules.modules, key=lambda mod: len(str(mod))):
                 if module.name.lower() == 'help':
                     continue
 
