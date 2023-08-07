@@ -189,8 +189,12 @@ class LoaderMod(loader.Module):
             message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
     
     async def reloadmod_cmd(self, app: Client, message: types.Message, args: str):
+        if not args:
+            return await utils.answer(
+                message, "❌ Вы не указали модуль")
+        
         try:
-            module = args.split()[0].replace('.py', '')
+            module = args.split(maxsplit=1)[0].replace('.py', '')
 
             if module + '.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(
@@ -205,8 +209,6 @@ class LoaderMod(loader.Module):
             load = await self.all_modules.load_module(module_source)
 
             if not load and not unload:
-                logging.error(f'Load: {load}\nUnload:{unload}')
-
                 return await utils.answer(
                     message,
                     '❌ Произошла ошибка, пожалуйста проверьте логи'
