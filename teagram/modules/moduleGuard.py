@@ -39,7 +39,11 @@ class ModuleGuardMod(loader.Module):
                 file_path = os.path.join("teagram/modules/", file_name)
                 if os.path.isfile(file_path):
                     with open(file_path, "r") as file:
-                        content = file.read()
+                        try:
+                            content = file.read()
+                        except UnicodeDecodeError:
+                            pass
+
 
                     for word in names["warns"]:
                         if word['id'] in content:
@@ -48,7 +52,6 @@ class ModuleGuardMod(loader.Module):
                     for word in names["criticals"]:
                         if word['id'] in content:
                             critical.append(word["name"])
-                    # nothing in names["info"]
 
                     # for word in names["info"]:
                     #     if word['id'] in content:
