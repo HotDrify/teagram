@@ -41,7 +41,7 @@ class TesterMod(loader.Module):
                 message, "❌ Вы не указали уровень или указали неверный уровень логов")
 
         handler: CustomStreamHandler = log.handlers[1] # type: ignore
-        logs = '\n'.join(str(error) for error in handler.logs).encode('utf-8')
+        logs = '\n'.join(str(error) for error in handler.dumps()).encode('utf-8') # type: ignore
         
         if not logs:
             return await utils.answer(
