@@ -7,28 +7,11 @@ import logging
 from pyrogram import Client, types
 from subprocess import check_output
 from .. import loader, utils
-from aiogram import Bot
 
 
 @loader.module(name="Updater", author='teagram')
 class UpdateMod(loader.Module):
     """🍵 Обновление с гита teagram"""
-    async def on_load(self, app: Client):
-        bot: Bot = self.bot.bot
-        me = await app.get_me()
-
-        try:
-            last = check_output('git log -1').decode().split()[1]
-            local = check_output('git rev-parse HEAD').decode()
-            if last != local:
-                await bot.send_message(me.id, f'✔ Доступно обновление ({last[:6]})')
-
-        except:
-            await bot.send_message(
-                me.id,
-                '❌ Произошла ошибка, при проверке доступного обновления.\n'
-                '❌ Пожалуйста, удостовертесь что у вас работает команда GIT'
-            )
 
     async def update_cmd(self, app: Client, message: types.Message):
         try:
