@@ -42,7 +42,7 @@ class ModuleGuardMod(loader.Module):
                         try:
                             content = file.read()
                         except UnicodeDecodeError:
-                            pass
+                            continue
 
 
                     for word in names["warns"]:
