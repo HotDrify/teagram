@@ -21,7 +21,10 @@ class UpdateMod(loader.Module):
             last = check_output('git log -1').decode().split()[1]
             local = check_output('git rev-parse HEAD').decode()
             if last != local:
-                await bot.send_message(me.id, f'✔ Доступно обновление ({last[:6]})')
+                await bot.send_message(
+                    me.id,
+                    f"✔ Доступно обновление (<a href='https://github.com/HotDrify/teagram/commit/{last}'>{last[:6]}</a>)"
+                )
 
         except:
             await bot.send_message(
