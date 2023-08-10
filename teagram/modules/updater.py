@@ -3,11 +3,14 @@ import sys
 import time
 import atexit
 import logging
+import traceback
 
 from pyrogram import Client, types
 from subprocess import check_output
 from .. import loader, utils
 from aiogram import Bot
+
+from aiogram.utils.exceptions import CantParseEntities
 
 
 @loader.module(name="Updater", author='teagram')
@@ -16,21 +19,33 @@ class UpdateMod(loader.Module):
     async def on_load(self, app: Client):
         bot: Bot = self.bot.bot
         me = await app.get_me()
+        
+        last = None
+        local = None
 
         try:
             last = check_output('git log -1', shell=True).split()[1]
             local = check_output('git rev-parse HEAD', shell=True)
+
+            if last != local:
+                await bot.send_message(
+                me.id,
+                f"✔ Доступно обновление (<a href='https://github.com/HotDrify/teagram/commit/{last}'>{last[:6]}</a>)"
+                )
+
+        except CantParseEntities:
             if last != local:
                 await bot.send_message(
                     me.id,
-                    f"✔ Доступно обновление (<a href='https://github.com/HotDrify/teagram/commit/{last}'>{last[:6]}...</a>)"
+                    f"✔ Доступно обновление (https://github.com/HotDrify/teagram/commit/{last})"
                 )
-
-        except:
+                
+        except Exception as error:
+            traceback.print_exc()
             await bot.send_message(
                 me.id,
                 '❌ Произошла ошибка, при проверке доступного обновления.\n'
-                '❌ Пожалуйста, удостовертесь что у вас работает команда GIT'
+                f'❌ Пожалуйста, удостовертесь что у вас работает команда GIT {error}'
             )
 
     async def update_cmd(self, app: Client, message: types.Message):
