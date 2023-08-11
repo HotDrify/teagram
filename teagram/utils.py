@@ -9,6 +9,7 @@ from typing import Any, List, Literal, Tuple, Union
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
 from pyrogram.types import Chat, Message, User
+from pyrogram import Client
 
 from . import database
 
@@ -121,6 +122,40 @@ async def answer(
 
     return messages
 
+async def answer_inline(
+    message: Union[Message, List[Message]],
+    bot: Union[str, int],
+    query: str,
+    chat_id: Union[str, int] = ''
+) -> None:
+    """
+    Параметры:
+        message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
+            Сообщение
+
+        bot (``str`` | ``int``):
+            Ник или аиди инлайн бота
+        
+        query (``str``):
+            Параметры для инлайн бота
+
+        chat_id (``str`` | ``int``, optional):
+            Чат, в который нужно отправить результат инлайна
+    """
+
+    if isinstance(message, list):
+        message = message[0]
+
+    app: Client = message._client
+    message: Message
+
+    results = await app.get_inline_bot_results(bot, query)
+    
+    await app.send_inline_bot_result(
+        chat_id or message.chat.id,
+        results.query_id,
+        results.results[0].id
+    )
 
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """Запускает асинхронно нон-асинк функцию
