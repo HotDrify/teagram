@@ -10,7 +10,7 @@ class AboutMod(loader.Module):
     boot_time = time.time()
     
     async def info_cmd(self, app: Client, message: types.Message):
-        """информацию о вашем 🍵teagram."""
+        """Информация о вашем 🍵teagram."""
         await utils.answer(message, "☕")
         me: types.User = await app.get_me()
         uptime = round(time.time() - self.boot_time)
