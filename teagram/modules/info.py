@@ -33,7 +33,7 @@ class AboutMod(loader.Module):
 """)
         
     async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
-        """информация о UserBot"""
+        """Информация о UserBot"""
         await utils.answer(message, "☕")
         await utils.answer(message, '''🤔 <b>Что такое юзербот?</b>
         
