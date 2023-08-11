@@ -55,17 +55,15 @@ class TokenManager(Item):
                 return logging.error(response.text)
 
             token = search.group(0)
+            await conv.ask("/setuserpic")
+            await conv.get_response()
 
-# сейчас есть проблема так что без авы (проблема не наша а пирограма)
+            await conv.ask("@" + bot_username)
+            await conv.get_response()
 
-#             await conv.ask("/setuserpic")
-#             await conv.get_response()
-
-#             await conv.ask("@" + bot_username)
-#             await conv.get_response()
-
-#             await conv.ask_media("bot_avatar.png", media_type="photo")
-#             await conv.get_response()
+            self._app.me = await self._app.get_me()
+            await conv.ask_media("assets/bot_avatar.png", media_type="photo")
+            await conv.get_response()
 # # надо аву поставить до папки teagram, нев ней а до нее
 
             await conv.ask("/setinline")
