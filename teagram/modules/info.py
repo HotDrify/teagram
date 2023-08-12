@@ -1,7 +1,7 @@
 import psutil
 import time
 from pyrogram import Client, types
-
+from datetime import timedelta
 from .. import __version__, loader, utils
 
 @loader.module(name="UserBot", author='teagram')
@@ -13,12 +13,9 @@ class AboutMod(loader.Module):
         """Информация о вашем 🍵teagram."""
         await utils.answer(message, "☕")
         me: types.User = await app.get_me()
-        uptime = round(time.time() - self.boot_time)
+        uptime_raw = round(time.time() - self.boot_time)
 
-        if uptime > 60:
-            uptime = str(uptime // 60) + " мин."
-        else:
-            uptime = str(round(uptime, 2)) + " секунд"
+        uptime = (timedelta(seconds=uptime_raw))
         
         await utils.answer(
             message,
