@@ -120,8 +120,8 @@ class Auth:
             if qr[0] == "y":
                 api_id = int(config.get("pyrogram","api_id"))
                 api_hash = config.get("pyrogram","api_hash")
-                a = 0
 
+                tries = 0
                 while True:                    
                     try:
                         r = await self.app.invoke(
@@ -132,7 +132,7 @@ class Auth:
                     except errors.exceptions.unauthorized_401.SessionPasswordNeeded:
                         break
 
-                    if isinstance(r, raw.types.auth.login_token.LoginToken) and a % 30 == 0:
+                    if isinstance(r, raw.types.auth.login_token.LoginToken) and tries % 30 == 0:
                         print('Settings > Devices > Scan QR Code (or Add device)\n'
                           'Настройки > Устройства > Подключить устройство')
                         print('Scan QR code below | Сканируйте QR код ниже:' )
@@ -151,7 +151,7 @@ class Auth:
                         qr.make(fit=True)
                         qr.print_ascii()
                     
-                    a += 1
+                    tries += 1
                     await asyncio.sleep(1)
                 
                 me: types.User = await self.enter_2fa()
