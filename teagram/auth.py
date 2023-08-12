@@ -131,7 +131,9 @@ class Auth:
                         )
                     except errors.exceptions.unauthorized_401.SessionPasswordNeeded:
                         break
-
+                    
+                    if isinstance(r, raw.types.auth.login_token_success.LoginTokenSuccess):
+                        break
                     if isinstance(r, raw.types.auth.login_token.LoginToken) and tries % 30 == 0:
                         print('Settings > Devices > Scan QR Code (or Add device)\n'
                           'Настройки > Устройства > Подключить устройство')
