@@ -13,7 +13,6 @@ from pyrogram import Client, errors, types, raw
 from pyrogram.session.session import Session
 from pyrogram.raw.functions.auth.export_login_token import ExportLoginToken
 
-from qrcode import constants
 from qrcode.main import QRCode
 
 
