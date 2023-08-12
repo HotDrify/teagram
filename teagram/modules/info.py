@@ -15,7 +15,7 @@ class AboutMod(loader.Module):
         me: types.User = await app.get_me()
         uptime_raw = round(time.time() - self.boot_time)
 
-        uptime = (timedelta(seconds=uptime))
+        uptime = (timedelta(seconds=uptime_raw))
         
         await utils.answer(
             message,
