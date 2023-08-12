@@ -1,12 +1,21 @@
 import configparser
 import logging
 import sys
+
+import base64
+
 from datetime import datetime
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
 from pyrogram import Client, errors, types
 from pyrogram.session.session import Session
+from pyrogram.raw.functions.auth.export_login_token import ExportLoginToken
+
+from qrcode import constants
+from qrcode.main import QRCode
+from io import StringIO
+
 
 from . import __version__
 
@@ -50,7 +59,7 @@ class Auth:
 
             with open("./config.ini", "w") as file:
                 config.write(file)
-
+        
         return True
 
     async def send_code(self) -> Tuple[str, str]:
@@ -100,12 +109,49 @@ class Auth:
         try:
             me = await self.app.get_me()
         except errors.AuthKeyUnregistered:
-            phone, phone_code_hash = await self.send_code()
-            logged = await self.enter_code(phone, phone_code_hash)
-            if not logged:
+            config = configparser.ConfigParser()
+
+            qr = colored_input("Вход по QR-CODE? y/n ").lower()
+
+            if qr.lower() == "y":
+                config.read("./config.ini")
+                api_id = int(config.get("pyrogram","api_id"))
+                api_hash = config.get("pyrogram","api_hash")
+                
+                token = await self.app.invoke(
+                    ExportLoginToken(
+                        api_id=api_id, api_hash=api_hash, except_ids=[0]
+                    )
+                )
+
+                f = StringIO()
+                qr = QRCode(
+                	version=1,
+                	error_correction=constants.ERROR_CORRECT_L,
+                	box_size=10,
+                	border=4,
+                )
+
+                qr.add_data('tg://login?token={}'.format(
+                    base64.urlsafe_b64encode(token.token).decode('utf-8').rstrip('=') # type: ignore
+                ))
+
+                qr.make(fit=True)
+                qr.print_ascii(f)
+
+                f.seek(0)
+                print(f.read())
+                
+                input('Нажмите enter после сканирования QR...')
+                
                 me: types.User = await self.enter_2fa()
             else:
-                me: types.User = await self.app.get_me()
+                phone, phone_code_hash = await self.send_code() # type: ignore
+                logged = await self.enter_code(phone, phone_code_hash)
+                if not logged:
+                    me: types.User = await self.enter_2fa()
+                else:
+                    me: types.User = await self.app.get_me()
         except errors.SessionRevoked:
             logging.error("Сессия была сброшена, удали сессию и заново введи команду запуска")
             await self.app.disconnect()
