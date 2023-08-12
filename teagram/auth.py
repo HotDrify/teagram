@@ -117,32 +117,39 @@ class Auth:
                 config.read("./config.ini")
                 api_id = int(config.get("pyrogram","api_id"))
                 api_hash = config.get("pyrogram","api_hash")
-                
-                token = await self.app.invoke(
-                    ExportLoginToken(
-                        api_id=api_id, api_hash=api_hash, except_ids=[0]
+
+                stop = False
+                while True:
+                    token = await self.app.invoke(
+                        ExportLoginToken(
+                            api_id=api_id, api_hash=api_hash, except_ids=[0]
+                        )
                     )
-                )
 
-                f = StringIO()
-                qr = QRCode(
-                	version=1,
-                	error_correction=constants.ERROR_CORRECT_L,
-                	box_size=10,
-                	border=4,
-                )
+                    f = StringIO()
+                    qr = QRCode(
+                        version=1,
+                        error_correction=constants.ERROR_CORRECT_L,
+                        box_size=10,
+                        border=4,
+                    )
 
-                qr.add_data('tg://login?token={}'.format(
-                    base64.urlsafe_b64encode(token.token).decode('utf-8').rstrip('=') # type: ignore
-                ))
+                    qr.add_data('tg://login?token={}'.format(
+                        base64.urlsafe_b64encode(token.token).decode('utf-8').rstrip('=') # type: ignore
+                    ))
 
-                qr.make(fit=True)
-                qr.print_ascii(f)
+                    qr.make(fit=True)
+                    qr.print_ascii(f)
 
-                f.seek(0)
-                print(f.read())
-                
-                input('Нажмите enter после сканирования QR...')
+                    f.seek(0)
+                    print(f.read())
+
+                    inp = input('Напишите yes после сканирования, и напишите no для ре-генерации QR кода (y/n): ')
+
+                    if inp.strip().lower() in ['yes', 'y']:
+                        break
+                    else:
+                        continue
                 
                 me: types.User = await self.enter_2fa()
             else:
