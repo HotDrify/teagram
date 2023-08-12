@@ -3,18 +3,18 @@ import logging
 import sys
 
 import base64
+import asyncio
 
 from datetime import datetime
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
-from pyrogram import Client, errors, types
+from pyrogram import Client, errors, types, raw
 from pyrogram.session.session import Session
 from pyrogram.raw.functions.auth.export_login_token import ExportLoginToken
 
 from qrcode import constants
 from qrcode.main import QRCode
-from io import StringIO
 
 
 from . import __version__
@@ -40,8 +40,10 @@ class Auth:
 
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
+
         config = configparser.ConfigParser()
         config.read("./config.ini")
+
         self.app = Client(
             name=session_name, api_id=config.get('pyrogram', 'api_id'),
             api_hash=config.get('pyrogram', 'api_hash'),
@@ -98,6 +100,7 @@ class Auth:
         while True:
             try:
                 passwd = colored_input("Введи пароль двухфакторной аутентификации: ", True)
+
                 return await self.app.check_password(passwd)
             except errors.BadRequest:
                 logging.error("Неверный пароль, попробуй снова")
@@ -110,46 +113,46 @@ class Auth:
             me = await self.app.get_me()
         except errors.AuthKeyUnregistered:
             config = configparser.ConfigParser()
+            config.read('config.ini')
 
-            qr = colored_input("Вход по QR-CODE? y/n ").lower()
+            qr = colored_input("Вход по QR-CODE? y/n ").lower().split()
 
-            if qr.lower() == "y":
-                config.read("./config.ini")
+            if qr[0] == "y":
                 api_id = int(config.get("pyrogram","api_id"))
                 api_hash = config.get("pyrogram","api_hash")
+                a = 0
 
-                stop = False
-                while True:
-                    token = await self.app.invoke(
-                        ExportLoginToken(
-                            api_id=api_id, api_hash=api_hash, except_ids=[0]
+                while True:                    
+                    try:
+                        r = await self.app.invoke(
+                            ExportLoginToken(
+                                api_id=api_id, api_hash=api_hash, except_ids=[]
+                            )
                         )
-                    )
-
-                    f = StringIO()
-                    qr = QRCode(
-                        version=1,
-                        error_correction=constants.ERROR_CORRECT_L,
-                        box_size=10,
-                        border=4,
-                    )
-
-                    qr.add_data('tg://login?token={}'.format(
-                        base64.urlsafe_b64encode(token.token).decode('utf-8').rstrip('=') # type: ignore
-                    ))
-
-                    qr.make(fit=True)
-                    qr.print_ascii(f)
-
-                    f.seek(0)
-                    print(f.read())
-
-                    inp = input('Напишите yes после сканирования, и напишите no для ре-генерации QR кода (y/n): ')
-
-                    if inp.strip().lower() in ['yes', 'y']:
+                    except errors.exceptions.unauthorized_401.SessionPasswordNeeded:
                         break
-                    else:
-                        continue
+
+                    if isinstance(r, raw.types.auth.login_token.LoginToken) and a % 30 == 0:
+                        print('Settings > Devices > Scan QR Code (or Add device)\n'
+                          'Настройки > Устройства > Подключить устройство')
+                        print('Scan QR code below | Сканируйте QR код ниже:' )
+
+                        qr = QRCode(
+                            version=1,
+                            error_correction=constants.ERROR_CORRECT_L,
+                            box_size=10,
+                            border=4,
+                        )
+
+                        qr.add_data('tg://login?token={}'.format(
+                            base64.urlsafe_b64encode(r.token).decode('utf-8').rstrip('=') # type: ignore
+                        ))
+
+                        qr.make(fit=True)
+                        qr.print_ascii()
+                    
+                    a += 1
+                    await asyncio.sleep(1)
                 
                 me: types.User = await self.enter_2fa()
             else:
