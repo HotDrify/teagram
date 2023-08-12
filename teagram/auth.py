@@ -141,12 +141,7 @@ class Auth:
                           'Настройки > Устройства > Подключить устройство')
                         print('Scan QR code below | Сканируйте QR код ниже:' )
 
-                        qr = QRCode(
-                            version=1,
-                            error_correction=constants.ERROR_CORRECT_L,
-                            box_size=10,
-                            border=4,
-                        )
+                        qr = QRCode(error_correction=1)
 
                         qr.add_data('tg://login?token={}'.format(
                             base64.urlsafe_b64encode(r.token).decode('utf-8').rstrip('=') # type: ignore
