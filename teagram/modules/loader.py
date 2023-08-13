@@ -160,6 +160,24 @@ class LoaderMod(loader.Module):
 
         file = await reply.download()
 
+        modules = [
+            'config',
+            'eval',
+            'help',
+            'info',
+            'moduleGuard',
+            'terminal',
+            'tester',
+            'updater'
+        ]
+        
+        for mod in modules:
+            if file == mod:
+                return await utils.answer(
+                    message,
+                    "❌ Нельзя загружать встроенные модули"
+                )
+
         try:
             with open(file, "r", encoding="utf-8") as file:
                 module_source = file.read()
@@ -189,6 +207,23 @@ class LoaderMod(loader.Module):
         if not (module_name := self.all_modules.unload_module(args)):
             return await utils.answer(
                 message, "❌ Неверное название модуля")
+        
+        modules = [
+            'config',
+            'eval',
+            'help',
+            'info',
+            'moduleGuard',
+            'terminal',
+            'tester',
+            'updater'
+        ]
+        
+        if module_name in modules:
+            return await utils.answer(
+                message,
+                "❌ Выгружать встроенные модули нельзя"
+            )
 
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
@@ -200,6 +235,24 @@ class LoaderMod(loader.Module):
         
         try:
             module = args.split(maxsplit=1)[0].replace('.py', '')
+
+            modules = [
+                'config',
+                'eval',
+                'help',
+                'info',
+                'moduleGuard',
+                'terminal',
+                'tester',
+                'updater'
+            ]
+            
+            for mod in modules:
+                if module == mod:
+                    return await utils.answer(
+                        message,
+                        "❌ Нельзя перезагружать встроенные модули"
+                    )
 
             if module + '.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(
