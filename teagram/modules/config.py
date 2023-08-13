@@ -109,7 +109,7 @@ class ConfigMod(loader.Module):
         for attr in attrs:
             buttons.append(
                 InlineKeyboardButton(
-                    attr, callback_data=f'attr_{mod.name.split(".")[-1]}'  # type: ignore
+                    attr, callback_data=f'ch_attr_{mod.name.split(".")[-1]}'  # type: ignore
                 )
             )
 
@@ -134,6 +134,12 @@ class ConfigMod(loader.Module):
             self.message,
             reply_markup=keyboard
         )
+    
+    @loader.on_bot(lambda _, __, call: call.data.startswith('ch_attr_'))
+    async def change_attribute_callback_handler(self, app: Client, call: CallbackQuery):
+        attribute = call.data.replace('ch_attr_', '') # атрибут
+
+        # дальше кнопка для смены атрибута, кнопка назад которая есть на 124 строке, и калбек
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery, args: str):
         if inline_query.from_user.id == (await app.get_me()).id:
