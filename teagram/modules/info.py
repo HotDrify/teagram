@@ -1,4 +1,6 @@
 import psutil
+import os
+import contextlib
 import time
 from pyrogram import Client, types
 from datetime import timedelta
@@ -11,6 +13,26 @@ class AboutMod(loader.Module):
     
     async def info_cmd(self, app: Client, message: types.Message):
         """Информация о вашем 🍵teagram."""
+        IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
+        IS_CODESPACES = "CODESPACES" in os.environ
+        IS_DOCKER = "DOCKER" in os.environ
+        IS_GOORM = "GOORM" in os.environ
+        IS_WSL = False
+        with contextlib.suppress(Exception):
+            from platform import uname
+            if "microsoft-standard" in uname().release:
+                IS_WSL = True
+
+        if IS_TERMUX:
+            platform = "📱 Termux"
+        elif IS_CODESPACES:
+            platorm = "⚙️ Github Codespace"
+        elif IS_DOCKER:
+            platform = "🐳 Docker"
+        elif IS_GOORM:
+            platform = "⚰️ Goorm"
+        elif IS_WSL:
+            platform = "🖥️ WSL"
         await utils.answer(message, "☕")
         me: types.User = await app.get_me()
         uptime_raw = round(time.time() - self.boot_time)
@@ -27,6 +49,8 @@ class AboutMod(loader.Module):
 <b>💾 RAM</b>:  `{utils.get_ram()}MB`
 
 <b>🕒 Аптайм</b>:  `{uptime}`
+
+<b>{platform}</b>
 """)
         
     async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
