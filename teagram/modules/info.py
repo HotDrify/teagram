@@ -30,7 +30,7 @@ class AboutMod(loader.Module):
         elif IS_DOCKER:
             platform = "🐳 Docker"
         elif IS_GOORM:
-            platform = "⚰️ Goorm"
+            platform = "💚 Goorm"
         elif IS_WSL:
             platform = "🖥️ WSL"
         await utils.answer(message, "☕")
