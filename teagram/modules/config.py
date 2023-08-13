@@ -16,6 +16,9 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, __, call: call.data == "send_cfg")
     async def example_callback_handler(self, app: Client, call: CallbackQuery):
+        if not (call.from_user.id == (await app.get_me()).id):
+            return await call.answer('Ты не владелец')
+        
         me = await app.get_me()
 
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
