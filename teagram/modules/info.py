@@ -18,6 +18,7 @@ class AboutMod(loader.Module):
         IS_CODESPACES = "CODESPACES" in os.environ
         IS_DOCKER = "DOCKER" in os.environ
         IS_GOORM = "GOORM" in os.environ
+        IS_WIN = "WINDIR" in os.environ
         IS_WSL = False
         with contextlib.suppress(Exception):
             from platform import uname
@@ -34,6 +35,8 @@ class AboutMod(loader.Module):
             platform = "💚 Goorm"
         elif IS_WSL:
             platform = "🧱 WSL"
+        elif IS_WIN:
+            platform = "💻 Windows"
         else:
             platform = "🖥️ VDS"
         await utils.answer(message, "☕")
@@ -46,7 +49,7 @@ class AboutMod(loader.Module):
             message,
             f"""
 <b>💎 Владелец</b>:  `{me.username}`
-<b>💻 Версия</b>:  `v{__version__}`
+<b>🆔 Версия</b>:  `v{__version__}`
 
 <b>🧠 CPU</b>:  `{utils.get_cpu()}%`
 <b>💾 RAM</b>:  `{utils.get_ram()}MB`
