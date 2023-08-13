@@ -33,9 +33,9 @@ class AboutMod(loader.Module):
         elif IS_GOORM:
             platform = "💚 Goorm"
         elif IS_WSL:
-            platform = "🖥️ WSL"
+            platform = "🧱 WSL"
         else:
-            platform = "🦾 VDS"
+            platform = "💻 VDS"
         await utils.answer(message, "☕")
         me: types.User = await app.get_me()
         uptime_raw = round(time.time() - self.boot_time)
