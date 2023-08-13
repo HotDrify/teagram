@@ -1,4 +1,4 @@
-import psutil
+import pyrogram
 import os
 import contextlib
 import time
@@ -27,8 +27,6 @@ class AboutMod(loader.Module):
 
         if IS_TERMUX:
             platform = "📱 Termux"
-        elif IS_CODESPACES:
-            platform = "👨‍💻 Github Codespaces"
         elif IS_DOCKER:
             platform = "🐳 Docker"
         elif IS_GOORM:
@@ -37,6 +35,8 @@ class AboutMod(loader.Module):
             platform = "🧱 WSL"
         elif IS_WIN:
             platform = "💻 Windows"
+        elif IS_CODESPACES:
+            platform = "👨‍💻 Github Codespaces"
         else:
             platform = "🖥️ VDS"
         await utils.answer(message, "☕")
@@ -78,6 +78,8 @@ class AboutMod(loader.Module):
 🚫 <b>Нет.</b> Они оффициально не поддерживаются, но вас не заблокируют за использование юзерботов.
 Но <b>могут заблокировать в случае выполнения вредоносного кода или за злоупотребление Telegram API</b> на вашем аккаунте, так что владельцу юзербота надо тщательно проверять что выполняется на вашем аккаунте.''')
 
-    async def teagram_cmd(self, app: Client, message: types.Message, args: str):
-        '''Узнать версию pyrogram'''
-        await utils.answer(message,f"🔥 <b>Версия Pyrogram:</b> <code>{pyrogram.__version__}</code>")
+    async def teagram_cmd(self, app: Client, message: types.Message):
+        await utils.answer(
+            message,
+            f'🔥 Версия pyrogram: `{pyrogram.__version__}`'
+        )

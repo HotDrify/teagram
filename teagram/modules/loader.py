@@ -244,7 +244,8 @@ class LoaderMod(loader.Module):
                 'moduleGuard',
                 'terminal',
                 'tester',
-                'updater'
+                'updater',
+                'loader'
             ]
             
             for mod in modules:
