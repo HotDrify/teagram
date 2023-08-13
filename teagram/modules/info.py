@@ -15,6 +15,7 @@ class AboutMod(loader.Module):
         """Информация о вашем 🍵teagram."""
         platform = ""
         IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
+        IS_CODESPACES = "CODESPACES" in os.environ
         IS_DOCKER = "DOCKER" in os.environ
         IS_GOORM = "GOORM" in os.environ
         IS_WSL = False
@@ -25,6 +26,8 @@ class AboutMod(loader.Module):
 
         if IS_TERMUX:
             platform = "📱 Termux"
+        elif IS_CODESPACES:
+            platform = "👨‍💻 Github Codespaces"
         elif IS_DOCKER:
             platform = "🐳 Docker"
         elif IS_GOORM:
