@@ -26,17 +26,17 @@ class AboutMod(loader.Module):
                 IS_WSL = True
 
         if IS_TERMUX:
-            platform = "📱 Termux"
+            platform = "<emoji id=5407025283456835913>📱</emoji> Termux"
         elif IS_DOCKER:
-            platform = "🐳 Docker"
+            platform = "<emoji id=5431815452437257407>🐳</emoji> Docker"
         elif IS_GOORM:
-            platform = "💚 Goorm"
+            platform = "<emoji id=5215584860063669771>💚</emoji> Goorm"
         elif IS_WSL:
-            platform = "🧱 WSL"
+            platform = "<emoji id=6327609909416298142>🧱</emoji> WSL"
         elif IS_WIN:
-            platform = "💻 Windows"
+            platform = "<emoji id=5309880373126113150>💻</emoji> Windows"
         elif IS_CODESPACES:
-            platform = "👨‍💻 Github Codespaces"
+            platform = "<emoji id=5467643451145199431>👨‍💻</emoji> Github Codespaces"
         else:
             platform = "🖥️ VDS"
         await utils.answer(message, "☕")
