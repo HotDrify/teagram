@@ -13,6 +13,7 @@ class AboutMod(loader.Module):
     
     async def info_cmd(self, app: Client, message: types.Message):
         """Информация о вашем 🍵teagram."""
+        platform = ""
         IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
         IS_CODESPACES = "CODESPACES" in os.environ
         IS_DOCKER = "DOCKER" in os.environ
@@ -33,6 +34,8 @@ class AboutMod(loader.Module):
             platform = "💚 Goorm"
         elif IS_WSL:
             platform = "🖥️ WSL"
+        else:
+            platform = "🖲️ VDS"
         await utils.answer(message, "☕")
         me: types.User = await app.get_me()
         uptime_raw = round(time.time() - self.boot_time)
