@@ -168,6 +168,7 @@ class LoaderMod(loader.Module):
                 message, "❌ Неверная кодировка файла")
 
         module_name = await self.all_modules.load_module(module_source)
+
         if module_name is True:
             return await utils.answer(
                 message, "✅ Зависимости установлены. Требуется перезагрузка")
@@ -175,6 +176,10 @@ class LoaderMod(loader.Module):
         if not module_name:
             return await utils.answer(
                 message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
+        
+        module = '_'.join(module_name.lower().split())
+        with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
+            file.write(module_source)
         
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
