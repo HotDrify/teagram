@@ -239,7 +239,7 @@ class LoaderMod(loader.Module):
             }
         )
 
-        await utils.answer(message, "🔁 Перезагрузка...")
+        await utils.answer(message, "<b><emoji id=5328274090262275771>🔁</emoji> Перезагрузка...</b>")
 
         logging.info("Перезагрузка...")
         return sys.exit(0)
