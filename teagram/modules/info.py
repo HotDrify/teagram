@@ -59,7 +59,7 @@ class AboutMod(loader.Module):
 <b>{platform}</b>
 """)
         
-    async def ubinfo_cmd(self, app: Client, message: types.Message, args: str):
+    async def teagram_cmd(self, app: Client, message: types.Message, args: str):
         """Информация о UserBot"""
         await utils.answer(message, "☕")
         await utils.answer(message, '''🤔 <b>Что такое юзербот?</b>
@@ -78,7 +78,7 @@ class AboutMod(loader.Module):
 🚫 <b>Нет.</b> Они оффициально не поддерживаются, но вас не заблокируют за использование юзерботов.
 Но <b>могут заблокировать в случае выполнения вредоносного кода или за злоупотребление Telegram API</b> на вашем аккаунте, так что владельцу юзербота надо тщательно проверять что выполняется на вашем аккаунте.''')
 
-    async def teagram_cmd(self, app: Client, message: types.Message):
+    async def pyro_cmd(self, app: Client, message: types.Message):
         await utils.answer(
             message,
             f'🔥 Версия pyrogram: `{pyrogram.__version__}`'
