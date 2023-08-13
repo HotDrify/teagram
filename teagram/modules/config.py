@@ -24,7 +24,7 @@ class ConfigMod(loader.Module):
             'message_handlers', 'name', 'version', 'watcher_handlers'
         ]
 
-    def get_module(self, data):
+    def get_module(self, data: str) -> loader.Module:
         for module in self.all_modules.modules:
             if module.name.lower() in data.lower():
                 return module
@@ -109,7 +109,7 @@ class ConfigMod(loader.Module):
         for attr in attrs:
             buttons.append(
                 InlineKeyboardButton(
-                    attr, callback_data=f'ch_attr_{mod.name.split(".")[-1]}'  # type: ignore
+                    attr, callback_data=f'ch_attr_{mod.name.split(".")[-1]}_{attr}'  # type: ignore
                 )
             )
 
@@ -135,11 +135,22 @@ class ConfigMod(loader.Module):
             reply_markup=keyboard
         )
     
-    @loader.on_bot(lambda _, __, call: call.data.startswith('ch_attr_'))
+    @loader.on_bot(lambda _, __, call: call.data.startswith('ch_attr_')) # type: ignore
     async def change_attribute_callback_handler(self, app: Client, call: CallbackQuery):
-        attribute = call.data.replace('ch_attr_', '') # атрибут
+        data = call.data.replace('ch_attr_', '').split('_')
+        module = data[0]
+        attribute = data[1] # атрибут
+
+        module = self.get_module(module)
 
         # дальше кнопка для смены атрибута, кнопка назад которая есть на 124 строке, и калбек
+
+        self.pending = attribute
+        self.pending_module = module
+
+    @loader.on_bot(lambda _, __, msg: self.pending) # type: ignore
+    async def change_message_handler(self, app: Client, message: types.Message):
+        # ну типа сюда настройку атрибута ❤
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery, args: str):
         if inline_query.from_user.id == (await app.get_me()).id:
