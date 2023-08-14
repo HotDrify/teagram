@@ -30,8 +30,8 @@ class TerminalMod(loader.Module):
             message,
             f"""
 <emoji id=5472111548572900003>⌨️</emoji> <b>Команда:</b> <code>{args.strip()}</code>
-💾 <b>Вывод:</b>
-<code>{output}</code>
-```
+💾 <b>Вывод:</b><code>
+{output}
+</code>
         """
         )

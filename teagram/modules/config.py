@@ -12,5 +12,5 @@ class ExampleMod(loader.Module):
         inline_keyboard = InlineKeyboardMarkup(row_width=2)
         modules = [mod.name for mod in self.all_modules.modules]
         for module in modules:
-            inline_keyboard.add(InlineKeyboardButton(module, callback_data=module))
+            inline_keyboard.add(InlineKeyboardButton(module, callback_data=module)) # type: ignore
         await message.reply("modules", reply_markup=inline_keyboard)
