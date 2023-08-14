@@ -36,7 +36,7 @@ class ConfigMod(loader.Module):
     def get_attrs(self, module):
         attrs = getmembers(module, lambda a: not isroutine(a))
         attrs = [
-            a[0] for a in attrs if not (
+            a for a in attrs if not (
                 a[0].startswith('__') and a[0].endswith('__')
             ) and a[0] not in self.DEFAULT_ATTRS
         ]
@@ -113,7 +113,10 @@ class ConfigMod(loader.Module):
         buttons = []
         count = 1
 
+        
+
         for attr in attrs:
+            attr = attr[0]
             buttons.append(
                 InlineKeyboardButton(
                     attr, callback_data=f'ch_attr_{mod.name.split(".")[-1]}_{attr}'  # type: ignore
@@ -133,8 +136,11 @@ class ConfigMod(loader.Module):
             callback_data='send_cfg'
         )) # type: ignore
 
+        attributes = [f'<b>(Тип {type(attr[1]).__name__})</b> <b>{attr[0]}</b>: <code>{attr[1]}</code>' for attr in attrs]
+        attributes = '\n'.join(attributes)
+
         await self.inline_bot.edit_message_text(
-            f'Модуль: {mod.name}', self.chat, self.message
+            f'Модуль: {mod.name}\n{attributes}', self.chat, self.message
         )
         await self.inline_bot.edit_message_reply_markup(
             self.chat,
