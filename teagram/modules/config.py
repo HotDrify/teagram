@@ -7,6 +7,7 @@ from aiogram.types import (
 from aiogram import Bot, Dispatcher
 from inspect import getmembers, isroutine
 from pyrogram import Client, types
+from asyncio import sleep
 
 from .. import loader, utils
 
@@ -23,6 +24,9 @@ class ConfigMod(loader.Module):
             'command_handlers', 'db', 'inline_handlers',
             'message_handlers', 'name', 'version', 'watcher_handlers'
         ]
+        self.pending = False
+        self.pending_id = utils.random_id(50)
+        self.pending_module = False
 
     def get_module(self, data: str) -> loader.Module:
         for module in self.all_modules.modules:
@@ -51,6 +55,9 @@ class ConfigMod(loader.Module):
         message: Message = await self.inline_bot.send_message(
             me.id, 'Модули', reply_markup=inline_keyboard
         )
+
+        if self.pending:
+            self.pending, self.pending_module, self.pending_id = (False, utils.random_id(50), False)
 
         count = 1
 
@@ -143,14 +150,51 @@ class ConfigMod(loader.Module):
 
         module = self.get_module(module)
 
-        # дальше кнопка для смены атрибута, кнопка назад которая есть на 124 строке, и калбек
-
         self.pending = attribute
         self.pending_module = module
+        self.pending_id = utils.random_id(3)
 
-    @loader.on_bot(lambda _, __, msg: self.pending) # type: ignore
+        keyboard = InlineKeyboardMarkup()
+
+        keyboard.row(
+            InlineKeyboardButton(
+                f'Сменить атрибут',
+                callback_data='aaa'
+            ), # type: ignore
+            InlineKeyboardButton(
+                '🔄 Назад',
+                callback_data='send_cfg'
+            ), # type: ignore
+        )
+
+        await self.inline_bot.edit_message_reply_markup(
+            self.chat,
+            self.message,
+            reply_markup=keyboard
+        )
+
+
+    @loader.on_bot(lambda _, __, data: data.data == 'aaa') # type: ignore
+    async def aaa_callback_handler(self, app: Client, call: CallbackQuery):
+        await call.answer(
+            f'{self.pending_id} ваш атрибут'
+        )    
+
+    @loader.on_bot(lambda self, __, msg: self.pending) # type: ignore
     async def change_message_handler(self, app: Client, message: types.Message):
-        # ну типа сюда настройку атрибута ❤
+        if self.pending_id in message.text:
+            attr = message.text.split()[1]
+
+            setattr(self.pending_module, self.pending, attr)
+
+            self.pending, self.pending_id, self.pending_module = (False, utils.random_id(50), False)
+
+            message = await message.reply('Успешно')
+
+            await sleep(2)
+
+            await message.delete()
+
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery, args: str):
         if inline_query.from_user.id == (await app.get_me()).id:
