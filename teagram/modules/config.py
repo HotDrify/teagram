@@ -158,7 +158,7 @@ class ConfigMod(loader.Module):
 
         keyboard.row(
             InlineKeyboardButton(
-                f'Сменить атрибут',
+                'Сменить атрибут',
                 callback_data='aaa'
             ), # type: ignore
             InlineKeyboardButton(
@@ -177,19 +177,22 @@ class ConfigMod(loader.Module):
     @loader.on_bot(lambda _, __, data: data.data == 'aaa') # type: ignore
     async def aaa_callback_handler(self, app: Client, call: CallbackQuery):
         await call.answer(
-            f'{self.pending_id} ваш атрибут'
+            f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"',
+            show_alert=True
         )    
 
-    @loader.on_bot(lambda self, __, msg: self.pending) # type: ignore
-    async def change_message_handler(self, app: Client, message: types.Message):
-        if self.pending_id in message.text:
+    @loader.on_bot(lambda self, __, msg: len(self.pending_id) != 50) # type: ignore
+    async def change_message_handler(self, app: Client, message: Message):
+        if self.pending_id in message.text: # type: ignore
             attr = message.text.split()[1]
 
-            setattr(self.pending_module, self.pending, attr)
+            await app.delete_messages(message.chat.id, message.message_id)
+
+            setattr(self.pending_module, self.pending, attr) # type: ignore
 
             self.pending, self.pending_id, self.pending_module = (False, utils.random_id(50), False)
 
-            message = await message.reply('Успешно')
+            message = await message.reply('✔ Атрибут успешно изменен!')
 
             await sleep(2)
 
