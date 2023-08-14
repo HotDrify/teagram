@@ -64,7 +64,6 @@ class Module:
 
     async def on_load(self, app: Client) -> Any:
         """Вызывается при загрузке модуля"""
-        logging.info(f'[INFO] 🍵 - module {self.name} loaded')
         print(f'[INFO] - module {self.name} loaded')
 
 class StringLoader(SourceLoader):
