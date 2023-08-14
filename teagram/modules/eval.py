@@ -30,9 +30,7 @@ async def execute_python_code(code, env={}):
 @loader.module(name="Eval", author='teagram')
 class EvalMod(loader.Module):
     """test"""
-
-
-    async def eval_cmd(self, app: Client, message: types.Message, args: str): # type: ignore
+    async def e_cmd(self, app: Client, message: types.Message, args: str): # type: ignore
         result = await execute_python_code(
             args,
             {
@@ -46,10 +44,10 @@ class EvalMod(loader.Module):
         await utils.answer(
             message,
             f"""
-            <b>💻 Code</b>:
-            <code>{args}</code>
+<b>💻 Code</b>:
+<code>{args}</code>
 
-            <b>💻 Output</b>:
-            <code>{result}</code>
+<b>💻 Output</b>:
+<code>{result}</code>
     """
         )
