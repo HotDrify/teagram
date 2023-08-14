@@ -4,7 +4,6 @@ import subprocess
 
 from getpass import types # type: ignore
 from .. import loader, utils
-from utils import paste_neko
 
 async def execute_python_code(code, env={}):
     # sourcery skip: inline-immediately-returned-variable
