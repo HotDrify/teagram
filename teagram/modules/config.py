@@ -9,7 +9,7 @@ from inspect import getmembers, isroutine
 from pyrogram import Client, types
 from asyncio import sleep
 
-from .. import loader, utils
+from .. import loader, utils, types
 
 
 @loader.module(name="config", author="teagram", version=1)
