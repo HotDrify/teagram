@@ -93,7 +93,7 @@ class ExampleMod(loader.Module): # Модуль обязательно долж�
     async def watcher(self, app: Client, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
         return await message.reply(
             "Привет, все работает отлично")
-
+</pre>
 <h1>Комьюнити</h1>
 <b><a href="https://t.me/UBteagram">Telegram (RU/EN)</a></b>
 <b><a href="https://discord.gg/s37xWt9Rr7">Discord (RU/EN)</a></b>
