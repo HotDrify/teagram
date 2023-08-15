@@ -34,15 +34,17 @@ class ConfigMod(loader.Module):
 
     def get_attrs(self, module):
         attrs = getmembers(module, lambda a: not isroutine(a))
-        attrs = [
-            (key, value) for key, value in attrs if not (
-                key.startswith('__') and key.endswith('__')
-            ) and key not in self.DEFAULT_ATTRS
-        ]
+        if attrs:
+            attrs = [
+                (key, value) for key, value in attrs if not (
+                    key.startswith('__') and key.endswith('__')
+                ) and key not in self.DEFAULT_ATTRS
+            ]
 
-        self.config = getattr(module, attrs[0][0])
+            self.config = getattr(module, attrs[0][0])
 
-        return attrs[0][1]
+            return attrs[0][1]
+        
 
     @loader.on_bot(lambda _, __, call: call.data == "send_cfg")
     async def config_callback_handler(self, app: Client, call: CallbackQuery):
