@@ -17,25 +17,29 @@ async def main():
     modules = loader.ModulesManager(app, db, me)
     await modules.load(app)
 
-    print('Юзербот включен ({})'.format(me.username))
+    prefix = db.get("teagram.loader", "prefixes", ["."])[0]
+    print('Юзербот включен (Префикс - "{}")'.format(prefix))
 
     if (restart := db.get("teagram.loader", "restart")):
-        msg = await app.get_messages(*map(int, restart["msg"].split(":")))
-        if (
-            not msg.empty
-            and msg.text != (
-                restarted_text := (
-                    f"✅ Перезагрузка прошла успешно! ({round(time.time())-int(restart['start'])} сек.)"
-                    if restart["type"] == "restart"
-                    else f"✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)"
+        restarted_text = (
+            f"✅ Перезагрузка прошла успешно! ({round(time.time())-int(restart['start'])} сек.)"
+            if restart["type"] == "restart"
+            else f"✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)"
+        )
+        
+        try:
+            msg = await app.get_messages(*map(int, restart["msg"].split(":")))
+            if (
+                not msg.empty
+                and msg.text != (
+                    restarted_text
                 )
-            )
-        ):
-            await msg.edit(restarted_text)
+            ):
+                await msg.edit(restarted_text)
+        except:
+            print(restarted_text)
 
         db.pop("teagram.loader", "restart")
-
-    prefix = db.get("teagram.loader", "prefixes", ["."])[0]
 
     await idle()
 
