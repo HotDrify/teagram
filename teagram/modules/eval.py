@@ -1,8 +1,5 @@
-import sys
-import asyncio
 import subprocess
 
-from getpass import types # type: ignore
 from .. import loader, utils
 
 async def execute_python_code(code, env={}):
