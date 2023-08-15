@@ -28,8 +28,8 @@ class Integer(Validator):
     def __init__(
         self,
         *,
-        minimum: int,
-        maximum: int
+        minimum: int = None,
+        maximum: int = None
     ):
         super().__init__(partial(
             self._valid,
