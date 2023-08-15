@@ -6,14 +6,16 @@
     <a href='https://github.com/hotdrify/teagram#установка'>
         Установка
     </a>
-    |
+    •
     <a href='https://github.com/hotdrify/teagram#комьюнити'>
         Комьюнити
     </a>
-    |
+    •
     <a href='https://github.com/hotdrify/teagram#пример-модуля'>
-        Пример модуля
+        Пример
     </a>
+    <img alt="last commit" src="https://img.shields.io/github/last-commit/HotDrify/teagram?style=for-the-badge">
+    <img alt="stars" src="https://img.shields.io/github/stars/HotDrify/teagram?style=for-the-badge">
 </p>
 
 
