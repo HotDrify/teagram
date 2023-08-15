@@ -3,11 +3,11 @@ import sys
 import time
 import atexit
 import logging
-import traceback
 
 from pyrogram import Client, types
 from subprocess import check_output
-from .. import loader, utils
+from .. import loader, utils, validators
+from ..types import Config, ConfigValue
 from loguru import logger
 
 from aiogram import Bot
@@ -16,7 +16,25 @@ from aiogram.utils.exceptions import CantParseEntities, CantInitiateConversation
 @loader.module(name="Updater", author='teagram')
 class UpdateMod(loader.Module):
     """🍵 Обновление с гита teagram"""
+    def __init__(self):
+        value = self.db.get('Updater', 'sendOnUpdate')
+        
+        if value is None:
+            value = True
+
+        self.config = Config(
+            ConfigValue(
+                option='sendOnUpdate',
+                default=True,
+                value=value,
+                validator=validators.Boolean()
+            ) # type: ignore
+        )
+
     async def on_load(self, app: Client):
+        if not self.config.get('sendOnUpdate'):
+            return
+
         bot: Bot = self.bot.bot
         me = await app.get_me()
         _me = await bot.get_me()

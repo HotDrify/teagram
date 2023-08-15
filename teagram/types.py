@@ -56,17 +56,17 @@ class ConfigValue:
     def __setattr__(self, key: str, value: Any):
         if self.validator:
             try:
-                self.validator._valid(value)
+                value = self.validator._valid(value)
             except ValidationError:
                 value = self.default
         
-        if isinstance(value, tuple):
-            raise ValidationError('Tuple (Check validator types)')
+        if isinstance(value, tuple) or isinstance(value, list) or isinstance(value, dict):
+            raise ValidationError('Неправильный тип (Проверьте типы валидаторов) / Invalid type (Check validator types)')
 
         object.__setattr__(self, key, value)
 
 class Config(dict):
-    def __init__(self, *values: list[ConfigValue]):
+    def __init__(self,  *values: list[ConfigValue]):
         self.config = {config.option: config for config in values}
 
         super().__init__(
@@ -80,7 +80,7 @@ class Config(dict):
         try:
             return self.config[key].value
         except KeyError:
-            return None
+            return None 
         
     def reload(self):
         for key in self.config:

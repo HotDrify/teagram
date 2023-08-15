@@ -9,7 +9,9 @@ from inspect import getmembers, isroutine
 from pyrogram import Client, types
 from asyncio import sleep
 
-from .. import loader, utils
+from distutils.util import strtobool
+
+from .. import loader, utils, database
 from ..types import Config, ConfigValue
 
 @loader.module(name="config", author="teagram", version=1)
@@ -21,7 +23,7 @@ class ConfigMod(loader.Module):
         self._dp = self.bot._dp
         self.DEFAULT_ATTRS = [
             'all_modules', 'author', 'bot', 'callback_handlers',
-            'command_handlers', 'db', 'inline_handlers',
+            'command_handlers', 'inline_handlers',
             'message_handlers', 'name', 'version', 'watcher_handlers'
         ]
         self.config = None  # Пoявляется после get_attrs
@@ -31,6 +33,18 @@ class ConfigMod(loader.Module):
 
     def get_module(self, data: str) -> loader.Module:
         return next((module for module in self.all_modules.modules if module.name.lower() in data.lower()), None)
+    
+    def validate(self, attribute):
+        if isinstance(attribute, str):
+            try:
+                attribute = int(attribute)
+            except:
+                try:
+                    attribute = bool(strtobool(attribute))
+                except:
+                    pass
+
+        return attribute
 
     def get_attrs(self, module):
         attrs = getmembers(module, lambda a: not isroutine(a))
@@ -39,8 +53,10 @@ class ConfigMod(loader.Module):
                 key.startswith('__') and key.endswith('__')
             ) and key not in self.DEFAULT_ATTRS
         ]
-        if attrs:
+        if len(attrs) > 1:
             self.config = getattr(module, attrs[0][0])
+            self.config_db: database.Database = attrs[1][1]
+            print(self.config_db)
 
             return attrs[0][1]
         
@@ -181,7 +197,13 @@ class ConfigMod(loader.Module):
 
             await app.delete_messages(message.chat.id, message.message_id)
 
-            self.config[self.pending] = attr
+            attribute: ConfigValue = self.config[self.pending]
+            self.config[self.pending] = self.validate(attr)
+            self.config_db.set(
+                self.pending_module.name,
+                self.pending,
+                self.validate(attr)
+            )
 
             self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
 
@@ -191,7 +213,7 @@ class ConfigMod(loader.Module):
 
             await message.delete()
 
-    async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery, args: str):
+    async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
         if inline_query.from_user.id == (await app.get_me()).id:
             await self.set_cfg(inline_query)
 
