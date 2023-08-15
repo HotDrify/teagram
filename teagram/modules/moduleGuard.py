@@ -1,13 +1,29 @@
 from pyrogram import Client, types
-from .. import loader, utils
+from .. import loader, utils, validators
+from ..types import Config, ConfigValue
 
 import os
 
 @loader.module(name="ModuleGuard", author='teagram')
 class ModuleGuardMod(loader.Module):
     """moduleGuard оповестит вас о вредоносном модуле."""
+    def __init__(self):
+        value = self.db.get('ModuleGuard', 'send')
+        
+        if value is None:
+            value = True
+
+        self.config = Config(
+            ConfigValue(
+                option='send',
+                default=True,
+                value=value,
+                validator=validators.Boolean()
+            ) # type: ignore
+        )
+
     async def on_load(self, app: types.Message):
-        if self.db.get('Guard', 'send_on_load'):
+        if self.config.get('send'):
             names = {
                 "info": [
                     {"id": "other", "name": "other"},
@@ -19,6 +35,7 @@ class ModuleGuardMod(loader.Module):
                 ],
                 "criticals": [
                     {"id": "session", "name": "plugin can get session"},
+                    {"id": "db.json", "name": "plugin can get auth data (db.json)"},
                     {"id": "config.ini", "name": "plugin can get auth data (config.ini)"}
                 ]
             }
@@ -26,7 +43,7 @@ class ModuleGuardMod(loader.Module):
             basic_plugins = ['eval.py', '_example.py', 'help.py', 
                             'info.py', 'loader.py', 'moduleGuard.py',
                             'terminal.py', 'tester.py', 'translator.py',
-                            'updater.py', 'backup.py']
+                            'updater.py', 'backup.py', 'config.py']
                             
             critical = []
             warns = []
@@ -88,27 +105,3 @@ class ModuleGuardMod(loader.Module):
                 message_text += 'Подозрительных плагинов не найдено'
 
             await app.send_message("me", message_text)
-
-    async def guard_cmd(self, app: Client, message: types.Message, args: str):
-        if not (turn := args.lower()) or turn.strip() not in ['on', 'off']:
-            return await utils.answer(
-                message,
-                '❌ Вы не указали аргументы (on/off)'
-            )
-
-        turn = turn.split()[0]
-        
-        if turn == 'on':
-            self.db.set('Guard', 'send_on_load', True)
-
-            await utils.answer(
-                message,
-                '✔ При загрузке будет проверка модулей!'
-            )
-        else:
-            self.db.set('Guard', 'send_on_load', False)
-
-            await utils.answer(
-                message,
-                '✔ При загрузке не будет проверки модулей!'
-            )
