@@ -1,6 +1,7 @@
 import subprocess
 
 from .. import loader, utils
+from pyrogram import Client, types
 
 async def execute_python_code(code, env={}):
     # sourcery skip: inline-immediately-returned-variable
