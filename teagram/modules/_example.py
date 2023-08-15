@@ -8,7 +8,8 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 from pyrogram import Client, types
 
 from .. import (  # ".." - т.к. модули находятся в папке teagram/modules, то нам нужно на уровень выше
-    loader, utils)
+    loader, utils, validators)
+from ..types import Config, ConfigValue
 
                             # loader, modules, bot - файлы из папки teagram
 
@@ -19,7 +20,14 @@ class ExampleMod(loader.Module):  # Example - название класса мо
     """Описание модуля"""
 
     def __init__(self):
-        self.test_attribute = "Это атрибут модуля"
+        self.config = Config(
+            ConfigValue(
+                'Это тестовый атрибут',
+                'Дефолтное значение атрибута',
+                'Значение атрибута',
+                validators.String() # тип значения
+            )
+        )
 
     async def on_load(self, app: Client):  # Можно считать что это асинхронный __init__
         """Вызывается когда модуль загружен"""

@@ -1,7 +1,21 @@
 <p align="center">
+    <img src="./assets/bot_avatar.png" width="500" alt="teagram-UB">
     <br>
     <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — крутой юзербот написанный на <a href="https://github.com/pyrogram/pyrogram">Pyrogram</a>
     <br>
+    <a href='https://github.com/hotdrify/teagram#установка'>
+        Установка
+    </a>
+    •
+    <a href='https://github.com/hotdrify/teagram#комьюнити'>
+        Комьюнити
+    </a>
+    •
+    <a href='https://github.com/hotdrify/teagram#пример-модуля'>
+        Пример
+    </a>
+    <img alt="last commit" src="https://img.shields.io/github/last-commit/HotDrify/teagram?style=for-the-badge">
+    <img alt="stars" src="https://img.shields.io/github/stars/HotDrify/teagram?style=for-the-badge">
 </p>
 
 
@@ -24,11 +38,8 @@ Teagram — это ваш интерактивный многофункцион�
     <li>Инлайн бот</li>
 </ul>
 
-
 <h1>Установка</h1>
-
-Для начала нужно установить компоненты:
-
+<h2>Termux(<a href='https://f-droid.org/en/packages/com.termux/'>f-droid</a>) / Linux / Windows WSL</h2>
 <pre lang="bash">
 apt update && apt upgrade -y && apt install -y openssl git python3 python3-pip
 </pre>
@@ -84,5 +95,7 @@ class ExampleMod(loader.Module): # Модуль обязательно долж�
     async def watcher(self, app: Client, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
         return await message.reply(
             "Привет, все работает отлично")
-
-
+</pre>
+<h1>Комьюнити</h1>
+<b><a href="https://t.me/UBteagram">Telegram (RU/EN)</a></b>
+<b><a href="https://discord.gg/s37xWt9Rr7">Discord (RU/EN)</a></b>
