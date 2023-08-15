@@ -39,13 +39,13 @@ class HelpMod(loader.Module):
 
             return await utils.answer(
                 message, 
-                f"🤖 Инлайн бот: <b>@{self.bot_username}</b>\n☕️ Доступные модули <b>{len(self.all_modules.modules)-1}</b>\n"
+                f"<emoji id=5359370246190801956>☕️</emoji> Доступные модули <b>{len(self.all_modules.modules)-1}</b>\n<emoji id=5228968570863496802>🤖</emoji> Инлайн бот: <b>@{self.bot_username}</b>\n"
                 f"{text}"
             )
 
         if not (module := self.all_modules.get_module(args)):
             return await utils.answer(
-                message, "❌ Такого модуля нет")
+                message, "<b><emoji id=5465665476971471368>❌</emoji> Такого модуля нет</b>")
 
         prefix = self.db.get("teagram.loader", "prefixes", ["."])[0]
 
@@ -61,12 +61,12 @@ class HelpMod(loader.Module):
         )
 
         header = (
-            f"🖥 Модуль: <b>{module.name}</b>\n" + (
-                f"👨🏿‍💻 Автор: <b>{module.author}</b>\n" if module.author else ""
+            f"<emoji id=5361735750968679136>🖥</emoji> <b>{module.name}</b>\n" + (
+                f"<emoji id=5224695503605735506>🧑‍💻</emoji> Автор: <b>{module.author}</b>\n" if module.author else ""
             ) + (
-                f"🔢 Версия: <b>{module.version}</b>\n" if module.version else ""
+                f"<emoji id=5224695503605735506>⌨️</emoji> Версия: <b>{module.version}</b>\n" if module.version else ""
             ) + (
-                f"\n📄 Описание:\n"
+                f"\n<emoji id=5400093244895797589>📄</emoji> Описание:\n"
                 f"    ╰ {module.__doc__ or 'Нет описания для модуля'}\n\n"
             )
         )

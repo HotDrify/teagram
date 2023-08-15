@@ -6,6 +6,7 @@ psutil>=5.9.5
 loguru>=0.7.0
 lightDB>=1.4.0
 GitPython>=3.1.31
+aiohttp
 pyyaml
 requests
 qrcode

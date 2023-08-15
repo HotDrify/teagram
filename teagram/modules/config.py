@@ -210,3 +210,4 @@ class ConfigMod(loader.Module):
         """Настройка через inline"""
         bot = await self.inline_bot.get_me()
         await utils.answer_inline(message, bot.username, 'cfg')
+

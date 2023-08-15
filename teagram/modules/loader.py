@@ -160,6 +160,24 @@ class LoaderMod(loader.Module):
 
         file = await reply.download()
 
+        modules = [
+            'config',
+            'eval',
+            'help',
+            'info',
+            'moduleGuard',
+            'terminal',
+            'tester',
+            'updater'
+        ]
+        
+        for mod in modules:
+            if file == mod:
+                return await utils.answer(
+                    message,
+                    "❌ Нельзя загружать встроенные модули"
+                )
+
         try:
             with open(file, "r", encoding="utf-8") as file:
                 module_source = file.read()
@@ -168,6 +186,7 @@ class LoaderMod(loader.Module):
                 message, "❌ Неверная кодировка файла")
 
         module_name = await self.all_modules.load_module(module_source)
+
         if module_name is True:
             return await utils.answer(
                 message, "✅ Зависимости установлены. Требуется перезагрузка")
@@ -175,6 +194,10 @@ class LoaderMod(loader.Module):
         if not module_name:
             return await utils.answer(
                 message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
+        
+        module = '_'.join(module_name.lower().split())
+        with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
+            file.write(module_source)
         
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
@@ -184,6 +207,23 @@ class LoaderMod(loader.Module):
         if not (module_name := self.all_modules.unload_module(args)):
             return await utils.answer(
                 message, "❌ Неверное название модуля")
+        
+        modules = [
+            'config',
+            'eval',
+            'help',
+            'info',
+            'moduleGuard',
+            'terminal',
+            'tester',
+            'updater'
+        ]
+        
+        if module_name in modules:
+            return await utils.answer(
+                message,
+                "❌ Выгружать встроенные модули нельзя"
+            )
 
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
@@ -195,6 +235,25 @@ class LoaderMod(loader.Module):
         
         try:
             module = args.split(maxsplit=1)[0].replace('.py', '')
+
+            modules = [
+                'config',
+                'eval',
+                'help',
+                'info',
+                'moduleGuard',
+                'terminal',
+                'tester',
+                'updater',
+                'loader'
+            ]
+            
+            for mod in modules:
+                if module == mod:
+                    return await utils.answer(
+                        message,
+                        "❌ Нельзя перезагружать встроенные модули"
+                    )
 
             if module + '.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(
@@ -239,7 +298,7 @@ class LoaderMod(loader.Module):
             }
         )
 
-        await utils.answer(message, "🔁 Перезагрузка...")
+        await utils.answer(message, "<b><emoji id=5328274090262275771>🔁</emoji> Перезагрузка...</b>")
 
         logging.info("Перезагрузка...")
         return sys.exit(0)

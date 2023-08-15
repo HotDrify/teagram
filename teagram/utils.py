@@ -2,10 +2,13 @@ import asyncio
 import functools
 import random
 import string
+import typing
 import yaml
 import os
+import aiohttp
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
+from urllib.parse import urlparse
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
 from pyrogram.types import Chat, Message, User
@@ -271,3 +274,17 @@ def get_langpack() -> Union[Any, List]:
             pack = yaml.safe_load(file)
 
         return pack
+
+async def paste_neko(code: str):
+    try:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+            async with session.post(
+                "https://nekobin.com/api/documents",
+                json={"content": code},
+            ) as paste:
+                paste.raise_for_status()
+                result = await paste.json()
+    except Exception:
+        return "Pasting failed"
+    else:
+        return f"nekobin.com/{result['result']['key']}.py"
