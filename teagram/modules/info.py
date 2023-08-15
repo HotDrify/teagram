@@ -57,7 +57,7 @@ class AboutMod(loader.Module):
 <b>💾 RAM</b>:  `{utils.get_ram()}MB`
 
 <b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  `{uptime}`
-<b><emoji id=5377399247589088543>🔥</emoji> Версия pyrogram: `{pyrogram.__version__}</b>
+<b><emoji id=5377399247589088543>🔥</emoji> Версия pyrogram: `{pyrogram.__version__}`</b>
 
 <b>{platform}</b>
 """)
