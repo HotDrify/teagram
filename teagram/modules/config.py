@@ -14,6 +14,24 @@ from distutils.util import strtobool
 from .. import loader, utils, database
 from ..types import Config, ConfigValue
 
+# distutils will be deleted in python 3.12
+# distutils будет удалена в python 3.12
+
+def strtobool(val):
+    """Convert a string representation of truth to true (1) or false (0).
+
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return 1
+    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return 0
+    else:
+        raise ValueError("invalid truth value %r" % (val,))
+
 @loader.module(name="config", author="teagram", version=1)
 class ConfigMod(loader.Module):
     """Настройка модулей"""
