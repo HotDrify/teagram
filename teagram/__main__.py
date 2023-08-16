@@ -2,8 +2,8 @@ import sys
 
 from . import logger, main
 
-if sys.version_info < (3, 8, 0):
-    print("Требуется Python 3.8 или выше")
+if sys.version_info < (3, 9, 0):
+    print("Требуется Python 3.9 или выше")
     sys.exit(1)
 
 
