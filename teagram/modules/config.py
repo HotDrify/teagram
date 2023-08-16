@@ -9,15 +9,13 @@ from inspect import getmembers, isroutine
 from pyrogram import Client, types
 from asyncio import sleep
 
-from distutils.util import strtobool
-
 from .. import loader, utils, database
 from ..types import Config, ConfigValue
 
 # distutils will be deleted in python 3.12
 # distutils будет удалена в python 3.12
-
 def strtobool(val):
+    # distutils.util.strtobool
     """Convert a string representation of truth to true (1) or false (0).
 
     True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
