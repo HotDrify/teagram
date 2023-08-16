@@ -10,3 +10,5 @@ aiohttp
 pyyaml
 requests
 qrcode
+
+# python 3.9 или выше
