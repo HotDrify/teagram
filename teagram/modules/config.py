@@ -39,7 +39,7 @@ class ConfigMod(loader.Module):
         self._dp = self.bot._dp
         self.DEFAULT_ATTRS = [
             'all_modules', 'author', 'bot', 'callback_handlers',
-            'command_handlers', 'inline_handlers',
+            'command_handlers', 'inline_handlers', 'bot_username',
             'message_handlers', 'name', 'version', 'watcher_handlers'
         ]
         self.config = None  # Пoявляется после get_attrs
