@@ -56,7 +56,6 @@ class ConfigMod(loader.Module):
         if len(attrs) > 1:
             self.config = getattr(module, attrs[0][0])
             self.config_db: database.Database = attrs[1][1]
-            print(self.config_db)
 
             return attrs[0][1]
         
