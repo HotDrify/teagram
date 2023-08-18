@@ -1,6 +1,4 @@
-import logging
 from subprocess import check_output
-
 from pyrogram import Client, types
 
 from .. import loader, utils

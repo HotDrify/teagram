@@ -2,6 +2,8 @@ import pyrogram
 import os
 import contextlib
 import time
+
+from terminal import bash_exec
 from pyrogram import Client, types
 from datetime import timedelta
 from .. import __version__, loader, utils
@@ -45,6 +47,9 @@ class AboutMod(loader.Module):
         uptime_raw = round(time.time() - self.boot_time)
 
         uptime = (timedelta(seconds=uptime_raw))
+        
+        update = await bash_exec('git diff')
+        version = f'`v{__version__}`' + (' <b>Доступно обновление</b>') if update else ""
         
         await utils.answer(
             message,
