@@ -48,8 +48,9 @@ class AboutMod(loader.Module):
 
         uptime = (timedelta(seconds=uptime_raw))
         
-        update = await bash_exec('git diff')
-        version = f'`v{__version__}`' + (' <b>Доступно обновление</b>') if update else ""
+        last = await bash_exec('git log -1').split()[1]
+        now = await bash_exec('git rev-parse HEAD')
+        version = f'`v{__version__}`' + (' <b>Доступно обновление</b>') if last != now else ""
         
         await utils.answer(
             message,
