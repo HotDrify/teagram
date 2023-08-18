@@ -3,7 +3,7 @@ import os
 import contextlib
 import time
 
-from terminal import bash_exec
+from .terminal import bash_exec
 from pyrogram import Client, types
 from datetime import timedelta
 from .. import __version__, loader, utils
@@ -56,7 +56,6 @@ class AboutMod(loader.Module):
             f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me.username}`
 <b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  `v{__version__}`
-
 
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  `{utils.get_cpu()}%`
 <b>💾 RAM</b>:  `{utils.get_ram()}MB`
