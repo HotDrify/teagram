@@ -48,15 +48,17 @@ class AboutMod(loader.Module):
 
         uptime = (timedelta(seconds=uptime_raw))
         
-        last = str(await bash_exec('git log -1')).split()[1]
-        now = await bash_exec('git rev-parse HEAD')
-        version = f'`v{__version__}`' + (' <b>Доступно обновление</b>') if last != now else ""
+        last = str(await bash_exec('git log -1')).split()[1].strip()
+        now = str(await bash_exec('git rev-parse HEAD')).strip()
+
+        print(last, now)
+        version = f'`v{__version__}`' + (' <b>Доступно обновление</b>' if last != now else "")
         
         await utils.answer(
             message,
             f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me.username}`
-<b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  `v{__version__}`
+<b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  {version}
 
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  `{utils.get_cpu()}%`
 <b>💾 RAM</b>:  `{utils.get_ram()}MB`
