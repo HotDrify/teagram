@@ -6,9 +6,9 @@ psutil>=5.9.5
 loguru>=0.7.0
 lightDB>=1.4.0
 GitPython>=3.1.31
-aiohttp
-pyyaml
-requests
-qrcode
+aiohttp>=3.8.5
+pyyaml>=6.0.1
+requests>=2.31.0
+qrcode>=7.4.2
 
 # python 3.9 или выше
