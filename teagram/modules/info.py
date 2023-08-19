@@ -53,7 +53,7 @@ class AboutMod(loader.Module):
 
         if custom:
             custom = custom.format(
-                me=me,
+                owner=me,
                 cpu=utils.get_cpu(),
                 ram=utils.get_ram(),
                 uptime=uptime,
