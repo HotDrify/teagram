@@ -14,7 +14,6 @@ def insert_returns(body):
             insert_returns(body[-1].body)
 
 async def execute_python_code(code, env={}):
-    # sourcery skip: inline-immediately-returned-variable
     try:
         fn_name = "_eval_expr"
         cmd = "\n".join(f" {i}" for i in code.splitlines())
@@ -33,8 +32,7 @@ async def execute_python_code(code, env={}):
 @loader.module(name="Eval", author='teagram')
 class EvalMod(loader.Module):
     """Используйте eval прямо через 🍵teagram!"""
-        
-    """test"""
+
     async def e_cmd(self, app: Client, message: types.Message, args: str): # type: ignore
         result = await execute_python_code(
             args,

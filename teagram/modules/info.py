@@ -1,63 +1,42 @@
 import pyrogram
-import os
-import contextlib
 import time
 
 from .terminal import bash_exec
 from pyrogram import Client, types
 from datetime import timedelta
-from .. import __version__, loader, utils
+from .. import __version__, loader, utils, validators
+from ..types import Config, ConfigValue
 
 
 @loader.module(name="UserBot", author='teagram')
 class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
-    boot_time = time.time()
+    def __init__(self):
+        self.boot_time = time.time()
+        self.config = Config(
+            ConfigValue(
+                'customText',
+                '',
+                self.db.get('UserBot', 'customText') or '',
+                validators.String()
+            ) # type: ignore
+        )
     
     async def info_cmd(self, app: Client, message: types.Message):
         """Информация о вашем 🍵teagram."""
-        platform = ""
-        IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
-        IS_CODESPACES = "CODESPACES" in os.environ
-        IS_DOCKER = "DOCKER" in os.environ
-        IS_GOORM = "GOORM" in os.environ
-        IS_WIN = "WINDIR" in os.environ
-        IS_WSL = False
-        with contextlib.suppress(Exception):
-            from platform import uname
-            if "microsoft-standard" in uname().release:
-                IS_WSL = True
+        platform = utils.get_platform()
 
-        if IS_TERMUX:
-            platform = "<emoji id=5407025283456835913>📱</emoji> Termux"
-        elif IS_DOCKER:
-            platform = "<emoji id=5431815452437257407>🐳</emoji> Docker"
-        elif IS_GOORM:
-            platform = "<emoji id=5215584860063669771>💚</emoji> Goorm"
-        elif IS_WSL:
-            platform = "<emoji id=6327609909416298142>🧱</emoji> WSL"
-        elif IS_WIN:
-            platform = "<emoji id=5309880373126113150>💻</emoji> Windows"
-        elif IS_CODESPACES:
-            platform = "<emoji id=5467643451145199431>👨‍💻</emoji> Github Codespaces"
-        else:
-            platform = "🖥️ VDS"
-        await utils.answer(message, "☕")
-        me: types.User = await app.get_me()
         uptime_raw = round(time.time() - self.boot_time)
-
         uptime = (timedelta(seconds=uptime_raw))
         
         last = str(await bash_exec('git log -1')).split()[1].strip()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
-
-        print(last, now)
         version = f'`v{__version__}`' + (' <b>Доступно обновление</b>' if last != now else "")
-        
-        await utils.answer(
-            message,
-            f"""
-<b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me.username}`
+
+        me = (await app.get_me()).username
+
+        default = f"""
+<b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me}`
 <b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  {version}
 
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  `{utils.get_cpu()}%`
@@ -67,7 +46,23 @@ class AboutMod(loader.Module):
 <b><emoji id=5377399247589088543>🔥</emoji> Версия pyrogram: `{pyrogram.__version__}`</b>
 
 <b>{platform}</b>
-""")
+"""
+
+        text = default
+        custom = self.config.get('customText')
+
+        if custom:
+            custom = custom.format(
+                me=me,
+                version=version,
+                uptime=uptime,
+                platform=platform
+            )
+        
+        await utils.answer(
+            message,
+            custom or text
+        )
         
     async def teagram_cmd(self, app: Client, message: types.Message, args: str):
         """Информация о UserBot"""

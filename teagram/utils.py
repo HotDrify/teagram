@@ -5,6 +5,7 @@ import string
 import typing
 import yaml
 import os
+import contextlib
 import aiohttp
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
@@ -250,6 +251,37 @@ def get_cpu() -> float:
         return round(cpu, 1)
     except:
         return 0
+    
+def get_platform() -> str:
+    """Возращает платформу."""
+    IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
+    IS_CODESPACES = "CODESPACES" in os.environ
+    IS_DOCKER = "DOCKER" in os.environ
+    IS_GOORM = "GOORM" in os.environ
+    IS_WIN = "WINDIR" in os.environ
+    IS_WSL = False
+    
+    with contextlib.suppress(Exception):
+        from platform import uname
+        if "microsoft-standard" in uname().release:
+            IS_WSL = True
+
+    if IS_TERMUX:
+        platform = "<emoji id=5407025283456835913>📱</emoji> Termux"
+    elif IS_DOCKER:
+        platform = "<emoji id=5431815452437257407>🐳</emoji> Docker"
+    elif IS_GOORM:
+        platform = "<emoji id=5215584860063669771>💚</emoji> Goorm"
+    elif IS_WSL:
+        platform = "<emoji id=6327609909416298142>🧱</emoji> WSL"
+    elif IS_WIN:
+        platform = "<emoji id=5309880373126113150>💻</emoji> Windows"
+    elif IS_CODESPACES:
+        platform = "<emoji id=5467643451145199431>👨‍💻</emoji> Github Codespaces"
+    else:
+        platform = "🖥️ VDS"
+    
+    return platform
 
 def random_id(size: int = 10) -> str:
     """Возвращает рандомный идентификатор заданной длины

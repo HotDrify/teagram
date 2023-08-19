@@ -4,13 +4,12 @@ from aiogram.types import (
     InlineQueryResultArticle, InputTextMessageContent,
     Message
 )
-from aiogram import Bot, Dispatcher
 from inspect import getmembers, isroutine
 from pyrogram import Client, types
 from asyncio import sleep
 
-from .. import loader, utils, database
-from ..types import Config, ConfigValue
+from .. import loader, utils, database, validators
+from ..types import ConfigValue
 
 # distutils will be deleted in python 3.12
 # distutils будет удалена в python 3.12
@@ -40,7 +39,8 @@ class ConfigMod(loader.Module):
         self.DEFAULT_ATTRS = [
             'all_modules', 'author', 'bot', 'callback_handlers',
             'command_handlers', 'inline_handlers', 'bot_username',
-            'message_handlers', 'name', 'version', 'watcher_handlers'
+            'message_handlers', 'name', 'version', 'watcher_handlers',
+            'boot_time'
         ]
         self.config = None  # Пoявляется после get_attrs
         self.pending = False
@@ -208,7 +208,7 @@ class ConfigMod(loader.Module):
     @loader.on_bot(lambda self, __, msg: len(self.pending_id) != 50)
     async def change_message_handler(self, app: Client, message: Message):
         if self.pending_id in message.text:
-            attr = message.text.split()[1]
+            attr = message.text.replace(self.pending_id, '').strip()
 
             await app.delete_messages(message.chat.id, message.message_id)
 
