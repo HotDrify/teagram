@@ -54,9 +54,12 @@ class AboutMod(loader.Module):
         if custom:
             custom = custom.format(
                 me=me,
-                version=version,
+                cpu=utils.get_cpu(),
+                ram=utils.get_ram(),
                 uptime=uptime,
-                platform=platform
+                version=version,
+                platform=platform,
+                pyro=pyrogram.__version__
             )
         
         await utils.answer(
