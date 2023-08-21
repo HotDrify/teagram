@@ -93,9 +93,10 @@ class ExampleMod(loader.Module):  # Example - название класса мо
     async def watcher(self, app: Client, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
         return await message.reply(
             "Привет, все работает отлично")
-
+    
     # Можно добавлять несколько вотчеров, главное чтобы функция начиналась с "watcher"
+    # @loader.on(...) без этого он будет считывать только ваши сообщения, можно просто передать в лямбду True
     async def watcher_(self, app: Client, message: types.Message):
-        if message.text == "Привет, это второй вотчер который не будет мешать первому работать":
+        if message.text == "Привет":
             return await message.reply(
-                "И тебе привет!")
+                "Привет!")
