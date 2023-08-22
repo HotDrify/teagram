@@ -1,5 +1,4 @@
 import logging
-import asyncio
 
 import os
 import re
@@ -8,14 +7,10 @@ import time
 
 
 import atexit
-import tempfile
 
 import requests
 
 from typing import List
-
-from git import Repo
-from git.exc import GitCommandError
 
 from telethon import TelegramClient, types
 from .. import loader, utils
@@ -54,7 +49,7 @@ async def get_git_raw_link(repo_url: str):
 class LoaderMod(loader.Module):
     """Загрузчик модулей"""
 
-    async def dlmod_cmd(self, app: TelegramClient, message: types.Message, args: str):
+    async def dlmod_cmd(self,  message: types.Message, args: str):
         """Загрузить модуль по ссылке. Использование: dlmod <ссылка или all или ничего>"""
         modules_repo = self.db.get(
             "teagram.loader", "repo",
@@ -144,7 +139,7 @@ class LoaderMod(loader.Module):
             )
         )
 
-    async def loadmod_cmd(self, app: TelegramClient, message: types.Message):
+    async def loadmod_cmd(self,  message: types.Message):
         """Загрузить модуль по файлу. Использование: <реплай на файл>"""
         reply = message.reply_to_message
         file = (
@@ -203,7 +198,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
 
-    async def unloadmod_cmd(self, app: TelegramClient, message: types.Message, args: str):
+    async def unloadmod_cmd(self,  message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
         if not (module_name := self.all_modules.unload_module(args)):
             return await utils.answer(
@@ -229,7 +224,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
     
-    async def reloadmod_cmd(self, app: TelegramClient, message: types.Message, args: str):
+    async def reloadmod_cmd(self,  message: types.Message, args: str):
         if not args:
             return await utils.answer(
                 message, "❌ Вы не указали модуль")
@@ -249,12 +244,12 @@ class LoaderMod(loader.Module):
                 'loader'
             ]
             
-            for mod in modules:
-                if module == mod:
-                    return await utils.answer(
-                        message,
-                        "❌ Нельзя перезагружать встроенные модули"
-                    )
+            # for mod in modules:
+            #     if module == mod:
+            #         return await utils.answer(
+            #             message,
+            #             "❌ Нельзя перезагружать встроенные модули"
+            #         )
 
             if module + '.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(
@@ -284,7 +279,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module}</code>\" перезагружен")
 
-    async def restart_cmd(self, app: TelegramClient, message: types.Message, update: bool = False):
+    async def restart_cmd(self, message: types.Message):
         """Перезагрузка юзербота"""
         def restart() -> None:
             """Запускает загрузку юзербота"""
@@ -293,7 +288,7 @@ class LoaderMod(loader.Module):
         atexit.register(restart)
         self.db.set(
             "teagram.loader", "restart", {
-                "msg": f"{message.chat.id}:{message.id}",
+                "msg": f"{((message.chat.id) if message.chat else 0 or message._chat_peer)}:{message.id}",
                 "start": time.time(),
                 "type": "restart"
             }
@@ -305,7 +300,7 @@ class LoaderMod(loader.Module):
         return sys.exit(0)
 
 
-    async def dlrepo_cmd(self, app: TelegramClient, message: types.Message, args: str):
+    async def dlrepo_cmd(self,  message: types.Message, args: str):
         """Установить репозиторий с модулями. Использование: dlrepo <ссылка на репозиторий или reset>"""
         if not args:
             return await utils.answer(

@@ -6,11 +6,11 @@ from .. import __version__, loader, utils
 @loader.module(name="Help", author='teagram')
 class HelpMod(loader.Module):
     """Помощь по командам 🍵 teagram"""
-    async def help_cmd(self, app: Client, message: types.Message, args: str):
+    async def help_cmd(self, message: types.Message):
         """Список всех модулей"""
         self.bot_username = (await self.bot.bot.get_me()).username
 
-        if not args:
+        if not False:
             text = ""
             for module in sorted(self.all_modules.modules, key=lambda mod: len(str(mod))):
                 if module.name.lower() == 'help':

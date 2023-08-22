@@ -33,23 +33,26 @@ async def execute_python_code(code, env={}):
 class EvalMod(loader.Module):
     """Используйте eval прямо через 🍵teagram!"""
 
-    async def e_cmd(self, app: Client, message: types.Message, args: str): # type: ignore
+    async def on_load(self, app):
+        self._client = app
+
+    async def e_cmd(self, message: types.Message, args: str): # type: ignore
         result = await execute_python_code(
             args,
             {
                 'self': self,
-                'client': app,
-                'app': app,
+                'client': self._client,
+                'app': self._client,
                 'message': message,
                 'args': args
             }
         )
-        await app.send_message(
-            message.chat.id,
+        await utils.answer(
+            message,
             f"""
 <b>💻 Code</b>:
 <code>{args}</code>
 
 <b>💻 Output</b>:
 <code>{result}</code>
-""", parse_mode='html')
+""")

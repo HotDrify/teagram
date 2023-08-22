@@ -79,11 +79,11 @@ class ConfigMod(loader.Module):
         
 
     @loader.on_bot(lambda _, __, call: call.data == "send_cfg")
-    async def config_callback_handler(self, app: Client, call: CallbackQuery):
-        if call.from_user.id != (await app.get_me()).id:
+    async def config_callback_handler(self, call: CallbackQuery):
+        if call.from_user.id != (await self._client.get_me()).id:
             return await call.answer('Ты не владелец')
 
-        me = await app.get_me()
+        me = await self._client.get_me()
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.all_modules.modules]
         message: Message = await self.inline_bot.send_message(me.id, 'Модули', reply_markup=inline_keyboard)
@@ -115,7 +115,7 @@ class ConfigMod(loader.Module):
         await self.inline_bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=inline_keyboard)
 
     @loader.on_bot(lambda _, __, call: call.data.startswith('mod'))
-    async def answer_callback_handler(self, app: Client, call: CallbackQuery):
+    async def answer_callback_handler(self, call: CallbackQuery):
         data = call.data
         data_parts = data.split('|')
         message = int(data_parts[1])
@@ -169,7 +169,7 @@ class ConfigMod(loader.Module):
         await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
     @loader.on_bot(lambda _, __, call: call.data.startswith('ch_attr_'))
-    async def change_attribute_callback_handler(self, app: Client, call: CallbackQuery):
+    async def change_attribute_callback_handler(self, call: CallbackQuery):
         data = call.data.replace('ch_attr_', '').split('_')
         module = data[0]
         attribute = data[1]
@@ -202,15 +202,13 @@ class ConfigMod(loader.Module):
         await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
     @loader.on_bot(lambda _, __, data: data.data == 'aaa')
-    async def aaa_callback_handler(self, app: Client, call: CallbackQuery):
+    async def aaa_callback_handler(self, call: CallbackQuery):
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
     @loader.on_bot(lambda self, __, msg: len(self.pending_id) != 50)
-    async def change_message_handler(self, app: Client, message: Message):
+    async def change_message_handler(self, message: Message):
         if self.pending_id in message.text:
             attr = message.text.replace(self.pending_id, '').strip()
-
-            await app.delete_messages(message.chat.id, message.message_id)
 
             attribute: ConfigValue = self.config[self.pending]
             self.config[self.pending] = self.validate(attr)
@@ -228,7 +226,7 @@ class ConfigMod(loader.Module):
 
             await message.delete()
 
-    async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
+    async def cfg_inline_handler(self, inline_query: InlineQuery):
         if inline_query.from_user.id == (await app.get_me()).id:
             await self.set_cfg(inline_query)
 
@@ -246,7 +244,7 @@ class ConfigMod(loader.Module):
             ]
         )
 
-    async def config_cmd(self, app: Client, message: types.Message):
+    async def config_cmd(self, message: types.Message):
         """Настройка через inline"""
         bot = await self.inline_bot.get_me()
         await utils.answer_inline(message, bot.username, 'cfg')

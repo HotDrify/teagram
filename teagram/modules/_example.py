@@ -35,12 +35,12 @@ class ExampleMod(loader.Module):  # Example - название класса мо
 
     # Если написать в лс/чате где есть бот "ты дурак?", то он ответит
     @loader.on_bot(lambda self, app, message: message.text and message.text.lower() == "ты дурак?")  # Сработает только если текст сообщения равняется "ты дурак?"
-    async def example_message_handler(self, app: TelegramClient, message: Message):  # _message_handler на конце функции чтобы обозначить что это хендлер сообщения
+    async def example_message_handler(self, message: Message):  # _message_handler на конце функции чтобы обозначить что это хендлер сообщения
         """Пример хендлера сообщения"""
         return await message.reply(
             "Сам такой!")
 
-    async def example_inline_handler(self, app: TelegramClient, inline_query: InlineQuery, args: str):  # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
+    async def example_inline_handler(self, inline_query: InlineQuery, args: str):  # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
                                                                                                 # args - аргументы после команды. необязательный аргумент
         """Пример инлайн-команды. Использование: @bot example [аргументы]"""
         await self.new_method(inline_query, args)
@@ -64,12 +64,12 @@ class ExampleMod(loader.Module):  # Example - название класса мо
         )
 
     @loader.on_bot(lambda self, app, call: call.data == "example_button_callback")  # Сработает только если каллбек дата равняется "example_button_callback"
-    async def example_callback_handler(self, app: TelegramClient, call: CallbackQuery):  # _callback_handler на конце функции чтобы обозначить что это каллбек-хендлер
+    async def example_callback_handler(self, call: CallbackQuery):  # _callback_handler на конце функции чтобы обозначить что это каллбек-хендлер
         """Пример каллбека"""
         return await call.answer(
             "Ого пример каллбека", show_alert=True)
 
-    async def example_cmd(self, app: TelegramClient, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
+    async def example_cmd(self, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
                                                                             # args - аргументы после команды. необязательный аргумент
         """Описание команды. Использование: example [аргументы]"""
         await utils.answer(  # utils.answer - это отправка сообщений, код можно посмотреть в utils
@@ -84,19 +84,19 @@ class ExampleMod(loader.Module):  # Example - название класса мо
             message, "Прошло 2.5 секунды!")
 
     @loader.on(lambda _, __, m: "тест" in getattr(m, "text", ""))  # Сработает только если есть "тест" в сообщении с командой
-    async def example2_cmd(self, app: Client, message: types.Message):
+    async def example2_cmd(self, message: types.Message):
         """Описание для второй команды с фильтрами"""
         return await utils.answer(
             message, f"Да, {self.test_attribute = }")
 
     @loader.on(lambda _, __, m: m and m.text == "Привет, это вотчер детка")
-    async def watcher(self, app: TelegramClient, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
+    async def watcher(self, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
         return await message.reply(
             "Привет, все работает отлично")
     
     # Можно добавлять несколько вотчеров, главное чтобы функция начиналась с "watcher"
     # @loader.on(...) без этого он будет считывать только ваши сообщения, можно просто передать в лямбду True
-    async def watcher_(self, app: TelegramClient, message: types.Message):
+    async def watcher_(self, message: types.Message):
         if message.text == "Привет":
             return await message.reply(
                 "Привет!")

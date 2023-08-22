@@ -24,7 +24,7 @@ class TranslatorMod(loader.Module):
             )
         )
 
-    async def translate_cmd(self, app, message: types.Message, args):
+    async def translate_cmd(self, message: types.Message, args):
         """Перевод"""
         if not (text := args):
             if not (text := message.reply_to_message.text):

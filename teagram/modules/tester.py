@@ -27,8 +27,8 @@ log.addHandler(handler)
 class TesterMod(loader.Module):
     """Тест чего-то"""
 
-    async def logs_cmd(self, app: Client, message: types.Message, args: str):
-        app.me = await app.get_me()
+    async def logs_cmd(self, message: types.Message, args: str):
+        self._client.me = await self.all_modules._client.get_me()
         """Отправляет логи. Использование: logs <уровень>"""
         if not args:
             args = "40"
@@ -55,7 +55,7 @@ class TesterMod(loader.Module):
             caption=f"📤 Teagram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
             )
     
-    async def setprefix_cmd(self, app: Client, message: types.Message, args: str):
+    async def setprefix_cmd(self, message: types.Message, args: str):
         """Изменить префикс, можно несколько штук разделённые пробелом. Использование: setprefix <префикс> [префикс, ...]"""
         if not (args := args.split()):
             return await utils.answer(
@@ -66,7 +66,7 @@ class TesterMod(loader.Module):
         return await utils.answer(
             message, f"✅ Префикс был изменен на {prefixes}")
 
-    async def setlang_cmd(self, app: Client, message: types.Message, args: str):
+    async def setlang_cmd(self, message: types.Message, args: str):
         """Изменить язык. Использование: setlang <язык>"""
         args = args.split()
         
@@ -86,7 +86,7 @@ class TesterMod(loader.Module):
         return await utils.answer(
             message, f"✅ Язык был изменен на {language}")
 
-    async def addalias_cmd(self, app: Client, message: types.Message, args: str):
+    async def addalias_cmd(self, message: types.Message, args: str):
         """Добавить алиас. Использование: addalias <новый алиас> <команда>"""
         if not (args := args.lower().split(maxsplit=1)):
             return await utils.answer(
@@ -113,7 +113,7 @@ class TesterMod(loader.Module):
         return await utils.answer(
             message, f"✅ Алиас <code>{args[0]}</code> для команды <code>{args[1]}</code> был добавлен")
 
-    async def delalias_cmd(self, app: Client, message: types.Message, args: str):
+    async def delalias_cmd(self, message: types.Message, args: str):
         """Удалить алиас. Использование: delalias <алиас>"""
         if not (args := args.lower()):
             return await utils.answer(
@@ -130,7 +130,7 @@ class TesterMod(loader.Module):
         return await utils.answer(
             message, f"✅ Алиас <code>{args}</code> был удален")
 
-    async def aliases_cmd(self, app: Client, message: types.Message):
+    async def aliases_cmd(self, message: types.Message):
         """Показать все алиасы"""
         aliases = self.all_modules.aliases
         if not aliases:
@@ -144,7 +144,7 @@ class TesterMod(loader.Module):
             )
         )
 
-    async def ping_cmd(self, app: Client, message: types.Message, args: str):
+    async def ping_cmd(self, message: types.Message, args: str):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
         await utils.answer(message, "☕")

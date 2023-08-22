@@ -31,7 +31,7 @@ class UpdateMod(loader.Module):
             ) # type: ignore
         )
 
-    async def on_load(self, app: Client):
+    async def on_load(self, app):
         if not self.config.get('sendOnUpdate'):
             return
 
@@ -68,7 +68,7 @@ class UpdateMod(loader.Module):
                 f'❌ Пожалуйста, удостовертесь что у вас работает команда GIT {error}'
             )
 
-    async def update_cmd(self, app: Client, message: types.Message):
+    async def update_cmd(self, message: types.Message):
         try:
             await utils.answer(message, 'Попытка обновления...')
 

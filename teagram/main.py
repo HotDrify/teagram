@@ -2,8 +2,6 @@ import logging
 import time
 
 from telethon import TelegramClient
-from pyrogram.methods.utilities.idle import idle
-
 from . import auth, database, loader
 
 
@@ -20,7 +18,7 @@ async def main():
     await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
-    print('Юзербот включен (Префикс - "{}")'.format('.'))
+    print('Юзербот включен (Префикс - "{}")'.format(prefix))
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
@@ -30,20 +28,21 @@ async def main():
         )
         
         try:
-            msg = await app.get_messages(*map(int, restart["msg"].split(":")))
+            _id = list(map(int, restart["msg"].split(":")))
+            msg = await app.get_messages(_id[0], ids=_id[1])
+
             if (
-                not msg.empty
-                and msg.text != (
+                msg and msg.text != (
                     restarted_text
                 )
             ):
-                await msg.edit(restarted_text)
+                await app.edit_message(_id[0], _id[1], restarted_text)
         except:
             print(restarted_text)
 
         db.pop("teagram.loader", "restart")
 
-    await app.run_until_disconnected()
+    await app.run_until_disconnected() # type: ignore
 
     logging.info("Завершение работы...")
     return True

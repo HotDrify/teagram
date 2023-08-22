@@ -12,8 +12,9 @@ from typing import Any, List, Literal, Tuple, Union
 from urllib.parse import urlparse
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
-from telethon.types import Chat, Message, User
+from telethon.types import Chat, User
 from telethon import TelegramClient
+from telethon.tl.custom import Message
 
 from . import database
 
@@ -27,7 +28,7 @@ def get_full_command(message: Message) -> Union[
         message (``pyrogram.types.Message``):
             Сообщение
     """
-    message.text = str(message.text or message.caption)
+    message.text = str(message.text)
     prefixes = database.db.get("teagram.loader", "prefixes", ["."])
 
     for prefix in prefixes:
@@ -44,81 +45,32 @@ def get_full_command(message: Message) -> Union[
     return prefixes[0], command.lower(), args[-1] if args else ""
 
 
-# async def answer(
-#     message: Union[Message, List[Message]],
-#     response: Union[str, Any],
-#     chat_id: Union[str, int] = None,
-#     doc: bool = False,
-#     photo: bool = False,
-#     **kwargs
-# ) -> List[Message]:
-#     """В основном это обычный message.edit, но:
-#         - Если содержание сообщения будет больше лимита (4096 символов),
-#             то отправится несколько разделённых сообщений
-#         - Работает message.reply, если команду вызвал не владелец аккаунта
+async def answer(
+    message: Union[Message, List[Message]],
+    response: Union[str, Any]
+) -> List[Message]:
+    messages: List[Message] = []
 
-#     Параметры:
-#         message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
-#             Сообщение
+    if isinstance(message, list):
+        message: Message = message[0]
 
-#         response (``str`` | ``typing.Any``):
-#             Текст или объект которое нужно отправить
+    if isinstance(response, str):
+        client: TelegramClient = message._client # type: ignore
+        chat = message.chat
 
-#         chat_id (``str`` | ``int``, optional):
-#             Чат, в который нужно отправить сообщение
-
-#         doc/photo (``bool``, optional):
-#             Если ``True``, сообщение будет отправлено как документ/фото или по ссылке
-
-#         kwargs (``dict``, optional):
-#             Параметры отправки сообщения
-#     """
-#     messages: List[Message] = []
-
-#     if isinstance(message, list):
-#         message: Message = message[0]
-
-#     if isinstance(response, str):
-#         await message.
-
-
-
-#     return messages
-
-# async def answer_inline(
-#     message: Union[Message, List[Message]],
-#     bot: Union[str, int],
-#     query: str,
-#     chat_id: Union[str, int] = ''
-# ) -> None:
-#     """
-#     Параметры:
-#         message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
-#             Сообщение
-
-#         bot (``str`` | ``int``):
-#             Ник или аиди инлайн бота
+        try:
+            msg = await client.edit_message(
+                (chat.id if chat else None or message._chat_peer), # type: ignore
+                message.id, # type: ignore
+                response,
+                parse_mode='html'
+            )
+        except:
+            msg = await message.reply(response, parse_mode='html')
         
-#         query (``str``):
-#             Параметры для инлайн бота
+        messages.append(msg)
 
-#         chat_id (``str`` | ``int``, optional):
-#             Чат, в который нужно отправить результат инлайна
-#     """
-
-#     if isinstance(message, list):
-#         message = message[0]
-
-#     app: Client = message._client
-#     message: Message
-
-#     results = await app.get_inline_bot_results(bot, query)
-    
-#     await app.send_inline_bot_result(
-#         chat_id or message.chat.id,
-#         results.query_id,
-#         results.results[0].id
-#     )
+    return messages
 
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """Запускает асинхронно нон-асинк функцию
@@ -136,55 +88,6 @@ def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     return asyncio.get_event_loop().run_in_executor(
         None, functools.partial(
             func, *args, **kwargs)
-    )
-
-
-def get_message_media(message: Message) -> Union[str, None]:
-    """Получить медиа с сообщения, если есть
-
-    Параметры:
-        message (``pyrogram.types.Message``):
-            Сообщение
-    """
-    return getattr(message, message.media or "", None)
-
-
-def get_media_ext(message: Message) -> Union[str, None]:
-    """Получить расширение файла
-
-    Параметры:
-        message (``pyrogram.types.Message``):
-            Сообщение
-    """
-    if not (media := get_message_media(message)):
-        return None
-
-    media_mime_type = getattr(media, "mime_type", "")
-    extension = message._client.mimetypes.guess_extension(media_mime_type)
-
-    if not extension:
-        extension = ".unknown"
-        file_type = FileId.decode(
-            media.file_id).file_type
-
-        if file_type in PHOTO_TYPES:
-            extension = ".jpg"
-
-    return extension
-
-
-def get_display_name(entity: Union[User, Chat]) -> str:
-    """Получить отображаемое имя
-
-    Параметры:
-        entity (``pyrogram.types.User`` | ``pyrogram.types.Chat``):
-            Сущность, для которой нужно получить отображаемое имя
-    """
-    return getattr(entity, "title", None) or (
-        entity.first_name or "" + (
-            " " + entity.last_name
-            if entity.last_name else ""
-        )
     )
 
 def get_ram() -> float:
@@ -242,16 +145,11 @@ def get_platform() -> str:
     
     return platform
 
-def random_id(size: int = 10) -> str:
-    """Возвращает рандомный идентификатор заданной длины
-
-    Параметры:
-        size (``int``, optional):
-            Длина идентификатора
-    """
+def random_id(length: int = 10) -> str:
+    """Returns random id"""
     return "".join(
         random.choice(string.ascii_letters + string.digits)
-        for _ in range(size)
+        for _ in range(length)
     )
 
 

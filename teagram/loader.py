@@ -191,7 +191,7 @@ class ModulesManager:
 
     def __init__(
         self,
-        app: TelegramClient,
+        client: TelegramClient,
         db: database.Database,
         me: types.User
     ) -> None:
@@ -205,7 +205,7 @@ class ModulesManager:
 
         self._local_modules_path: str = "./teagram/modules"
 
-        self._app = app
+        self._client = client
         self._db = db
         self.me = me
 
@@ -274,6 +274,7 @@ class ModulesManager:
 
                 value.db = self._db
                 value.all_modules = self
+                value.client = self._client
                 value.bot = self.bot_manager
 
                 instance = value()
@@ -364,7 +365,7 @@ class ModulesManager:
     async def send_on_load(self, module: Module) -> bool:
         """Используется для выполнении функции после загрузки модуля"""
         try:
-            await module.on_load(self._app)
+            await module.on_load(self._client)
         except Exception as error:
             return logging.exception(error)
 

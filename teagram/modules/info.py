@@ -1,8 +1,8 @@
-import pyrogram
+import telethon
 import time
 
-from asyncio import create_subprocess_shell
-from telethon import TelegramClient, types
+from .terminal import bash_exec
+from telethon.tl.custom import Message
 from datetime import timedelta
 from .. import __version__, loader, utils, validators
 from ..types import Config, ConfigValue
@@ -21,29 +21,31 @@ class AboutMod(loader.Module):
                 validators.String()
             ) # type: ignore
         )
+    async def on_load(self, app):
+        self._client = app
     
-    async def info_cmd(self, app: TelegramClient, message: types.Message):
+    async def info_cmd(self, message: Message):
         """Информация о вашем 🍵teagram."""
         platform = utils.get_platform()
 
         uptime_raw = round(time.time() - self.boot_time)
         uptime = (timedelta(seconds=uptime_raw))
         
-        last = str(await create_subprocess_shell('git log -1')).split()[1].strip()
-        now = str(await create_subprocess_shell('git rev-parse HEAD')).strip()
-        version = f'`v{__version__}`' + (' <b>Доступно обновление</b>' if last != now else "")
+        last = str(await bash_exec('git log -1')).split()[1].strip()
+        now = str(await bash_exec('git rev-parse HEAD')).strip()
+        version = f'v{__version__}' + (' <b>Доступно обновление</b>' if last != now else "")
 
-        me = (await app.get_me()).username
+        me = (await self._client.get_me()).username
 
         default = f"""
-<b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me}`
-<b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  {version}
+<b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  <code>{me}</code>
+<b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  <code>{version}</code>
 
-<b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  `{utils.get_cpu()}%`
-<b>💾 RAM</b>:  `{utils.get_ram()}MB`
+<b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  <code>{utils.get_cpu()}%</code>
+<b>💾 RAM</b>:  <code>{utils.get_ram()}MB</code>
 
-<b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  `{uptime}`
-<b><emoji id=5377399247589088543>🔥</emoji> Версия pyrogram: `{pyrogram.__version__}`</b>
+<b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  <code>{uptime}%</code>
+<b><emoji id=5377399247589088543>📱</emoji> Версия telethon: <code>{telethon.__version__}%</code></b>
 
 <b>{platform}</b>
 """
@@ -59,13 +61,12 @@ class AboutMod(loader.Module):
                 uptime=uptime,
                 version=version,
                 platform=platform,
-                pyro=pyrogram.__version__
+                tele=telethon.__version__
             )
         
-        await app.send_message(
-            message.chat.id,
-            custom or text,
-            parse_mode='html'
+        await utils.answer(
+            message,
+            custom or text
         )
         
 #     async def teagram_cmd(self, app: Client, message: types.Message, args: str):
