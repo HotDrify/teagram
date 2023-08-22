@@ -2,10 +2,8 @@ import configparser
 import logging
 import sys
 
-import base64
 import asyncio
 
-from datetime import datetime
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
@@ -19,12 +17,7 @@ from qrcode.main import QRCode
 
 from . import __version__
 
-# Session.notice_displayed: bool = True
-
-
 class Auth:
-    """Авторизация в аккаунт"""
-
     def __init__(self, session_name: str = "../teagram") -> None:
         self._check_api_tokens()
 
@@ -32,22 +25,44 @@ class Auth:
         config.read("./config.ini")
 
         self.app: TelegramClient = TelegramClient(
-            session=session_name, api_id=int(config.get('telethon', 'api_id')),
-            api_hash=config.get('telethon', 'api_hash'), app_version=f"v{__version__}"
+            session=session_name, app_version=f"v{__version__}",
+            api_id=int(config.get('telethon', 'api_id')), api_hash=config.get('telethon', 'api_hash')
         )
 
     def _check_api_tokens(self) -> bool:
         config = configparser.ConfigParser()
         if not config.read("./config.ini"):
             config["telethon"] = {
-                "api_id": input("Введи API ID: "),
-                "api_hash": input("Введи API hash: ")
+                "api_id": input("Enter API id: "),
+                "api_hash": input("Enter API hash: ")
             }
 
             with open("./config.ini", "w") as file:
                 config.write(file)
         
         return True
+
+    async def _2fa(self) -> str:
+        password = await self.app(GetPasswordRequest()) # type: ignore
+        
+        while True:
+            twofa = getpass('Enter 2FA password: ')
+            try:
+                await self.app._on_login(
+                    (
+                        await self.app(
+                            CheckPasswordRequest(
+                                compute_check(password, twofa.strip())
+                            )
+                        ) # type: ignore
+                    ).user
+                )
+            except errors.PasswordHashInvalidError:
+                logging.error('Wrong password!')
+            else:
+                return twofa
+        
+
 
     async def send_code(self) -> Tuple[str, str]:
         """Enter phone number"""
@@ -56,46 +71,53 @@ class Auth:
 
             try:
                 phone = input("Enter phone number: ")
-                return phone, (await self.app.send_code_request(phone)).phone_code_hash
+                return phone, (await self.app.send_code_request(phone, _retry_count=5)).phone_code_hash
             except errors.PhoneNumberInvalidError:
-                error_text = "Неверный номер телефона, попробуй ещё раз"
+                error_text = "Invalid phone number, please try again"
             except errors.PhoneNumberBannedError:
-                error_text = "Номер телефона заблокирован"
+                error_text = "Phone number blocked"
             except errors.PhoneNumberFloodError:
-                error_text = "На номере телефона флудвейт"
+                error_text = "On the phone number floodwait"
             except errors.PhoneNumberUnoccupiedError:
-                error_text = "Номер не зарегистрирован"
+                error_text = "Number not registered"
             except errors.BadRequestError as error:
-                error_text = f"Произошла неизвестная ошибка: {error}"
+                error_text = f"An unknown error has occurred: {error}"
 
             if error_text:
                 logging.error(error_text)
 
-    async def enter_code(self, phone: str, phone_code_hash: str) -> Union[types.User, bool]:
+    async def enter_code(self, phone: str, phone_code_hash: str) -> types.User:
         """Login in account"""
+        
+        code = input("Enter confirmation code: ")
+
         try:
-            code = input("Enter confirmation code: ")
-            passwd = getpass("Enter 2FA passowrd: ")
+            user = await self.app.sign_in(
+                phone,
+                code,
+                phone_code_hash=phone_code_hash
+            ) # type: ignore
+
+            return user
+        except errors.SessionPasswordNeededError:
+            twofa = await self._2fa()
 
             return await self.app.sign_in(
                 phone,
                 code,
-                password=passwd,
+                password=twofa,
                 phone_code_hash=phone_code_hash
             ) # type: ignore
-        except errors.SessionPasswordNeededError:
-            return False
-        except errors.PasswordHashInvalidError:
-            logging.error("Wrong password")
+
 
     async def authorize(self) -> Union[Tuple[types.User, TelegramClient], NoReturn]:
         """Account authorization process"""
         await self.app.connect()
 
         try:
-            me = await self.app.get_me()
+            me = await self.app.get_me() # type: ignore
             if not me:
-                raise errors.AuthKeyUnregisteredError('asd')
+                raise errors.AuthKeyUnregisteredError('?')
         except errors.AuthKeyUnregisteredError:
             qr = input("Login by QR-CODE? y/n ").lower().split()
 
@@ -115,6 +137,7 @@ class Auth:
 
                         await qrcode.recreate()
                         qr = QRCode()
+                        
                         qr.clear()
                         qr.add_data(qrcode.url)
                         qr.print_ascii()
@@ -122,30 +145,18 @@ class Auth:
                     tries += 1
                     await asyncio.sleep(1)
                 
-                password = await self.app(GetPasswordRequest())
+                await self._2fa()
 
-                while True:
-                    twofa = getpass('Enter 2FA password: ')
-                    try:
-                        await self.app._on_login(
-                            await self.app(CheckPasswordRequest(compute_check(password, twofa.strip())).user)
-                        )
-                    except errors.PasswordHashInvalidError:
-                        logging.error('Wrong password!')
-                    else:
-                        break
-
-                me = await self.app.get_me()
+                me = await self.app.get_me() # type: ignore
                     
             else:
                 phone, phone_code_hash = await self.send_code() # type: ignore
                 await self.enter_code(phone, phone_code_hash)
                 
-                me: types.User = await self.app.get_me()
+                me: types.User = await self.app.get_me() # type: ignore
         except errors.SessionRevokedError:
-            logging.error("The session was revoked, delete the session and re-enter the start command")
+            logging.error("The session was terminated, delete the session and re-auth")
             self.app.disconnect()
 
             return sys.exit(64)
-
         return me, self.app

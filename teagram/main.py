@@ -18,7 +18,20 @@ async def main():
     await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
+    
     print('Юзербот включен (Префикс - "{}")'.format(prefix))
+    print(
+"""
+
+  _____ _____    _    ____ ____      _    __  __ 
+ |_   _| ____|  / \  / ___|  _ \    / \  |  \/  |
+   | | |  _|   / _ \| |  _| |_) |  / _ \ | |\/| |
+   | | | |___ / ___ \ |_| |  _ <  / ___ \| |  | |
+   |_| |_____/_/   \_\____|_| \_\/_/   \_\_|  |_|
+
+
+"""
+    )
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
