@@ -84,8 +84,8 @@ class UpdateMod(loader.Module):
             atexit.register(restart)
             self.db.set(
                 "teagram.loader", "restart", {
-                    "msg": f"{message.chat.id}:{message.id}",
-                    "start": str(round(time.time())),
+                    "msg": f"{((message.chat.id) if message.chat else 0 or message._chat_peer)}:{message.id}",
+                    "start": time.time(),
                     "type": "update"
                 }
             )

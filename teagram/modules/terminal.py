@@ -21,7 +21,6 @@ def bash_exec(args: str):
 class TerminalMod(loader.Module):
     """Используйте терминал BASH прямо через 🍵teagram!"""
     async def terminal_cmd(self, message: types.Message, args: str):
-        message = message.chat.id
         await self._client.send_message(message, "☕")
         output = await bash_exec(args)
 
