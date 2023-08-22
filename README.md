@@ -1,7 +1,7 @@
 <p align="center">
     <img src="./assets/bot_avatar.png" width="500" alt="teagram-UB">
     <br>
-    <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — юзербот который использует <a href="https://github.com/pyrogram/pyrogram">Pyrogram</a>
+    <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — юзербот который использует <a href="https://github.com/LonamiWebs/Telethon">Telethon</a>
     <br>
     <a href='https://github.com/hotdrify/teagram#установка'>
         Установка
