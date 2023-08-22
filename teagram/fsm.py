@@ -3,7 +3,9 @@ import logging
 from types import TracebackType
 from typing import List, Union
 
-from pyrogram import Client, types
+from telethon import TelegramClient, types
+from telethon.tl.functions.messages import DeleteMessagesRequest
+from telethon.tl.custom.message import Message
 
 
 class Conversation:
@@ -11,14 +13,14 @@ class Conversation:
 
     def __init__(
         self,
-        app: Client,
+        app: TelegramClient,
         chat_id: Union[str, int],
         purge: bool = False
     ) -> None:
         """Инициализация класса
 
         Параметры:
-            app (``pyrogram.Client``):
+            app (``TelegramClient``):
                 Клиент
 
             chat_id (``str`` | ``int``):
@@ -27,7 +29,7 @@ class Conversation:
             purge (``bool``, optional):
                 Удалять сообщения после завершения диалога
         """
-        self.app = app
+        self.app: TelegramClient = app
         self.chat_id = chat_id
         self.purge = purge
 
@@ -115,15 +117,15 @@ class Conversation:
             timeout (``int``, optional):
                 Время ожидания ответа
         """
-        responses = self.app.get_chat_history(self.chat_id, limit=1)
+        responses = self.app.iter_messages(self.chat_id, limit=1)
         async for response in responses:
-            if response.from_user.is_self:
+            if int(response._sender_id) != int((await self.app.get_me()).id):
                 timeout -= 1
                 if timeout == 0:
                     raise RuntimeError("Истекло время ожидания ответа")
 
                 await asyncio.sleep(1)
-                responses = self.app.get_chat_history(self.chat_id, limit=1)
+                responses = self.app.iter_messages(self.chat_id, limit=1)
 
         self.messagee_to_purge.append(response)
         return response
@@ -132,6 +134,6 @@ class Conversation:
     async def _purge(self) -> bool:
         """Удалить все отправленные и полученные сообщения"""
         for message in self.messagee_to_purge:
-            await message.delete()
+            await self.app(DeleteMessagesRequest(message.id))
 
         return True

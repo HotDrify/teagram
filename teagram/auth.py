@@ -9,29 +9,17 @@ from datetime import datetime
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
-from pyrogram import Client, errors, types, raw
-from pyrogram.session.session import Session
-from pyrogram.raw.functions.auth.export_login_token import ExportLoginToken
+from telethon.password import compute_check
+from telethon import TelegramClient, errors, types
+from telethon.tl.functions.account import GetPasswordRequest
+from telethon.tl.functions.auth import CheckPasswordRequest
 
 from qrcode.main import QRCode
 
 
 from . import __version__
 
-Session.notice_displayed: bool = True
-
-
-def colored_input(prompt: str = "", hide: bool = False) -> str:
-    """Цветной инпут"""
-    frame = sys._getframe(1)
-    return (input if not hide else getpass)(
-        "\x1b[32m{time:%Y-%m-%d %H:%M:%S}\x1b[0m | "
-        "\x1b[1m{level: <8}\x1b[0m | "
-        "\x1b[36m{name}\x1b[0m:\x1b[36m{function}\x1b[0m:\x1b[36m{line}\x1b[0m - \x1b[1m{prompt}\x1b[0m".format(
-            time=datetime.now(), level="INPUT", name=frame.f_globals["__name__"],
-            function=frame.f_code.co_name, line=frame.f_lineno, prompt=prompt
-        )
-    )
+# Session.notice_displayed: bool = True
 
 
 class Auth:
@@ -43,19 +31,17 @@ class Auth:
         config = configparser.ConfigParser()
         config.read("./config.ini")
 
-        self.app = Client(
-            name=session_name, api_id=config.get('pyrogram', 'api_id'),
-            api_hash=config.get('pyrogram', 'api_hash'),
-            app_version=f"v{__version__}"
+        self.app: TelegramClient = TelegramClient(
+            session=session_name, api_id=int(config.get('telethon', 'api_id')),
+            api_hash=config.get('telethon', 'api_hash'), app_version=f"v{__version__}"
         )
 
     def _check_api_tokens(self) -> bool:
-        """Проверит установлены ли токены, если нет, то начинает установку"""
         config = configparser.ConfigParser()
         if not config.read("./config.ini"):
-            config["pyrogram"] = {
-                "api_id": colored_input("Введи API ID: "),
-                "api_hash": colored_input("Введи API hash: ")
+            config["telethon"] = {
+                "api_id": input("Введи API ID: "),
+                "api_hash": input("Введи API hash: ")
             }
 
             with open("./config.ini", "w") as file:
@@ -64,104 +50,102 @@ class Auth:
         return True
 
     async def send_code(self) -> Tuple[str, str]:
-        """Отправить код подтверждения"""
+        """Enter phone number"""
         while True:
             error_text: str = ""
 
             try:
-                phone = colored_input("Введи номер телефона: ")
-                return phone, (await self.app.send_code(phone)).phone_code_hash
-            except errors.PhoneNumberInvalid:
+                phone = input("Enter phone number: ")
+                return phone, (await self.app.send_code_request(phone)).phone_code_hash
+            except errors.PhoneNumberInvalidError:
                 error_text = "Неверный номер телефона, попробуй ещё раз"
-            except errors.PhoneNumberBanned:
+            except errors.PhoneNumberBannedError:
                 error_text = "Номер телефона заблокирован"
-            except errors.PhoneNumberFlood:
+            except errors.PhoneNumberFloodError:
                 error_text = "На номере телефона флудвейт"
-            except errors.PhoneNumberUnoccupied:
+            except errors.PhoneNumberUnoccupiedError:
                 error_text = "Номер не зарегистрирован"
-            except errors.BadRequest as error:
+            except errors.BadRequestError as error:
                 error_text = f"Произошла неизвестная ошибка: {error}"
 
             if error_text:
                 logging.error(error_text)
 
     async def enter_code(self, phone: str, phone_code_hash: str) -> Union[types.User, bool]:
-        """Ввести код подтверждения"""
+        """Login in account"""
         try:
-            code = colored_input("Введи код подтверждения: ")
-            
-            return await self.app.sign_in(phone, phone_code_hash, code)
-        except errors.SessionPasswordNeeded:
+            code = input("Enter confirmation code: ")
+            passwd = getpass("Enter 2FA passowrd: ")
+
+            return await self.app.sign_in(
+                phone,
+                code,
+                password=passwd,
+                phone_code_hash=phone_code_hash
+            ) # type: ignore
+        except errors.SessionPasswordNeededError:
             return False
+        except errors.PasswordHashInvalidError:
+            logging.error("Wrong password")
 
-    async def enter_2fa(self) -> types.User:
-        """Ввести код двухфакторной аутентификации"""
-        while True:
-            try:
-                passwd = colored_input("Введи пароль двухфакторной аутентификации: ", True)
-
-                return await self.app.check_password(passwd)
-            except errors.BadRequest:
-                logging.error("Неверный пароль, попробуй снова")
-
-    async def authorize(self) -> Union[Tuple[types.User, Client], NoReturn]:
-        """Процесс авторизации в аккаунт"""
+    async def authorize(self) -> Union[Tuple[types.User, TelegramClient], NoReturn]:
+        """Account authorization process"""
         await self.app.connect()
 
         try:
             me = await self.app.get_me()
-        except errors.AuthKeyUnregistered:
-            config = configparser.ConfigParser()
-            config.read('config.ini')
-
-            qr = colored_input("Вход по QR-CODE? y/n ").lower().split()
+            if not me:
+                raise errors.AuthKeyUnregisteredError('asd')
+        except errors.AuthKeyUnregisteredError:
+            qr = input("Login by QR-CODE? y/n ").lower().split()
 
             if qr[0] == "y":
-                api_id = int(config.get("pyrogram","api_id"))
-                api_hash = config.get("pyrogram","api_hash")
-
                 tries = 0
                 while True:                    
                     try:
-                        r = await self.app.invoke(
-                            ExportLoginToken(
-                                api_id=api_id, api_hash=api_hash, except_ids=[]
-                            )
-                        )
-                    except errors.exceptions.unauthorized_401.SessionPasswordNeeded:
-                        me: types.User = await self.enter_2fa()
-                        
+                        qrcode = await self.app.qr_login()
+                    except errors.UnauthorizedError:                        
                         break
 
-                    if isinstance(r, raw.types.auth.login_token_success.LoginTokenSuccess):
+                    if isinstance(qrcode, types.auth.LoginTokenSuccess):
                         break
-                    if isinstance(r, raw.types.auth.login_token.LoginToken) and tries % 30 == 0:
-                        print('Settings > Devices > Scan QR Code (or Add device)\n'
-                          'Настройки > Устройства > Подключить устройство')
-                        print('Scan QR code below | Сканируйте QR код ниже:' )
+                    if tries % 30 == 0:
+                        print('Settings > Devices > Scan QR Code (or Add device)\n')
+                        print('Scan QR code below:' )
 
-                        qr = QRCode(error_correction=1)
-
-                        qr.add_data('tg://login?token={}'.format(
-                            base64.urlsafe_b64encode(r.token).decode('utf-8').rstrip('=') # type: ignore
-                        ))
-
-                        qr.make(fit=True)
+                        await qrcode.recreate()
+                        qr = QRCode()
+                        qr.clear()
+                        qr.add_data(qrcode.url)
                         qr.print_ascii()
                     
                     tries += 1
                     await asyncio.sleep(1)
+                
+                password = await self.app(GetPasswordRequest())
+
+                while True:
+                    twofa = getpass('Enter 2FA password: ')
+                    try:
+                        await self.app._on_login(
+                            await self.app(CheckPasswordRequest(compute_check(password, twofa.strip())).user)
+                        )
+                    except errors.PasswordHashInvalidError:
+                        logging.error('Wrong password!')
+                    else:
+                        break
+
+                me = await self.app.get_me()
                     
             else:
                 phone, phone_code_hash = await self.send_code() # type: ignore
-                logged = await self.enter_code(phone, phone_code_hash)
-                if not logged:
-                    me: types.User = await self.enter_2fa()
-                else:
-                    me: types.User = await self.app.get_me()
-        except errors.SessionRevoked:
-            logging.error("Сессия была сброшена, удали сессию и заново введи команду запуска")
-            await self.app.disconnect()
+                await self.enter_code(phone, phone_code_hash)
+                
+                me: types.User = await self.app.get_me()
+        except errors.SessionRevokedError:
+            logging.error("The session was revoked, delete the session and re-enter the start command")
+            self.app.disconnect()
+
             return sys.exit(64)
 
         return me, self.app

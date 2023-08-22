@@ -2,32 +2,32 @@ import logging
 from inspect import getfullargspec, iscoroutine
 from types import FunctionType
 
-from pyrogram import Client, filters, types
-from pyrogram.handlers import MessageHandler
+from telethon import TelegramClient, types
+from telethon.events import NewMessage
 
 from . import loader, utils
 
 
-async def check_filters(func: FunctionType, app: Client, message: types.Message) -> bool:
-    """Проверка фильтров"""
-    if (custom_filters := getattr(func, "_filters", None)):
-        coro = custom_filters(app, message)
-        if iscoroutine(coro):
-            coro = await coro
+# async def check_filters(func: FunctionType, app: TelegramClient, message: types.Message) -> bool:
+#     """Проверка фильтров"""
+#     if (custom_filters := getattr(func, "_filters", None)):
+#         coro = custom_filters(app, message)
+#         if iscoroutine(coro):
+#             coro = await coro
 
-        if not coro:
-            return False
-    else:
-        if not message.outgoing:
-            return False
+#         if not coro:
+#             return False
+#     else:
+#         if not message.outgoing:
+#             return False
 
-    return True
+#     return True
 
 
 class DispatcherManager:
     """Менеджер диспетчера"""
 
-    def __init__(self, app: Client, modules: "loader.ModulesManager") -> None:
+    def __init__(self, app: TelegramClient, modules: "loader.ModulesManager") -> None:
         self.app = app
         self.modules = modules
 
@@ -35,18 +35,18 @@ class DispatcherManager:
         """Загружает менеджер диспетчера"""
         logging.info("Загрузка диспетчера...")
 
-        self.app.add_handler(
-            MessageHandler(
-                self._handle_message, filters.all)
+        self.app.add_event_handler(
+            self._handle_message,
+            NewMessage
         )
 
         logging.info("Диспетчер успешно загружен")
         return True
 
-    async def _handle_message(self, app: Client, message: types.Message) -> types.Message:
+    async def _handle_message(self, app: TelegramClient, message: types.Message) -> types.Message:
         """Обработчик сообщений"""
         await self._handle_watchers(app, message)
-        await self._handle_other_handlers(app, message)
+        # await self._handle_other_handlers(app, message)
 
         prefix, command, args = utils.get_full_command(message)
         if not (command or args):
@@ -57,8 +57,8 @@ class DispatcherManager:
         if not func:
             return
     
-        if not await check_filters(func, app, message):
-            return
+        # if not await check_filters(func, app, message):
+        #     return
 
         try:
             if (
@@ -78,12 +78,12 @@ class DispatcherManager:
 
         return message
 
-    async def _handle_watchers(self, app: Client, message: types.Message) -> types.Message:
+    async def _handle_watchers(self, app: TelegramClient, message: types.Message) -> types.Message:
         """Обработчик вотчеров"""
         for watcher in self.modules.watcher_handlers:
             try:
-                if not await check_filters(watcher, app, message):
-                    continue
+                # if not await check_filters(watcher, app, message):
+                #     continue
 
                 await watcher(app, message)
             except Exception as error:
@@ -91,24 +91,24 @@ class DispatcherManager:
 
         return message
 
-    async def _handle_other_handlers(self, app: Client, message: types.Message) -> types.Message:
-        """Обработчик других хендлеров"""
-        for handler in app.dispatcher.groups[0]:
-            if getattr(handler.callback, "__func__", None) == DispatcherManager._handle_message:
-                continue
+    # async def _handle_other_handlers(self, app: Client, message: types.Message) -> types.Message:
+    #     """Обработчик других хендлеров"""
+    #     for handler in app.dispatcher.groups[0]:
+    #         if getattr(handler.callback, "__func__", None) == DispatcherManager._handle_message:
+    #             continue
 
-            coro = handler.filters(app, message)
-            if iscoroutine(coro):
-                coro = await coro
+    #         coro = handler.filters(app, message)
+    #         if iscoroutine(coro):
+    #             coro = await coro
 
-            if not coro:
-                continue
+    #         if not coro:
+    #             continue
 
-            try:
-                handler = handler.callback(app, message)
-                if iscoroutine(handler):
-                    await handler
-            except Exception as error:
-                logging.exception(error)
+    #         try:
+    #             handler = handler.callback(app, message)
+    #             if iscoroutine(handler):
+    #                 await handler
+    #         except Exception as error:
+    #             logging.exception(error)
 
-        return message
+    #     return message

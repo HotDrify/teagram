@@ -1,4 +1,4 @@
-Pyrogram>=2.0.106
+telethon>=1.29.3
 aiogram>=2.25.1
 TgCrypto>=1.2.5
 googletrans==3.1.0a0

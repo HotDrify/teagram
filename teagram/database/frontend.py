@@ -1,20 +1,19 @@
 from typing import KT, VT, Union
 
 from lightdb import LightDB
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 
 from . import CloudDatabase
 
 
 class Database(LightDB):
-    """Локальная база данных в файле"""
+    """Local database"""
 
     def __init__(self, location: str):
         super().__init__(location)
         self.cloud = None
 
-    def init_cloud(self, app: Client, me: types.User):
-        """Инициализация облачной базы данных"""
+    def init_cloud(self, app: TelegramClient, me: types.User):
         self.cloud = CloudDatabase(app, me)
 
     def __repr__(self):
@@ -41,11 +40,3 @@ class Database(LightDB):
 
         self.save()
         return value
-
-    # async def save_data(self, message: Union[types.Message, str]):
-    #     """Сохранить данные в чат"""
-    #     return await self.cloud.save_data(message)
-
-    # async def get_data(self, message_id: int):
-    #     """Найти данные по айди сообщения"""
-    #     return await self.cloud.get_data(message_id)

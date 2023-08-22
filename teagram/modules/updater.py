@@ -4,7 +4,7 @@ import time
 import atexit
 import logging
 
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 from subprocess import check_output
 from .. import loader, utils, validators
 from ..types import Config, ConfigValue

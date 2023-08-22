@@ -12,8 +12,8 @@ from typing import Any, List, Literal, Tuple, Union
 from urllib.parse import urlparse
 
 from pyrogram.file_id import PHOTO_TYPES, FileId
-from pyrogram.types import Chat, Message, User
-from pyrogram import Client
+from telethon.types import Chat, Message, User
+from telethon import TelegramClient
 
 from . import database
 
@@ -44,122 +44,81 @@ def get_full_command(message: Message) -> Union[
     return prefixes[0], command.lower(), args[-1] if args else ""
 
 
-async def answer(
-    message: Union[Message, List[Message]],
-    response: Union[str, Any],
-    chat_id: Union[str, int] = None,
-    doc: bool = False,
-    photo: bool = False,
-    **kwargs
-) -> List[Message]:
-    """В основном это обычный message.edit, но:
-        - Если содержание сообщения будет больше лимита (4096 символов),
-            то отправится несколько разделённых сообщений
-        - Работает message.reply, если команду вызвал не владелец аккаунта
+# async def answer(
+#     message: Union[Message, List[Message]],
+#     response: Union[str, Any],
+#     chat_id: Union[str, int] = None,
+#     doc: bool = False,
+#     photo: bool = False,
+#     **kwargs
+# ) -> List[Message]:
+#     """В основном это обычный message.edit, но:
+#         - Если содержание сообщения будет больше лимита (4096 символов),
+#             то отправится несколько разделённых сообщений
+#         - Работает message.reply, если команду вызвал не владелец аккаунта
 
-    Параметры:
-        message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
-            Сообщение
+#     Параметры:
+#         message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
+#             Сообщение
 
-        response (``str`` | ``typing.Any``):
-            Текст или объект которое нужно отправить
+#         response (``str`` | ``typing.Any``):
+#             Текст или объект которое нужно отправить
 
-        chat_id (``str`` | ``int``, optional):
-            Чат, в который нужно отправить сообщение
+#         chat_id (``str`` | ``int``, optional):
+#             Чат, в который нужно отправить сообщение
 
-        doc/photo (``bool``, optional):
-            Если ``True``, сообщение будет отправлено как документ/фото или по ссылке
+#         doc/photo (``bool``, optional):
+#             Если ``True``, сообщение будет отправлено как документ/фото или по ссылке
 
-        kwargs (``dict``, optional):
-            Параметры отправки сообщения
-    """
-    messages: List[Message] = []
+#         kwargs (``dict``, optional):
+#             Параметры отправки сообщения
+#     """
+#     messages: List[Message] = []
 
-    if isinstance(message, list):
-        message = message[0]
+#     if isinstance(message, list):
+#         message: Message = message[0]
 
-    if isinstance(response, str) and all(not arg for arg in [doc, photo]):
-        outputs = [
-            response[i: i + 4096]
-            for i in range(0, len(response), 4096)
-        ]
+#     if isinstance(response, str):
+#         await message.
 
-        if chat_id:
-            messages.append(
-                await message._client.send_message(
-                    chat_id, outputs[0], **kwargs)
-            )
-        else:
-            messages.append(
-                await (
-                    message.edit if message.outgoing
-                    else message.reply
-                )(outputs[0], **kwargs)
-            )
 
-        for output in outputs[1:]:
-            messages.append(
-                await messages[0].reply(output, **kwargs)
-            )
 
-    elif doc:
-        if chat_id:
-            messages.append(
-                await message._client.send_document(
-                    chat_id, response, **kwargs)
-            )
-        else:
-            messages.append(
-                await message.reply_document(response, **kwargs)
-            )
+#     return messages
 
-    elif photo:
-        if chat_id:
-            messages.append(
-                await message._client.send_photo(
-                    chat_id, response, **kwargs)
-            )
-        else:
-            messages.append(
-                await message.reply_photo(response, **kwargs)
-            )
+# async def answer_inline(
+#     message: Union[Message, List[Message]],
+#     bot: Union[str, int],
+#     query: str,
+#     chat_id: Union[str, int] = ''
+# ) -> None:
+#     """
+#     Параметры:
+#         message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
+#             Сообщение
 
-    return messages
-
-async def answer_inline(
-    message: Union[Message, List[Message]],
-    bot: Union[str, int],
-    query: str,
-    chat_id: Union[str, int] = ''
-) -> None:
-    """
-    Параметры:
-        message (``pyrogram.types.Message`` | ``typing.List[pyrogram.types.Message]``):
-            Сообщение
-
-        bot (``str`` | ``int``):
-            Ник или аиди инлайн бота
+#         bot (``str`` | ``int``):
+#             Ник или аиди инлайн бота
         
-        query (``str``):
-            Параметры для инлайн бота
+#         query (``str``):
+#             Параметры для инлайн бота
 
-        chat_id (``str`` | ``int``, optional):
-            Чат, в который нужно отправить результат инлайна
-    """
+#         chat_id (``str`` | ``int``, optional):
+#             Чат, в который нужно отправить результат инлайна
+#     """
 
-    if isinstance(message, list):
-        message = message[0]
+#     if isinstance(message, list):
+#         message = message[0]
 
-    app: Client = message._client
-    message: Message
+#     app: Client = message._client
+#     message: Message
 
-    results = await app.get_inline_bot_results(bot, query)
+#     results = await app.get_inline_bot_results(bot, query)
     
-    await app.send_inline_bot_result(
-        chat_id or message.chat.id,
-        results.query_id,
-        results.results[0].id
-    )
+#     await app.send_inline_bot_result(
+#         chat_id or message.chat.id,
+#         results.query_id,
+#         results.results[0].id
+#     )
 
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """Запускает асинхронно нон-асинк функцию

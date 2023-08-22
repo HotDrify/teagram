@@ -5,6 +5,8 @@ from typing import Union
 
 from loguru import logger
 from pyrogram import errors, types
+from telethon import errors, types
+from telethon.tl.functions.contacts import UnblockRequest
 
 from .. import fsm, utils
 from .types import Item
@@ -17,11 +19,11 @@ class TokenManager(Item):
         """Создать и настроить бота"""
         logging.info("Начался процесс создания нового бота...")
 
-        async with fsm.Conversation(self._app, "@BotFather", True) as conv:
+        async with fsm.Conversation(self._app, "@BotFather") as conv:
             try:
                 await conv.ask("/cancel")
-            except errors.UserIsBlocked:
-                await self._app.unblock_user("@BotFather")
+            except errors.UserIsBlockedError:
+                await self._app(UnblockRequest('@BotFather'))
 
             await conv.get_response()
 
@@ -49,7 +51,7 @@ class TokenManager(Item):
             time.sleep(0.5) 
             response = await conv.get_response()
 
-            search = re.search(r"(?<=<code>)(.*?)(?=</code>)", response.text.html)
+            search = re.search(r"(?<=<code>)(.*?)(?=</code>)", response.text)
             if not search:
                 logging.error("Произошла ошибка при создании бота. Ответ @BotFather:")
                 return logging.error(response.text)
@@ -61,7 +63,7 @@ class TokenManager(Item):
             await conv.ask("@" + bot_username)
             await conv.get_response()
 
-            self._app.me = await self._app.get_me()
+            # self._app.me = await self._app.get_me()
             await conv.ask_media("assets/bot_avatar.png", media_type="photo")
             await conv.get_response()
 # # надо аву поставить до папки teagram, нев ней а до нее
@@ -83,8 +85,8 @@ class TokenManager(Item):
         async with fsm.Conversation(self._app, "@BotFather") as conv:
             try:
                 await conv.ask("/cancel")
-            except errors.UserIsBlocked:
-                await self._app.unblock_user("@BotFather")
+            except errors.UserIsBlockedError:
+                await self._app(UnblockRequest('@BotFather'))
 
             await conv.get_response()
 
@@ -100,11 +102,11 @@ class TokenManager(Item):
                 response = await conv.get_response()
 
             found = False
-            for row in response.reply_markup.keyboard:
-                for button in row:
-                    search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button)
+            for row in response.reply_markup.rows:
+                for button in row.buttons:
+                    search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button.text)
                     if search:
-                        await conv.ask(button)
+                        await conv.ask(button.text)
                         found = True
                         break
 

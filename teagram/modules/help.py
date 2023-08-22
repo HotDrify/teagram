@@ -1,4 +1,4 @@
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 
 from .. import __version__, loader, utils
 

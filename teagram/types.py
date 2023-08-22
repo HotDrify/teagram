@@ -1,7 +1,7 @@
 from types import FunctionType
 from typing import Any, Dict, List, Union, Callable
 
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 
 from . import database
 from  dataclasses import dataclass, field
@@ -13,7 +13,7 @@ class Module:
     author: str
     version: Union[int, float]
 
-    async def on_load(self, app: Client) -> Any:
+    async def on_load(self, app: TelegramClient) -> Any:
         """Вызывается при загрузке модуля"""
 
 

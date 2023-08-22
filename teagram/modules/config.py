@@ -5,7 +5,7 @@ from aiogram.types import (
     Message
 )
 from inspect import getmembers, isroutine
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 from asyncio import sleep
 
 from .. import loader, utils, database, validators

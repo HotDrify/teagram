@@ -3,7 +3,7 @@ import asyncio
 import sys
 
 from aiogram import Bot, Dispatcher, exceptions
-from pyrogram import Client
+from telethon import TelegramClient
 
 from typing import Union, NoReturn
 from loguru import logger
@@ -22,14 +22,14 @@ class BotManager(
 
     def __init__(
         self,
-        app: Client,
+        app: TelegramClient,
         db: database.Database,
         all_modules: types.ModulesManager
     ) -> None:
         """Инициализация класса
 
         Параметры:
-            app (``pyrogram.Client``):
+            app (``TelegramClient``):
                 Клиент
 
             db (``database.Database``):

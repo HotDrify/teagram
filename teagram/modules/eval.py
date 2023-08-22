@@ -1,7 +1,7 @@
 import ast
 
 from .. import loader, utils
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 
 def insert_returns(body):
     if isinstance(body[-1], ast.Expr):
@@ -44,13 +44,12 @@ class EvalMod(loader.Module):
                 'args': args
             }
         )
-        await utils.answer(
-            message,
+        await app.send_message(
+            message.chat.id,
             f"""
 <b>💻 Code</b>:
 <code>{args}</code>
 
 <b>💻 Output</b>:
 <code>{result}</code>
-    """
-        )
+""", parse_mode='html')

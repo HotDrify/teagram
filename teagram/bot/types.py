@@ -3,7 +3,7 @@ from types import FunctionType
 from typing import Union
 
 from aiogram.types import CallbackQuery, InlineQuery, Message
-from pyrogram import Client
+from telethon import TelegramClient
 
 from .. import database, types
 
@@ -15,7 +15,7 @@ class Item:
         """Инициализация класса"""
         self._all_modules: types.ModulesManager = None
         self._db: database.Database = None
-        self._app: Client = None
+        self._app: TelegramClient = None
 
     async def _check_filters(
         self,

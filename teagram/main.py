@@ -1,6 +1,7 @@
 import logging
 import time
 
+from telethon import TelegramClient
 from pyrogram.methods.utilities.idle import idle
 
 from . import auth, database, loader
@@ -9,7 +10,8 @@ from . import auth, database, loader
 async def main():
     """Основной цикл юзербота"""
     me, app = await auth.Auth().authorize()
-    await app.initialize()
+    app: TelegramClient
+    await app.connect()
 
     db = database.db
     db.init_cloud(app, me)
@@ -18,7 +20,7 @@ async def main():
     await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
-    print('Юзербот включен (Префикс - "{}")'.format(prefix))
+    print('Юзербот включен (Префикс - "{}")'.format('.'))
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
@@ -41,7 +43,7 @@ async def main():
 
         db.pop("teagram.loader", "restart")
 
-    await idle()
+    await app.run_until_disconnected()
 
     logging.info("Завершение работы...")
     return True

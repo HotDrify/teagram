@@ -19,7 +19,7 @@ from typing import Union, List, Dict, Any
 from types import FunctionType, LambdaType
 from loguru import logger
 
-from pyrogram import Client, types, filters
+from telethon import TelegramClient, types
 from . import dispatcher, utils, database, bot
 
 VALID_URL = r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
@@ -34,41 +34,25 @@ def module(
     author: Union[str, None] = None,
     version: Union[int, float, None] = None
 ) -> FunctionType:
-    """Обрабатывает класс модуля
-
-    Параметры:
-        name (``str``):
-            Название модуля
-
-        author (``str``, optional):
-            Автор модуля
-
-        version (``int`` | ``float``, optional):
-            Версия модуля
-    """
     def decorator(instance: "Module"):
-        """Декоратор для обработки класса модуля"""
         instance.name = name
         instance.author = author
         instance.version = version
         return instance
+    
     return decorator
 
 
 @module(name="Unknown")
 class Module:
-    """Описание модуля"""
     name: str
     author: str
     version: Union[int, float]
 
-    async def on_load(self, app: Client) -> Any:
-        """Вызывается при загрузке модуля"""
+    async def on_load(self, app: TelegramClient) -> Any:
         print(f'[INFO] - module {self.name} loaded')
 
 class StringLoader(SourceLoader):
-    """Загружает модуль со строки"""
-
     def __init__(self, data: str, origin: str) -> None:
         self.data = data.encode("utf-8")
         self.origin = origin
@@ -102,7 +86,6 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
 
 
 def get_watcher_handlers(instance: Module) -> List[FunctionType]:
-    """Возвращает список из вотчеров"""
     return [
         getattr(instance, method_name)
         for method_name in dir(instance)
@@ -114,7 +97,6 @@ def get_watcher_handlers(instance: Module) -> List[FunctionType]:
 
 
 def get_message_handlers(instance: Module) -> Dict[str, FunctionType]:
-    """Возвращает словарь из названий с функциями хендлеров сообщений"""
     return {
         method_name[:-16].lower(): getattr(
             instance, method_name
@@ -128,7 +110,6 @@ def get_message_handlers(instance: Module) -> Dict[str, FunctionType]:
 
 
 def get_callback_handlers(instance: Module) -> Dict[str, FunctionType]:
-    """Возвращает словарь из названий с функциями каллбек-хендлеров"""
     return {
         method_name[:-17].lower(): getattr(
             instance, method_name
@@ -142,7 +123,6 @@ def get_callback_handlers(instance: Module) -> Dict[str, FunctionType]:
 
 
 def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
-    """Возвращает словарь из названий с функциями инлайн-хендлеров"""
     return {
         method_name[:-15].lower(): getattr(
             instance, method_name
@@ -155,31 +135,31 @@ def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
     }
 
 
-def on(custom_filters: Union[filters.Filter, LambdaType]) -> FunctionType:
-    """Создает фильтр для команды
+# def on(custom_filters: Union[filters.Filter, LambdaType]) -> FunctionType:
+#     """Создает фильтр для команды
 
-    Параметры:
-        custom_filters (``pyrogram.filters.Filter`` | ``types.LambdaType``):
-            Фильтры
+#     Параметры:
+#         custom_filters (``pyrogram.filters.Filter`` | ``types.LambdaType``):
+#             Фильтры
 
-    Пример:
-        >>> @on(lambda _, app, message: message.chat.type == "supergroup")
-        >>> async def func_cmd(
-                self,
-                app: pyrogram.Client,
-                message: pyrogram.types.Message
-            ):
-        >>>     ...
-    """
-    def decorator(func: FunctionType):
-        """Декоратор для обработки команды"""
-        func._filters = (
-            filters.create(custom_filters)
-            if custom_filters.__module__ != "pyrogram.filters"
-            else custom_filters
-        )
-        return func
-    return decorator
+#     Пример:
+#         >>> @on(lambda _, app, message: message.chat.type == "supergroup")
+#         >>> async def func_cmd(
+#                 self,
+#                 app: TelegramClient,
+#                 message: pyrogram.types.Message
+#             ):
+#         >>>     ...
+#     """
+#     def decorator(func: FunctionType):
+#         """Декоратор для обработки команды"""
+#         func._filters = (
+#             filters.create(custom_filters)
+#             if custom_filters.__module__ != "pyrogram.filters"
+#             else custom_filters
+#         )
+#         return func
+#     return decorator
 
 
 def on_bot(custom_filters: LambdaType) -> FunctionType:
@@ -194,7 +174,7 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
         >>> @on_bot(lambda self, app, call: call.from_user.id == self.all_modules.me.id)
         >>> async def func_callback_handler(
                 self,
-                app: pyrogram.Client,
+                app: TelegramClient,
                 call: aiogram.types.CallbackQuery
             ):
         >>>     ...
@@ -211,7 +191,7 @@ class ModulesManager:
 
     def __init__(
         self,
-        app: Client,
+        app: TelegramClient,
         db: database.Database,
         me: types.User
     ) -> None:
@@ -234,7 +214,7 @@ class ModulesManager:
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None
 
-    async def load(self, app: Client) -> bool:
+    async def load(self, app: TelegramClient) -> bool:
         """Загружает менеджер модулей"""
         self.dp = dispatcher.DispatcherManager(app, self)
         await self.dp.load()

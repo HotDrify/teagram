@@ -1,13 +1,13 @@
 import asyncio
 from typing import Union
 
-from pyrogram import Client, types
+from telethon import TelegramClient, types
 
 
 class CloudDatabase:
     """Чат в Telegram с данными для базы данных"""
 
-    def __init__(self, app: Client, me: types.User):
+    def __init__(self, app: TelegramClient, me: types.User):
         self._app = app
         self._me = me
         self.data_chat = None
