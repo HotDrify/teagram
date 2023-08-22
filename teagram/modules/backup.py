@@ -1,7 +1,7 @@
 import os
 import zipfile
 
-from telethon import TelegramClient, types
+from telethon import types
 
 from .. import loader, utils, wrappers
 from loguru import logger
@@ -38,47 +38,47 @@ def create_backup(src: str, dest: str):
 @loader.module(name="Backuper", author='teagram')
 class BackupMod(loader.Module):
     """С помощью этого модуля вы сможете делать бекапы модов и всего ЮБ"""
-    async def backupub_cmd(self, app: TelegramClient, message: types.Message):
+    async def backupub_cmd(self, message: types.Message):
         """Бекап ЮБ"""
-        message = await app.send_message(
-            message.chat.id,
+        await utils.answer(
+            message,
             '👀 Попытка бекапа...'
         )
 
         backup = await create_backup('./', '')
 
         if backup[1]:
-            return await app.send_message(
-                message.chat.id,
+            return await utils.answer(
+                message,
                 f'✅ Успешно сохранено ({backup[0]})'
             )
         else:
             logger.error(backup[0])
 
-            return await app.send_message(
-                message.chat.id,
+            return await utils.answer(
+                message,
                 f'❌ Ошибка, проверьте логи (возможный бекап {backup[2]})'
             )
         
-    async def backupmods_cmd(self, app: TelegramClient, message: types.Message):
+    async def backupmods_cmd(self, message: types.Message):
         """Бекап модулей"""
-        await app.send_message(
-            message.chat.id,
+        await utils.answer(
+            message,
             '👀 Попытка бекапа...'
         )
 
         backup = await create_backup('./teagram/modules/', '')
 
         if backup[1]:
-            return await app.send_message(
-                message.chat.id,
+            return await utils.answer(
+                message,
                 f'✅ Успешно сохранено ({backup[0]})'
             )
         else:
             logger.error(backup[0])
 
-            return await app.send_message(
-                message.chat.id,
+            return await utils.answer(
+                message,
                 f'❌ Ошибка, проверьте логи (возможный бекап {backup[2]})'
             )
         
