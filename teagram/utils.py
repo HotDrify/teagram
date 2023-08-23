@@ -9,11 +9,12 @@ import aiohttp
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
 
-from telethon import TelegramClient
-from telethon.tl.custom import Message, InlineResults
+from telethon import TelegramClient, types
+from telethon.tl import custom
 
 from . import database
 
+Message = Union[custom.Message, types.Message]
 
 def get_full_command(message: Message) -> Union[
     Tuple[Literal[""], Literal[""], Literal[""]], Tuple[str, str, str]
@@ -34,7 +35,7 @@ def get_full_command(message: Message) -> Union[
         message_text = "/command arg1 arg2"
         message = Message(text=message_text)
         result = get_full_command(message)
-        #   result also can be if you didn't set prefix: ("", "command", "arg1 arg2")
+        #  result also can be if you didn't set prefix: ("", "command", "arg1 arg2")
         # For the example message_text, result will be: ("/", "command", "arg1 arg2")
     """
 
@@ -141,7 +142,7 @@ async def invoke_inline(
         Awaitable: The result of the invoked inline query.
     """
     client: TelegramClient = message._client # type: ignore
-    query: InlineResults = await client.inline_query(bot_username, inline_id)
+    query: custom.InlineResults = await client.inline_query(bot_username, inline_id)
 
     return await query[0].click(
         get_chat(message),

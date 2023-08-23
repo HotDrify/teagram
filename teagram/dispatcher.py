@@ -64,11 +64,8 @@ class DispatcherManager:
     
         if not await check_filters(func, message):
             return
-
-        if message.from_id.user_id != self.owner.id:
-            return
         
-        message._client = self.app
+        setattr(message, '_client', self.app)
         
         try:
             if (
@@ -93,7 +90,7 @@ class DispatcherManager:
         """Обработчик вотчеров"""
         for watcher in self.modules.watcher_handlers:
             try:
-                message._client = self.app
+                setattr(message, '_client', self.app)
 
                 if not await check_filters(watcher, message):
                     continue

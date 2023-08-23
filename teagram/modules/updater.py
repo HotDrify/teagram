@@ -31,12 +31,12 @@ class UpdateMod(loader.Module):
             ) # type: ignore
         )
 
-    async def on_load(self, app):
+    async def on_load(self):
         if not self.config.get('sendOnUpdate'):
             return
 
         bot: Bot = self.bot.bot
-        me = await app.get_me()
+        me = await self.client.get_me()
         _me = await bot.get_me()
 
         last = None

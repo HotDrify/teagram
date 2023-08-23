@@ -22,7 +22,7 @@ class ModuleGuardMod(loader.Module):
             ) # type: ignore
         )
 
-    async def on_load(self, app: Client):
+    async def on_load(self):
         if self.config.get('send'):
             names = {
                 "info": [
@@ -104,4 +104,4 @@ class ModuleGuardMod(loader.Module):
             if message_text == basic_text:
                 message_text += 'Подозрительных плагинов не найдено'
 
-            await app.send_message("me", message_text, parse_mode='html')
+            await self.client.send_message("me", message_text, parse_mode='html')

@@ -29,9 +29,10 @@ class ExampleMod(loader.Module):  # Example - название класса мо
             )
         )
 
-    async def on_load(self, app: TelegramClient):
+    async def on_load(self):
         """Вызывается когда модуль загружен"""
-        # Сюда можно написать какой нибудь скрипт для проверки 
+        # Сюда можно написать какой нибудь скрипт, например подключение к бд и т.д.
+        # Клиент юзербота: self.client
 
     # Если написать в лс/чате где есть бот "ты дурак?", то он ответит
     @loader.on_bot(lambda self, message: 'тест message_handler' in message.text)  # Сработает только если текст сообщения равняется "ты дурак?"

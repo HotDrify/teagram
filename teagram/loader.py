@@ -48,7 +48,7 @@ class Module:
     author: str
     version: Union[int, float]
 
-    async def on_load(self, app: TelegramClient) -> Any:
+    async def on_load(self) -> Any:
         print(f'[INFO] - module {self.name} loaded')
 
 class StringLoader(SourceLoader):
@@ -72,16 +72,18 @@ class StringLoader(SourceLoader):
 def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
     """Возвращает словарь из названий с функциями команд"""
     return {
-        method_name[:-4].lower(): getattr(
+        method_name[:-4].lower() if method_name.endswith('_cmd') else method_name[:-3].lower(): getattr(
             instance, method_name
         ) for method_name in dir(instance)
         if (
             callable(getattr(instance, method_name))
             and len(method_name) > 4
-            and method_name.endswith("_cmd")
+            and (
+                method_name.endswith("_cmd") or
+                method_name.endswith("cmd")
+            )
         )
     }
-
 
 def get_watcher_handlers(instance: Module) -> List[FunctionType]:
     return [
@@ -153,6 +155,7 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
         """Декоратор для обработки команды бота"""
         func._filters = custom_filters
         return func
+    
     return decorator
 
 class ModulesManager:
@@ -232,7 +235,6 @@ class ModulesManager:
         module = module_from_spec(spec)
         sys.modules[module.__name__] = module
         spec.loader.exec_module(module)
-
 
         instance = None
         for key, value in vars(module).items():
@@ -334,7 +336,7 @@ class ModulesManager:
     async def send_on_load(self, module: Module) -> bool:
         """Используется для выполнении функции после загрузки модуля"""
         try:
-            await module.on_load(self._client)
+            await module.on_load()
         except Exception as error:
             return logging.exception(error)
 
