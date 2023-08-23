@@ -16,7 +16,7 @@ from ..types import Config, ConfigValue
 
 @loader.module(name="Example", author="teagram", version=1)  # name модуля ("name" обязательный аргумент, остальное — нет), author - автор, version - версия
 class ExampleMod(loader.Module):  # Example - название класса модуля
-                                # Mod в конце названия обязательно
+                                  # Mod в конце названия обязательно
     """Описание модуля"""
 
     def __init__(self):
@@ -29,15 +29,15 @@ class ExampleMod(loader.Module):  # Example - название класса мо
             )
         )
 
-    async def on_load(self, app: Client):  # Можно считать что это асинхронный __init__
+    async def on_load(self, app: TelegramClient):
         """Вызывается когда модуль загружен"""
-        # logging.info(f"Модуль {self.name} загружен")
+        # Сюда можно написать какой нибудь скрипт для проверки 
 
     # Если написать в лс/чате где есть бот "ты дурак?", то он ответит
-    @loader.on_bot(lambda self, app, message: message.text and message.text.lower() == "ты дурак?")  # Сработает только если текст сообщения равняется "ты дурак?"
+    @loader.on_bot(lambda self, message: 'тест message_handler' in message.text)  # Сработает только если текст сообщения равняется "ты дурак?"
     async def example_message_handler(self, message: Message):  # _message_handler на конце функции чтобы обозначить что это хендлер сообщения
         """Пример хендлера сообщения"""
-        return await message.reply(
+        await message.reply(
             "Сам такой!")
 
     async def example_inline_handler(self, inline_query: InlineQuery, args: str):  # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
@@ -63,10 +63,10 @@ class ExampleMod(loader.Module):  # Example - название класса мо
             ]
         )
 
-    @loader.on_bot(lambda self, app, call: call.data == "example_button_callback")  # Сработает только если каллбек дата равняется "example_button_callback"
+    @loader.on_bot(lambda self, call: call.data == "example_button_callback")  # Сработает только если каллбек дата равняется "example_button_callback"
     async def example_callback_handler(self, call: CallbackQuery):  # _callback_handler на конце функции чтобы обозначить что это каллбек-хендлер
         """Пример каллбека"""
-        return await call.answer(
+        await call.answer(
             "Ого пример каллбека", show_alert=True)
 
     async def example_cmd(self, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
@@ -80,23 +80,21 @@ class ExampleMod(loader.Module):  # Example - название класса мо
         )
 
         await sleep(2.5)  # никогда не используй time.sleep, потому что это не асинхронная функция, она остановит весь юзербот
-        return await utils.answer(
+        await utils.answer(
             message, "Прошло 2.5 секунды!")
 
-    @loader.on(lambda _, __, m: "тест" in getattr(m, "text", ""))  # Сработает только если есть "тест" в сообщении с командой
+    @loader.on(lambda _, m: "тест" in getattr(m, "text", ""))  # Сработает только если есть "тест" в сообщении с командой
     async def example2_cmd(self, message: types.Message):
         """Описание для второй команды с фильтрами"""
-        return await utils.answer(
+        await utils.answer(
             message, f"Да, {self.test_attribute = }")
 
-    @loader.on(lambda _, __, m: m and m.text == "Привет, это вотчер детка")
+    @loader.on(lambda _, m: m and m.text == "Привет, это вотчер детка")
     async def watcher(self, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
-        return await message.reply(
+        await message.reply(
             "Привет, все работает отлично")
     
     # Можно добавлять несколько вотчеров, главное чтобы функция начиналась с "watcher"
-    # @loader.on(...) без этого он будет считывать только ваши сообщения, можно просто передать в лямбду True
     async def watcher_(self, message: types.Message):
         if message.text == "Привет":
-            return await message.reply(
-                "Привет!")
+            await message.reply("Привет!")

@@ -1,7 +1,7 @@
 from .. import loader, utils, validators
 from ..types import Config, ConfigValue
 
-from pyrogram import types
+from telethon import types
 from googletrans import Translator, LANGUAGES
 from googletrans.models import Translated
 
@@ -27,7 +27,7 @@ class TranslatorMod(loader.Module):
     async def translate_cmd(self, message: types.Message, args):
         """Перевод"""
         if not (text := args):
-            if not (text := message.reply_to_message.text):
+            if not (text := (await message.get_reply_message()).raw_text):
                 return await utils.answer(
                     message,
                     '❌ Текст не найден'
