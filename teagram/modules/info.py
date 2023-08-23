@@ -2,11 +2,11 @@ import telethon
 import time
 
 from .terminal import bash_exec
-from telethon.tl.custom import Message
-from datetime import timedelta
 from .. import __version__, loader, utils, validators
 from ..types import Config, ConfigValue
 
+from telethon.tl.custom import Message
+from datetime import timedelta
 
 @loader.module(name="UserBot", author='teagram')
 class AboutMod(loader.Module):
@@ -21,8 +21,6 @@ class AboutMod(loader.Module):
                 validators.String()
             ) # type: ignore
         )
-    async def on_load(self, app):
-        self._client = app
     
     async def info_cmd(self, message: Message):
         """Информация о вашем 🍵teagram."""
@@ -35,7 +33,7 @@ class AboutMod(loader.Module):
         now = str(await bash_exec('git rev-parse HEAD')).strip()
         version = f'v{__version__}' + (' <b>Доступно обновление</b>' if last != now else "")
 
-        me = (await self._client.get_me()).username
+        me = (await self.client.get_me()).username
 
         default = f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  <code>{me}</code>
@@ -44,13 +42,12 @@ class AboutMod(loader.Module):
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  <code>{utils.get_cpu()}%</code>
 <b>💾 RAM</b>:  <code>{utils.get_ram()}MB</code>
 
-<b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  <code>{uptime}%</code>
-<b><emoji id=5377399247589088543>📱</emoji> Версия telethon: <code>{telethon.__version__}%</code></b>
+<b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  <code>{uptime}</code>
+<b><emoji id=5377399247589088543>📱</emoji> Версия telethon: <code>{telethon.__version__}</code></b>
 
 <b>{platform}</b>
 """
 
-        text = default
         custom = self.config.get('customText')
 
         if custom:
@@ -66,24 +63,7 @@ class AboutMod(loader.Module):
         
         await utils.answer(
             message,
-            custom or text
+            'assets/bot_avatar.png',
+            photo=True,
+            caption=custom or default
         )
-        
-#     async def teagram_cmd(self, app: Client, message: types.Message, args: str):
-#         """Информация о UserBot"""
-#         await utils.answer(message, "☕")
-#         await utils.answer(message, '''<emoji id=5467741625507651028>🤔</emoji> <b>Что такое юзербот?</b>
-        
-# <emoji id=5373098009640836781>📚</emoji> <b>Юзербот это</b> - <b>Сборник разных програм</b> для взаймодeйствия с Telegram API
-# А с помощью взаймодействия с Telegram API <b>можно написать разныe скрипты</b> для автоматизаций некоторых действий со стороны пользователя такие как: <b>Присоединение к каналам, отправление сообщений, и т.д</b>
-
-# <emoji id=6325536273435986182>🤔</emoji> <b>Чем отличается юзербот от обычного бота?</b>
-
-# 🤭 <b>Юзербот может выполняться на аккаунте обычного пользователя</b>
-# Например: @paveldurov А бот может выполняться только на специальных бот аккаунтах например: @examplebot
-# <b>Юзерботы довольно гибкие</b> в плане настройки, у них больше функций.
-
-# <emoji id=5467596412663372909>⁉️</emoji> <b>Поддерживаются ли оффициально юзерботы телеграмом?</b>
-
-# <emoji id=5462882007451185227>🚫</emoji> <b>Нет.</b> Они оффициально не поддерживаются, но вас не заблокируют за использование юзерботов.
-# Но <b>могут заблокировать в случае выполнения вредоносного кода или за злоупотребление Telegram API</b> на вашем аккаунте, так что владельцу юзербота надо тщательно проверять что выполняется на вашем аккаунте.''')

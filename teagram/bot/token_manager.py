@@ -11,13 +11,20 @@ from telethon.tl.functions.contacts import UnblockRequest
 from .. import fsm, utils
 from .types import Item
 
-
 class TokenManager(Item):
-    """Менеджер токенов"""
+    """
+    Token manager class.
+    Manages the creation and revocation of bot tokens.
+    """
 
     async def _create_bot(self) -> Union[str, None]:
-        """Создать и настроить бота"""
-        logging.info("Начался процесс создания нового бота...")
+        """
+        Create and configure a bot.
+        
+        Returns:
+            Union[str, None]: The bot token or None on failure.
+        """
+        logging.info("Starting the process of creating a new bot...")
 
         async with fsm.Conversation(self._app, "@BotFather") as conv:
             try:
@@ -34,12 +41,12 @@ class TokenManager(Item):
                 phrase not in response.text
                 for phrase in ["That I cannot do.", "Sorry"]
             ):
-                logging.error("Произошла ошибка при создании бота. Ответ @BotFather:")
+                logging.error("An error occurred while creating the bot. @BotFather's response:")
                 logging.error(response.text)
 
                 if 'too many attempts' in response.text:
                     seconds = response.text.split()[-2]
-                    logger.error(f'Пожалуйста повторите через {seconds} секунд')
+                    logger.error(f'Please try again after {seconds} seconds')
 
             await conv.ask(f"Teagram UserBot of {utils.get_display_name(self._all_modules.me)[:45]}")
             await conv.get_response()
@@ -53,7 +60,7 @@ class TokenManager(Item):
 
             search = re.search(r"(?<=<code>)(.*?)(?=</code>)", response.text)
             if not search:
-                logging.error("Произошла ошибка при создании бота. Ответ @BotFather:")
+                logging.error("An error occurred while creating the bot. @BotFather's response:")
                 return logging.error(response.text)
 
             token = search.group(0)
@@ -63,10 +70,8 @@ class TokenManager(Item):
             await conv.ask("@" + bot_username)
             await conv.get_response()
 
-            # self._app.me = await self._app.get_me()
             await conv.ask_media("assets/bot_avatar.png", media_type="photo")
             await conv.get_response()
-# # надо аву поставить до папки teagram, нев ней а до нее
 
             await conv.ask("/setinline")
             await conv.get_response()
@@ -74,14 +79,19 @@ class TokenManager(Item):
             await conv.ask("@" + bot_username)
             await conv.get_response()
 
-            await conv.ask("teagram-команда")
+            await conv.ask("teagram-command")
             await conv.get_response()
 
-            logger.success("Бот успешно создан")
+            logger.success("Bot created successfully")
             return token
 
     async def _revoke_token(self) -> str:
-        """Сбросить токен бота"""
+        """
+        Revoke a bot token.
+        
+        Returns:
+            str: The revoked bot token.
+        """
         async with fsm.Conversation(self._app, "@BotFather") as conv:
             try:
                 await conv.ask("/cancel")
@@ -94,10 +104,10 @@ class TokenManager(Item):
             response = await conv.get_response()
 
             if "/newbot" in response.text:
-                return logging.error("Нет созданных ботов")
-            
+                return logging.error("No created bots")
+
             if not response.reply_markup:
-                logging.warn('reply_markup не найден')
+                logging.warn('reply_markup not found')
                 time.sleep(1.5)
                 response = await conv.get_response()
 
@@ -113,14 +123,14 @@ class TokenManager(Item):
                 if found:
                     break
                 else:
-                    return logging.error("Нет созданного material бота")
+                    return logging.error("No created material bot")
 
             time.sleep(1)
             response = await conv.get_response()
             search = re.search(r"\d{1,}:[0-9a-zA-Z_-]{35}", response.text)
 
             if search:
-                logger.success("Бот успешно сброшен")
+                logger.success("Bot revoked successfully")
                 return str(search.group(0))
             else:
                 token = response.text.split()[-1]

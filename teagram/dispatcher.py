@@ -62,7 +62,7 @@ class DispatcherManager:
         if not func:
             return
     
-        if not await check_filters(func, app, message):
+        if not await check_filters(func, message):
             return
 
         if message.from_id.user_id != self.owner.id:
@@ -94,7 +94,7 @@ class DispatcherManager:
         for watcher in self.modules.watcher_handlers:
             try:
                 message._client = self.app
-                
+
                 if not await check_filters(watcher, message):
                     continue
 

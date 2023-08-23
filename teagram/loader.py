@@ -28,7 +28,6 @@ VALID_PIP_PACKAGES = re.compile(
     re.MULTILINE,
 )
 
-
 def module(
     name: str,
     author: Union[str, None] = None,
@@ -69,7 +68,6 @@ class StringLoader(SourceLoader):
 
     def get_data(self, _: str) -> str:
         return self.data
-
 
 def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
     """Возвращает словарь из названий с функциями команд"""
@@ -135,33 +133,6 @@ def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
     }
 
 
-# def on(custom_filters: Union[filters.Filter, LambdaType]) -> FunctionType:
-#     """Создает фильтр для команды
-
-#     Параметры:
-#         custom_filters (``pyrogram.filters.Filter`` | ``types.LambdaType``):
-#             Фильтры
-
-#     Пример:
-#         >>> @on(lambda _, app, message: message.chat.type == "supergroup")
-#         >>> async def func_cmd(
-#                 self,
-#                 app: TelegramClient,
-#                 message: pyrogram.types.Message
-#             ):
-#         >>>     ...
-#     """
-#     def decorator(func: FunctionType):
-#         """Декоратор для обработки команды"""
-#         func._filters = (
-#             filters.create(custom_filters)
-#             if custom_filters.__module__ != "pyrogram.filters"
-#             else custom_filters
-#         )
-#         return func
-#     return decorator
-
-
 def on_bot(custom_filters: LambdaType) -> FunctionType:
     """Создает фильтр для команды бота
 
@@ -171,10 +142,9 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
             Функция должна принимать параметры self, app, message/call/inline_query
 
     Пример:
-        >>> @on_bot(lambda self, app, call: call.from_user.id == self.all_modules.me.id)
+        >>> @on_bot(lambda self, call: call.from_user.id == self.all_modules.me.id)
         >>> async def func_callback_handler(
                 self,
-                app: TelegramClient,
                 call: aiogram.types.CallbackQuery
             ):
         >>>     ...
@@ -185,9 +155,8 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
         return func
     return decorator
 
-
 class ModulesManager:
-    """Менеджер модулей"""
+    """Manager of modules"""
 
     def __init__(
         self,

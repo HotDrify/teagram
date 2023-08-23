@@ -8,38 +8,70 @@ from aiogram.types import (CallbackQuery, InlineQuery,
 from .. import utils
 from .types import Item
 
-
 class Events(Item):
-    """Обработчик событий"""
+    """
+    Event handler class.
+    Handles various event types such as messages, callback queries, and inline queries.
+    """
 
     async def _message_handler(self, message: Message) -> Message:
-        """Обработчик сообщений"""
+        """
+        Message event handler.
+
+        Processes incoming messages by invoking appropriate message handlers.
+
+        Args:
+            message (Message): The incoming message.
+
+        Returns:
+            Message: The processed message.
+        """
         for func in self._all_modules.message_handlers.values():
             if not await self._check_filters(func, func.__self__, message):
                 continue
 
             try:
-                await func(self._app, message)
+                await func(message)
             except Exception as error:
                 logging.exception(error)
 
         return message
 
     async def _callback_handler(self, call: CallbackQuery) -> CallbackQuery:
-        """Обработчик каллбек-хендлеров"""
+        """
+        Callback query event handler.
+
+        Processes incoming callback queries by invoking appropriate callback handlers.
+
+        Args:
+            call (CallbackQuery): The incoming callback query.
+
+        Returns:
+            CallbackQuery: The processed callback query.
+        """
         for func in self._all_modules.callback_handlers.values():
             if not await self._check_filters(func, func.__self__, call):
                 continue
 
             try:
-                await func(self._app, call)
+                await func(call)
             except Exception as error:
                 logging.exception(error)
 
         return call
 
     async def _inline_handler(self, inline_query: InlineQuery) -> InlineQuery:
-        """Обработчик инлайн-хендеров"""
+        """
+        Inline query event handler.
+
+        Processes incoming inline queries by invoking appropriate inline handlers.
+
+        Args:
+            inline_query (InlineQuery): The incoming inline query.
+
+        Returns:
+            InlineQuery: The processed inline query.
+        """
         if not (query := inline_query.query):
             commands = ""
             for command, func in self._all_modules.inline_handlers.items():
@@ -47,7 +79,7 @@ class Events(Item):
                     commands += f"\n💬 <code>@{(await self.bot.me).username} {command}</code>"
 
             message = InputTextMessageContent(
-                f"👇 <b>Доступные команды</b>\n"
+                f"👇 <b>Available Commands</b>\n"
                 f"{commands}"
             )
 
@@ -55,9 +87,8 @@ class Events(Item):
                 [
                     InlineQueryResultArticle(
                         id=utils.random_id(),
-                        title="Доступные команды",
-                        input_message_content=message,
-#                        thumb_url="ссылку на фото",
+                        title="Available Commands",
+                        input_message_content=message
                     )
                 ], cache_time=0
             )
@@ -73,10 +104,9 @@ class Events(Item):
                 [
                     InlineQueryResultArticle(
                         id=utils.random_id(),
-                        title="Ошибка",
+                        title="Error",
                         input_message_content=InputTextMessageContent(
-                            "❌ Такой инлайн-команды нет"),
-#                        thumb_url="ссылку на фото"
+                            "❌ No such inline command")
                     )
                 ], cache_time=0
             )
@@ -89,9 +119,9 @@ class Events(Item):
                 len(vars_ := inspect.getfullargspec(func).args) > 3
                 and vars_[3] == "args"
             ):
-                await func(self._app, inline_query, args)
+                await func(inline_query, args)
             else:
-                await func(self._app, inline_query)
+                await func(inline_query)
         except Exception as error:
             logging.exception(error)
 

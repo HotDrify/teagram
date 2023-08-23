@@ -147,12 +147,15 @@ class TesterMod(loader.Module):
     async def ping_cmd(self, message: types.Message, args: str):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
+        
         await utils.answer(message, "☕")
+        
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
+
         await utils.answer(
             message,
             f"""
-🕒 **Время отлика Telegram**: `{ping}ms`
+🕒 <b>Время отлика Telegram</b>: <code>{ping}ms</code>
             """
         )
 

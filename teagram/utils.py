@@ -2,19 +2,15 @@ import asyncio
 import functools
 import random
 import string
-import typing
 import yaml
 import os
 import contextlib
 import aiohttp
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
-from urllib.parse import urlparse
 
-from pyrogram.file_id import PHOTO_TYPES, FileId
-from telethon.types import Chat, User
 from telethon import TelegramClient
-from telethon.tl.custom import Message
+from telethon.tl.custom import Message, InlineResults
 
 from . import database
 
@@ -22,12 +18,26 @@ from . import database
 def get_full_command(message: Message) -> Union[
     Tuple[Literal[""], Literal[""], Literal[""]], Tuple[str, str, str]
 ]:
-    """Вывести кортеж из префикса, команды и аргументов
-
-    Параметры:
-        message (``pyrogram.types.Message``):
-            Сообщение
     """
+    Extract a tuple of prefix, command, and arguments from the message.
+
+    Parameters:
+        message (Message): The message.
+
+    Returns:
+        Union[
+            Tuple[Literal[""], Literal[""], Literal[""]],
+            Tuple[str, str, str]
+        ]: A tuple containing the prefix, command, and arguments.
+
+    Example:
+        message_text = "/command arg1 arg2"
+        message = Message(text=message_text)
+        result = get_full_command(message)
+        #   result also can be if you didn't set prefix: ("", "command", "arg1 arg2")
+        # For the example message_text, result will be: ("/", "command", "arg1 arg2")
+    """
+
     message.text = str(message.text)
     prefixes = database.db.get("teagram.loader", "prefixes", ["."])
 
@@ -44,54 +54,135 @@ def get_full_command(message: Message) -> Union[
 
     return prefixes[0], command.lower(), args[-1] if args else ""
 
+def get_chat(message: Message):
+    return (message.chat.id if message.chat else None or message._chat_peer)
 
 async def answer(
     message: Union[Message, List[Message]],
-    response: Union[str, Any]
+    response: Union[str, Any],
+    photo: bool = False,
+    document: bool = False,
+    caption: str = '',
+    parse_mode: str = 'html',
+    **kwargs
 ) -> List[Message]:
+    """
+    Send a response to a message, with optional photo or document attachment.
+
+    Parameters:
+        message (Union[Message, List[Message]]): The original message or a list of messages to reply to.
+        response (Union[str, Any]): The response to send. It can be a text message, a path to a photo/document, or a file-like object.
+        photo (bool, optional): If True, a photo will be sent along with the response. Default is False.
+        document (bool, optional): If True, a document will be sent along with the response. Default is False.
+        caption (str, optional): Caption for the sent photo or document, if applicable.
+        parse_mode (str, optional): Parse mode for formatting text. Default is 'html'.
+        **kwargs: Additional keyword arguments for sending messages or files.
+
+    Returns:
+        List[Message]: A list of sent messages.
+
+    Example:
+        response_text = "Thank you for your message!"
+        await utils.answer(message, response_text)
+        
+        response_image_path = "image.jpg"
+        await utils.answer(message, response_image_path, photo=True, caption="Here's an image for you.")
+    """
     messages: List[Message] = []
+    client: TelegramClient = message._client  # type: ignore
+    chat = get_chat(message)
 
     if isinstance(message, list):
         message: Message = message[0]
 
-    if isinstance(response, str):
-        client: TelegramClient = message._client # type: ignore
-        chat = message.chat
-
+    if isinstance(response, str) and not (photo or document):
         try:
             msg = await client.edit_message(
-                (chat.id if chat else None or message._chat_peer), # type: ignore
-                message.id, # type: ignore
+                chat,
+                message.id,
                 response,
-                parse_mode='html'
+                parse_mode=parse_mode,
+                **kwargs
             )
         except:
-            msg = await message.reply(response, parse_mode='html')
-        
+            msg = await message.reply(response, parse_mode=parse_mode, **kwargs)
+
         messages.append(msg)
+
+    if photo or document:
+        await client.delete_messages(chat, message.id)
+        
+        messages.append(
+            await client.send_file(
+                chat, 
+                response,
+                caption=caption,
+                parse_mode=parse_mode,
+                **kwargs
+            ) # type: ignore
+        ) # type: ignore
 
     return messages
 
-def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
-    """Запускает асинхронно нон-асинк функцию
-
-    Параметры:
-        func (``types.FunctionType``):
-            Функция для запуска
-
-        args (``list``):
-            Аргументы к функции
-
-        kwargs (``dict``):
-            Параметры к функции
+async def invoke_inline(
+    message: Message,
+    bot_username: str,
+    inline_id: str
+):
     """
+    Invoke an inline query to a bot.
+
+    Args:
+        message (Union[Message, List[Message]]): The original message or a list of messages to refer to.
+        bot_username (str): The username of the bot to invoke the inline query.
+        inline_id (str): The unique identifier of the inline query.
+
+    Returns:
+        Awaitable: The result of the invoked inline query.
+    """
+    client: TelegramClient = message._client # type: ignore
+    query: InlineResults = await client.inline_query(bot_username, inline_id)
+
+    return await query[0].click(
+        get_chat(message),
+        reply_to=message.reply_to_msg_id or None
+    )
+
+
+def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
+    """
+    Run a non-async function asynchronously.
+
+    Parameters:
+        func (FunctionType): The function to run.
+        args (list): Arguments for the function.
+        kwargs (dict): Keyword arguments for the function.
+
+    Returns:
+        asyncio.Future: A Future object representing the result of the function.
+
+    Example:
+        def sync_function(x):
+            return x * 2
+
+        async def main():
+            result = await run_sync(sync_function, 5)
+            print(result)  # Output: 10
+    """
+
     return asyncio.get_event_loop().run_in_executor(
         None, functools.partial(
             func, *args, **kwargs)
     )
 
 def get_ram() -> float:
-    """Возвращает данные о памяти."""
+    """
+    Get memory usage in megabytes.
+
+    Returns:
+        float: Memory usage in megabytes.
+    """
+    
     try:
         import psutil
         process = psutil.Process(os.getpid())
@@ -103,19 +194,34 @@ def get_ram() -> float:
         return 0
 
 def get_cpu() -> float:
-    """Возвращает данные о процессоре."""
+    """
+    Get CPU usage as a percentage.
+
+    Returns:
+        float: CPU usage as a percentage.
+    """
+
     try:
         import psutil
+
         process = psutil.Process(os.getpid())
         cpu = process.cpu_percent()
+
         for child in process.children(recursive=True):
             cpu += child.cpu_percent()
-        return round(cpu, 1)
+
+        return cpu
     except:
         return 0
     
 def get_platform() -> str:
-    """Возращает платформу."""
+    """
+    Get the platform information.
+
+    Returns:
+        str: Platform information.
+    """
+
     IS_TERMUX = "com.termux" in os.environ.get("PREFIX", "")
     IS_CODESPACES = "CODESPACES" in os.environ
     IS_DOCKER = "DOCKER" in os.environ
@@ -146,7 +252,16 @@ def get_platform() -> str:
     return platform
 
 def random_id(length: int = 10) -> str:
-    """Returns random id"""
+    """
+    Generate a random ID.
+
+    Parameters:
+        length (int): Length of the random ID. Default is 10.
+
+    Returns:
+        str: Random ID.
+    """
+
     return "".join(
         random.choice(string.ascii_letters + string.digits)
         for _ in range(length)
@@ -154,6 +269,13 @@ def random_id(length: int = 10) -> str:
 
 
 def get_langpack() -> Union[Any, List]:
+    """
+    Get the language pack.
+
+    Returns:
+        Union[Any, List]: The language pack.
+    """
+
     if not (lang := database.db.get('teagram.loader', 'lang')):
         database.db.set('teagram.loader', 'lang', 'en')
 
@@ -165,6 +287,16 @@ def get_langpack() -> Union[Any, List]:
         return pack
 
 async def paste_neko(code: str):
+    """
+    Paste code on nekobin.com and get the URL.
+
+    Parameters:
+        code (str): The code to be pasted.
+
+    Returns:
+        str: The URL of the pasted code.
+    """
+
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
             async with session.post(

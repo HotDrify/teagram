@@ -71,9 +71,17 @@ class UpdateMod(loader.Module):
     async def update_cmd(self, message: types.Message):
         try:
             await utils.answer(message, 'Попытка обновления...')
+            
+            update_req = False
+            if 'requirements.txt' in check_output('git diff', shell=True).decode():
+                update_req = True
 
-            check_output('git stash', shell=True).decode()
-            output = check_output('git pull', shell=True).decode()
+            try:
+                output = check_output('git pull', shell=True).decode()
+            except:
+                check_output('git stash', shell=True)
+                output = check_output('git pull', shell=True).decode()
+
             
             if 'Already up to date.' in output:
                 return await utils.answer(message, 'У вас установлена последняя версия ✔')
@@ -84,15 +92,16 @@ class UpdateMod(loader.Module):
             atexit.register(restart)
             self.db.set(
                 "teagram.loader", "restart", {
-                    "msg": f"{((message.chat.id) if message.chat else 0 or message._chat_peer)}:{message.id}",
+                    "msg": f"{utils.get_chat(message)}:{message.id}",
                     "start": time.time(),
                     "type": "update"
                 }
             )
 
-            await utils.answer(message, "🔁 Обновление...")
+            if update_req:
+                check_output('pip install -r requirements.txt')
 
-            logging.info("Обновление...")
+            await utils.answer(message, "🔁 Обновление...")
             return sys.exit(0)
         except Exception as error:
             await utils.answer(message, f'Произошла ошибка: {error}')

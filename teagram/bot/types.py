@@ -7,12 +7,16 @@ from telethon import TelegramClient
 
 from .. import database, types
 
-
 class Item:
-    """Элемент"""
+    """
+    Base class for items.
+    This class provides functionality for checking filters applied to event handlers.
+    """
 
     def __init__(self) -> None:
-        """Инициализация класса"""
+        """
+        Initialize the class.
+        """
         self._all_modules: types.ModulesManager = None
         self._db: database.Database = None
         self._app: TelegramClient = None
@@ -23,9 +27,19 @@ class Item:
         module: types.Module,
         update_type: Union[Message, InlineQuery, CallbackQuery],
     ) -> bool:
-        """Проверка фильтров"""
+        """
+        Check filters for an event handler.
+
+        Args:
+            func (FunctionType): The event handler function.
+            module (types.Module): The module the function belongs to.
+            update_type (Union[Message, InlineQuery, CallbackQuery]): The type of update.
+
+        Returns:
+            bool: True if the event should be processed, False otherwise.
+        """
         if (custom_filters := getattr(func, "_filters", None)):
-            coro = custom_filters(module, self._app, update_type)
+            coro = custom_filters(module, update_type)
             if inspect.iscoroutine(coro):
                 coro = await coro
 
