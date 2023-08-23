@@ -7,18 +7,20 @@ from . import database
 from  dataclasses import dataclass, field
 from .validators import Integer, String, Boolean, ValidationError
 
+from aiogram import Dispatcher, Bot
+
 class Module:
-    """Описание модуля"""
+    """Module's descripton"""
     name: str
     author: str
     version: Union[int, float]
 
     async def on_load(self, app: TelegramClient) -> Any:
-        """Вызывается при загрузке модуля"""
+        """Invokes on module load"""
 
 
 class ModulesManager:
-    """Менеджер модулей"""
+    """Manager of modules"""
 
     def __init__(self) -> None:
         self.modules: List[Module]
@@ -36,8 +38,8 @@ class ModulesManager:
 
         self.aliases: Dict[str, str]
 
-        self.dp
-        self.bot_manager
+        self.dp: Dispatcher
+        self.bot_manager: Bot
 
 class WaitForDefault:
     pass

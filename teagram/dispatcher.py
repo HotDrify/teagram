@@ -4,24 +4,29 @@ from types import FunctionType
 
 from telethon import TelegramClient, types
 from telethon.events import NewMessage
+from typing import Union
+from telethon.tl.custom import Message
 
 from . import loader, utils
 
 
-# async def check_filters(func: FunctionType, app: TelegramClient, message: types.Message) -> bool:
-#     """Проверка фильтров"""
-#     if (custom_filters := getattr(func, "_filters", None)):
-#         coro = custom_filters(app, message)
-#         if iscoroutine(coro):
-#             coro = await coro
+async def check_filters(
+    func: FunctionType,
+    message: Union[types.Message, Message]
+) -> bool:
+    """Проверка фильтров"""
+    if (custom_filters := getattr(func, "_filters", None)):
+        coro = custom_filters(message)
+        if iscoroutine(coro):
+            coro = await coro
 
-#         if not coro:
-#             return False
-#     else:
-#         if not message.outgoing:
-#             return False
+        if not coro:
+            return False
+    else:
+        if not message.out:
+            return False
 
-#     return True
+    return True
 
 
 class DispatcherManager:
@@ -57,11 +62,13 @@ class DispatcherManager:
         if not func:
             return
     
-        # if not await check_filters(func, app, message):
-        #     return
+        if not await check_filters(func, app, message):
+            return
 
         if message.from_id.user_id != self.owner.id:
             return
+        
+        message._client = self.app
         
         try:
             if (
@@ -74,7 +81,8 @@ class DispatcherManager:
         except Exception as error:
             logging.exception(error)
             await utils.answer(
-                message, f"❌ Произошла ошибка при выполнении команды.\n"
+                message,
+                        f"❌ Произошла ошибка при выполнении команды.\n"
                         f"Запрос был: <code>{message.text}</code>\n"
                         f"Подробности можно найти в <code>{prefix}logs</code>"
             )
@@ -85,8 +93,10 @@ class DispatcherManager:
         """Обработчик вотчеров"""
         for watcher in self.modules.watcher_handlers:
             try:
-                # if not await check_filters(watcher, app, message):
-                #     continue
+                message._client = self.app
+                
+                if not await check_filters(watcher, message):
+                    continue
 
                 await watcher(message)
             except Exception as error:
