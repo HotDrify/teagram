@@ -110,18 +110,19 @@ async def answer(
 
         messages.append(msg)
 
-    if photo or document:
-        await client.delete_messages(chat, message.id)
-        
+    if photo or document:       
         messages.append(
             await client.send_file(
                 chat, 
                 response,
                 caption=caption,
                 parse_mode=parse_mode,
+                reply_to=message.id,
                 **kwargs
             ) # type: ignore
         ) # type: ignore
+
+        await client.delete_messages(chat, message.id)
 
     return messages
 
