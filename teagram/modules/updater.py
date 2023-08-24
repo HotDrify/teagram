@@ -42,10 +42,10 @@ class UpdateMod(loader.Module):
         last = None
 
         try:
-            last = check_output('git log -1', shell=True).decode().split()[1]
-            diff = check_output('git diff', shell=True).decode()
+            last = check_output('git log -1', shell=True).decode().split()[1].strip()
+            diff = check_output('git rev-parse HEAD', shell=True).decode().strip()
 
-            if diff:
+            if last != diff:
                 await bot.send_message(
                     me.id,
                     f"✔ Доступно обновление (<a href='https://github.com/HotDrify/teagram/commit/{last}'>{last[:6]}...</a>)"

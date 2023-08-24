@@ -4,7 +4,6 @@ import re
 from typing import Union
 
 from loguru import logger
-from pyrogram import errors, types
 from telethon import errors, types
 from telethon.tl.functions.contacts import UnblockRequest
 

@@ -1,4 +1,0 @@
-uvloop>=0.17.0
-ujson>=5.8.0
-TgCrypto>=1.2.5
-pyre2>=0.3.6
