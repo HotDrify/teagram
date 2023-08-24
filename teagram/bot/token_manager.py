@@ -76,6 +76,8 @@ class TokenManager(Item):
             await conv.get_response()
 
             logger.success("Бот успешно создан")
+            async with fsm.Conversation(self._app, f"@{bot_username}", True) as conv:
+                await conv.ask("/start")
             return token
 
     async def _revoke_token(self) -> str:
