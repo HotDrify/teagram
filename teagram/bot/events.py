@@ -15,7 +15,12 @@ class Events(Item):
     async def _message_handler(self, message: Message) -> Message:
         """Обработчик сообщений"""
         if "/start" in message.text:
-            await message.answer_photo(photo=open('assets/bot_avatar.png', 'rb'), caption='☕ привет! это крутой, модульный юзербот написанный на pyrogram!\n\n☕<a href="https://github.com/hotdrify/teagram">github</a>\n🤔<a href="https://t.me/ubteagram">поддержка</a>')
+            await message.answer_photo(
+                photo=open('assets/bot_avatar.png', 'rb'),
+                caption='☕ Привет! Это модульный юзербот написанный на pyrogram!'
+                '\n\n☕<a href="https://github.com/hotdrify/teagram">Github</a>'
+                '\n🤔<a href="https://t.me/ubteagram">Поддержка</a>'
+            )
         for func in self._all_modules.message_handlers.values():
             if not await self._check_filters(func, func.__self__, message):
                 continue

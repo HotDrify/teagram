@@ -42,8 +42,8 @@ class UpdateMod(loader.Module):
         last = None
 
         try:
-            last = check_output('git log -1', shell=True).decode().split()[1]
-            diff = check_output('git diff', shell=True).decode()
+            last = check_output('git log -1', shell=True).decode().split()[1].strip()
+            diff = check_output('git rev-parse HEAD', shell=True).decode().strip()
 
             if diff:
                 await bot.send_message(
