@@ -1,8 +1,12 @@
 import logging
 import asyncio
 import sys
+import traceback
+import inspect
+import json
 
 from aiogram import Bot, Dispatcher, exceptions
+from aiogram.types import InlineKeyboardMarkup, InlineQuery, InputTextMessageContent, InlineQueryResultArticle
 from telethon import TelegramClient
 from telethon.types import Message
 
@@ -35,6 +39,7 @@ class BotManager(Events, TokenManager):
         self._all_modules = all_modules
 
         self._token = self._db.get("teagram.bot", "token", None)
+        self._units = {}
 
     async def load(self) -> Union[bool, NoReturn]:
         """
@@ -79,9 +84,132 @@ class BotManager(Events, TokenManager):
         self._dp.register_inline_handler(self._inline_handler, lambda _: True)
         self._dp.register_callback_query_handler(self._callback_handler, lambda _: True)
 
-    async def use_inline(self, inline_id: str, message: Message) -> Message:
+    async def invoke_inline(self, inline_id: str, message: Message) -> Message:
         return await utils.invoke_inline(
             message,
             (await self.bot.get_me()).username,
             inline_id
         )
+    
+    async def form(
+        self,
+        *,
+        title: str,
+        description: Union[str, None] = None,
+        text: str,
+        message: Message, 
+        reply_markup: Union[InlineKeyboardMarkup, None] = None,
+    ):
+        unit_id = utils.random_id()
+        self._units[unit_id] = {
+            'type': 'form',
+            'title': title,
+            'description': description,
+            'text': text,
+            'keyboard': reply_markup,
+            'message': message,
+            'top_msg_id': message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id
+        }
+
+        try:
+            await self.invoke_inline(unit_id, message)
+        except Exception as error:
+            del self._units[unit_id]
+
+            error = "\n".join(traceback.format_exc().splitlines()[1:])
+
+            await utils.answer(
+                message,
+                f'Не удалось отправить форму\n'
+                f"<code>{error}</code>"
+            )
+    
+    async def _inline_handler(self, inline_query: InlineQuery) -> InlineQuery:
+        """
+        Inline query event handler.
+
+        Processes incoming inline queries by invoking appropriate inline handlers.
+
+        Args:
+            inline_query (InlineQuery): The incoming inline query.
+
+        Returns:
+            InlineQuery: The processed inline query.
+        """
+        if not (query := inline_query.query):
+            commands = ""
+            for command, func in self._all_modules.inline_handlers.items():
+                if await self._check_filters(func, func.__self__, inline_query):
+                    commands += f"\n💬 <code>@{(await self.bot.me).username} {command}</code>"
+
+            message = InputTextMessageContent(
+                f"👇 <b>Available Commands</b>\n"
+                f"{commands}"
+            )
+
+            return await inline_query.answer(
+                [
+                    InlineQueryResultArticle(
+                        id=utils.random_id(),
+                        title="Available Commands",
+                        input_message_content=message
+                    )
+                ], cache_time=0
+            )
+        
+        try:
+            form = self._units[query]
+            text = form.get('text')
+            keyboard = form.get('keyboard')
+
+            await inline_query.answer(
+                [
+                    InlineQueryResultArticle(
+                        id=utils.random_id(),
+                        title=form.get('title'),
+                        description=form.get('description'),
+                        input_message_content=InputTextMessageContent(
+                            text,
+                            parse_mode='HTML',
+                            disable_web_page_preview=True
+                        ),
+                        reply_markup=keyboard
+                    )
+                ]
+            )
+        except Exception as error:
+            traceback.print_exc()
+
+        query_ = query.split()
+
+        cmd = query_[0]
+        args = " ".join(query_[1:])
+
+        func = self._all_modules.inline_handlers.get(cmd)
+        if not func:
+            return await inline_query.answer(
+                [
+                    InlineQueryResultArticle(
+                        id=utils.random_id(),
+                        title="Error",
+                        input_message_content=InputTextMessageContent(
+                            "❌ No such inline command")
+                    )
+                ], cache_time=0
+            )
+
+        if not await self._check_filters(func, func.__self__, inline_query):
+            return
+
+        try:
+            if (
+                len(vars_ := inspect.getfullargspec(func).args) > 3
+                and vars_[3] == "args"
+            ):
+                await func(inline_query, args)
+            else:
+                await func(inline_query)
+        except Exception as error:
+            logging.exception(error)
+
+        return inline_query

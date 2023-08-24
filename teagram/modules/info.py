@@ -4,6 +4,9 @@ import time
 from .terminal import bash_exec
 from .. import __version__, loader, utils, validators
 from ..types import Config, ConfigValue
+from ..bot import BotManager
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from telethon.tl.custom import Message
 from datetime import timedelta
@@ -20,6 +23,16 @@ class AboutMod(loader.Module):
                 self.db.get('UserBot', 'customText') or '',
                 validators.String()
             ) # type: ignore
+        )
+        self.bot: BotManager = self.bot
+
+    async def testinfo_cmd(self, message: Message):
+        await self.bot.form(
+            title='Teagram info',
+            description='cho',
+            text='odsfgoadsofg',
+            message=message,
+            reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton('privet', callback_data='no'))
         )
     
     async def info_cmd(self, message: Message):
