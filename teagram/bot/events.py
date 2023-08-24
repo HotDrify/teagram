@@ -15,7 +15,7 @@ class Events(Item):
     async def _message_handler(self, message: Message) -> Message:
         """Обработчик сообщений"""
         if "/start" in message.text:
-            await message.answer('☕ привет! это крутой, модульный юзербот написанный на pyrogram!\n\n☕<a href="https://github com/hotfrify/teagram">GitHub</a> \n🤔<a href="https://t.me/ubteagram">поддержка</a>')
+            await message.answer('☕ привет! это крутой, модульный юзербот написанный на pyrogram!\n\n☕<a href="https://github.com/hotdrify/teagram">github</a>\n🤔<a href="https://t.me/ubteagram">поддержка</a>')
         for func in self._all_modules.message_handlers.values():
             if not await self._check_filters(func, func.__self__, message):
                 continue
