@@ -250,7 +250,7 @@ def get_platform() -> str:
     elif IS_CODESPACES:
         platform = "<emoji id=5467643451145199431>👨‍💻</emoji> Github Codespaces"
     elif IS_TRIGGER:
-        platform = "🌍 Trigger Earth"
+        platform = "🌍 TriggerEarth"
     else:
         platform = "🖥️ VDS"
     
