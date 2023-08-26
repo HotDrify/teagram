@@ -9,6 +9,7 @@ import aiohttp
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
 
+from telethon.tl.functions.channels import CreateChannelRequest
 from telethon import TelegramClient, types
 from telethon.tl import custom
 
@@ -57,6 +58,15 @@ def get_full_command(message: Message) -> Union[
 
 def get_chat(message: Message):
     return (message.chat.id if message.chat else None or message._chat_peer)
+
+async def create_group(
+    app: TelegramClient,
+    title: str,
+    description: str,
+    megagroup: bool = False,
+    broadcast: bool = False
+):
+    return await app(CreateChannelRequest(title, description, megagroup=megagroup, broadcast=broadcast))
 
 async def answer(
     message: Union[Message, List[Message]],

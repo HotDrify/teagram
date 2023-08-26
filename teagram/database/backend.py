@@ -2,48 +2,62 @@ import asyncio
 from typing import Union
 
 from telethon import TelegramClient, types
-
+from ..utils import create_group
 
 class CloudDatabase:
-    """Чат в Telegram с данными для базы данных"""
+    """
+    Cloud database. Essentially, it's a Telegram chat used for sending various logs.
+    """
 
     def __init__(self, app: TelegramClient, me: types.User):
+        """
+        Initialize the CloudDatabase instance.
+
+        Args:
+            app (TelegramClient): The Telegram client instance.
+            me (types.User): The user associated with the Telegram client.
+        """
         self._app = app
         self._me = me
-        self.data_chat = None
-    
-    # in future
-    #     asyncio.get_event_loop().create_task(
-    #         self.find_data_chat())
+        self.chat = None
 
-    # async def find_data_chat(self):
-    #     """Информация о чате с данными"""
-    #     if not self.data_chat:
-    #         chat = [
-    #             dialog.chat async for dialog in self._app.get_dialogs()
-    #             if dialog.chat.title == f"teagram-{self._me.id}-data"
-    #             and dialog.chat.type == "supergroup"
-    #         ]
+        asyncio.get_event_loop().create_task(self.get_chat())
 
-    #         if not chat:
-    #             self.data_chat = await self._app.create_supergroup(f"teagram-{self._me.id}-data")
-    #         else:
-    #             self.data_chat = chat[0]
+    async def get_chat(self):
+        if not self.chat:
+            chat = None
+            
+            async for dialog in self._app.iter_dialogs():
+                if dialog.name == 'teagram-logs':
+                    chat = dialog
 
-    #     return self.data_chat
+                    break
 
-    async def save_data(self, message: Union[types.Message, str]):
-        """Сохранить данные в чат"""
+            if not chat:
+                self.chat = (
+                    await create_group(
+                        self._app,
+                        'teagram-logs', 
+                        'Here teagram logs'
+                    )
+                ).__dict__["chats"][0].__dict__["id"]
+            else:
+                self.chat = chat
+
+        return self.chat
+
+    async def send_data(self, message: Union[types.Message, str]):
+        """Send data to the chat."""
         return (
             await self._app.send_message(
-                self.data_chat.id, message
+                self.chat, message
             )
             if isinstance(message, str)
-            else await message.copy(self.data_chat.id)
+            else await self._app.forward_messages(self.chat, message)
         )
 
     async def get_data(self, message_id: int):
-        """Найти данные по айди сообщения"""
+        """Retrieve data using a message ID."""
         return await self._app.get_messages(
-            self.data_chat.id, message_id
+            self.chat, message_id
         )

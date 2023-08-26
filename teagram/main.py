@@ -54,6 +54,8 @@ async def main():
             print(restarted_text)
 
         db.pop("teagram.loader", "restart")
+    else:
+        await db.cloud.send_data('Userbot has started (Prefix - "{}")'.format(prefix))
 
     await app.run_until_disconnected() # type: ignore
 
