@@ -37,12 +37,12 @@ class AboutMod(loader.Module):
 
         default = f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me}`
-<b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  {version}
+<b><emoji id=6334741148560524533>🐧</emoji> Версия</b>:  {version}
 
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  `{utils.get_cpu()}%`
-<b>💾 RAM</b>:  `{utils.get_ram()}MB`
+<b>📀 RAM</b>:  `{utils.get_ram()}MB`
 
-<b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  `{uptime}`
+<b><emoji id=5974081491901091242>⌚</emoji> Аптайм</b>:  `{uptime}`
 <b><emoji id=5377399247589088543>🔥</emoji> Версия pyrogram: `{pyrogram.__version__}`</b>
 
 <b>{platform}</b>
