@@ -37,7 +37,7 @@ class AboutMod(loader.Module):
 
         default = f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me}`
-<b><emoji id=6334741148560524533>🐧</emoji> Версия</b>:  {version}
+<b><emoji id=5361541227604878624>🐧</emoji> Версия</b>:  {version}
 
 <b>🧠 CPU</b>:  `{utils.get_cpu()}%`
 <b>📀 RAM</b>:  `{utils.get_ram()}MB`
