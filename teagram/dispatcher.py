@@ -3,7 +3,7 @@ from inspect import getfullargspec, iscoroutine
 from types import FunctionType
 
 from telethon import TelegramClient, types
-from telethon.events import NewMessage
+from telethon.events import NewMessage, MessageEdited
 from typing import Union
 from telethon.tl.custom import Message
 
@@ -44,6 +44,10 @@ class DispatcherManager:
         self.app.add_event_handler(
             self._handle_message,
             NewMessage
+        )
+        self.app.add_event_handler(
+            self._handle_message,
+            MessageEdited
         )
 
         logging.info("Диспетчер успешно загружен")
