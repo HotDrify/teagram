@@ -28,7 +28,7 @@ class TesterMod(loader.Module):
     """Тест чего-то"""
 
     async def logs_cmd(self, message: types.Message, args: str):
-        self._client.me = await self.all_modules._client.get_me()
+        self._client.me = await self.manager._client.get_me()
         """Отправляет логи. Использование: logs <уровень>"""
         if not args:
             args = "40"
@@ -98,12 +98,12 @@ class TesterMod(loader.Module):
                         "✅ Правильно: addalias <новый алиас> <команда>"
             )
 
-        aliases = self.all_modules.aliases
+        aliases = self.manager.aliases
         if args[0] in aliases:
             return await utils.answer(
                 message, "❌ Такой алиас уже существует")
 
-        if not self.all_modules.command_handlers.get(args[1]):
+        if not self.manager.command_handlers.get(args[1]):
             return await utils.answer(
                 message, "❌ Такой команды нет")
 
@@ -119,7 +119,7 @@ class TesterMod(loader.Module):
             return await utils.answer(
                 message, "❔ Какой алиас нужно удалить?")
 
-        aliases = self.all_modules.aliases
+        aliases = self.manager.aliases
         if args not in aliases:
             return await utils.answer(
                 message, "❌ Такого алиаса нет")
@@ -132,7 +132,7 @@ class TesterMod(loader.Module):
 
     async def aliases_cmd(self, message: types.Message):
         """Показать все алиасы"""
-        aliases = self.all_modules.aliases
+        aliases = self.manager.aliases
         if not aliases:
             return await utils.answer(
                 message, "Алиасов нет")

@@ -47,7 +47,7 @@ class TokenManager(Item):
                     seconds = response.text.split()[-2]
                     logger.error(f'Please try again after {seconds} seconds')
 
-            await conv.ask(f"Teagram UserBot of {utils.get_display_name(self._all_modules.me)[:45]}")
+            await conv.ask(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
             await conv.get_response()
 
             bot_username = f"teagram_{utils.random_id(6)}_bot"

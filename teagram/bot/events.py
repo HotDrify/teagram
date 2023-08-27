@@ -23,7 +23,7 @@ class Events(Item):
         Returns:
             Message: The processed message.
         """
-        for func in self._all_modules.message_handlers.values():
+        for func in self._manager.message_handlers.values():
             if not await self._check_filters(func, func.__self__, message):
                 continue
 
@@ -46,7 +46,7 @@ class Events(Item):
         Returns:
             CallbackQuery: The processed callback query.
         """
-        for func in self._all_modules.callback_handlers.values():
+        for func in self._manager.callback_handlers.values():
             if not await self._check_filters(func, func.__self__, call):
                 continue
 

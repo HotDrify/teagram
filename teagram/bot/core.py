@@ -25,18 +25,18 @@ class BotManager(Events, TokenManager):
     Manages the bot's functionalities.
     """
 
-    def __init__(self, app: TelegramClient, db: database.Database, all_modules: types.ModulesManager) -> None:
+    def __init__(self, app: TelegramClient, db: database.Database, manager: types.ModulesManager) -> None:
         """
         Initialize the Bot Manager.
 
         Parameters:
             app (TelegramClient): The client instance.
             db (database.Database): The database instance.
-            all_modules (types.ModulesManager): The modules manager.
+            manager (types.ModulesManager): The modules manager.
         """
         self._app = app
         self._db = db
-        self._all_modules = all_modules
+        self._manager = manager
 
         self._token = self._db.get("teagram.bot", "token", None)
         self._units = {}
@@ -138,7 +138,7 @@ class BotManager(Events, TokenManager):
         """
         if not (query := inline_query.query):
             commands = ""
-            for command, func in self._all_modules.inline_handlers.items():
+            for command, func in self._manager.inline_handlers.items():
                 if await self._check_filters(func, func.__self__, inline_query):
                     commands += f"\n💬 <code>@{(await self.bot.me).username} {command}</code>"
 
@@ -185,7 +185,7 @@ class BotManager(Events, TokenManager):
         cmd = query_[0]
         args = " ".join(query_[1:])
 
-        func = self._all_modules.inline_handlers.get(cmd)
+        func = self._manager.inline_handlers.get(cmd)
         if not func:
             return await inline_query.answer(
                 [

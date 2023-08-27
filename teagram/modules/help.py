@@ -11,7 +11,7 @@ class HelpMod(loader.Module):
 
         if not args:
             text = ""
-            for module in sorted(self.all_modules.modules, key=lambda mod: len(str(mod))):
+            for module in sorted(self.manager.modules, key=lambda mod: len(str(mod))):
                 if module.name.lower() == 'help':
                     continue
 
@@ -27,7 +27,7 @@ class HelpMod(loader.Module):
                 if commands or inline:
                     text += f"\n<b>{module.name}</b> - " + (commands if commands else '`Команд не найдено`') + inline
 
-            modules_count = len(self.all_modules.modules) - 1
+            modules_count = len(self.manager.modules) - 1
             bot_inline_info = f"<emoji id=5228968570863496802>🤖</emoji> Инлайн бот: <b>@{self.bot_username}</b>\n"
 
             return await utils.answer(
@@ -35,7 +35,7 @@ class HelpMod(loader.Module):
                 f"<emoji id=5359370246190801956>☕️</emoji> Доступные модули <b>{modules_count}</b>\n{bot_inline_info}{text}"
             )
 
-        module = self.all_modules.get_module(args)
+        module = self.manager.get_module(args)
         if not module:
             return await utils.answer(
                 message, "<b><emoji id=5465665476971471368>❌</emoji> Такого модуля нет</b>")

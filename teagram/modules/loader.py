@@ -36,7 +36,7 @@ class LoaderMod(loader.Module):
         
         try:
             response = await utils.run_sync(requests.get, args)
-            module = await self.all_modules.load_module(response.text, response.url)
+            module = await self.manager.load_module(response.text, response.url)
 
             if module is True:
                 return await utils.answer(
@@ -99,7 +99,7 @@ class LoaderMod(loader.Module):
                     "❌ Нельзя загружать встроенные модули"
                 )
 
-        module_name = await self.all_modules.load_module(_file)
+        module_name = await self.manager.load_module(_file)
 
         if module_name is True:
             return await utils.answer(
@@ -118,7 +118,7 @@ class LoaderMod(loader.Module):
 
     async def unloadmod_cmd(self,  message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
-        if not (module_name := self.all_modules.unload_module(args)):
+        if not (module_name := self.manager.unload_module(args)):
             return await utils.answer(
                 message, "❌ Неверное название модуля")
         
@@ -176,11 +176,11 @@ class LoaderMod(loader.Module):
                     f'❌ Модуль {module} не найден'
                 )
             
-            unload = self.all_modules.unload_module(module)
+            unload = self.manager.unload_module(module)
             with open(f'teagram/modules/{module}.py', encoding='utf-8') as file:
                 module_source = file.read()
 
-            load = await self.all_modules.load_module(module_source)
+            load = await self.manager.load_module(module_source)
 
             if not load and not unload:
                 return await utils.answer(

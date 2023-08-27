@@ -144,7 +144,7 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
             Функция должна принимать параметры self, app, message/call/inline_query
 
     Пример:
-        >>> @on_bot(lambda self, call: call.from_user.id == self.all_modules.me.id)
+        >>> @on_bot(lambda self, call: call.from_user.id == self.manager.me.id)
         >>> async def func_callback_handler(
                 self,
                 call: aiogram.types.CallbackQuery
@@ -244,7 +244,7 @@ class ModulesManager:
                         self.unload_module(module, True)
 
                 value.db = self._db
-                value.all_modules = self
+                value.manager = self
                 value.client = self._client
                 value.bot = self.bot_manager
 

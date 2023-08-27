@@ -1,11 +1,10 @@
-import logging
 from asyncio import sleep
 
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                             InlineKeyboardMarkup, InlineQuery,
                             InlineQueryResultArticle, InputTextMessageContent,
                             Message)
-from telethon import TelegramClient, types
+from telethon import types
 
 from .. import (  # ".." - т.к. модули находятся в папке teagram/modules, то нам нужно на уровень выше
     loader, utils, validators)
@@ -22,27 +21,31 @@ class ExampleMod(loader.Module):  # Example - название класса мо
     def __init__(self):
         self.config = Config(
             ConfigValue(
-                'Это тестовый атрибут',
-                'Дефолтное значение атрибута',
-                'Значение атрибута',
-                validators.String() # тип значения
-            )
+                'Это тестовый атрибут',        # Название атрибута
+                'Дефолтное значение атрибута', # Дефолтное значение
+                'Значение атрибута',           # Можно подгрузить из базы данных
+                validators.String()            # Тип значения
+            ) # type: ignore
         )
 
     async def on_load(self):
         """Вызывается когда модуль загружен"""
         # Сюда можно написать какой нибудь скрипт, например подключение к бд и т.д.
-        # Клиент юзербота: self.client
+        # Атрибуты: self.db      - база данных
+        #           self.manager - менеджер модулей 
+        #           self.client  - телеграм клиент
+        #           self.bot     - инлайн бот
+        # Их можно использовать в любой части кода (В пределах класса)
 
-    # Если написать в лс/чате где есть бот "ты дурак?", то он ответит
+    # Если написать в лс/чате где есть бот "тест message_handler", то он ответит
     @loader.on_bot(lambda self, message: 'тест message_handler' in message.text)  # Сработает только если текст сообщения равняется "ты дурак?"
     async def example_message_handler(self, message: Message):  # _message_handler на конце функции чтобы обозначить что это хендлер сообщения
         """Пример хендлера сообщения"""
         await message.reply(
-            "Сам такой!")
+            "Да это message_handler, а что?")
 
     async def example_inline_handler(self, inline_query: InlineQuery, args: str):  # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
-                                                                                                # args - аргументы после команды. необязательный аргумент
+                                                                                   # args - аргументы после команды. необязательный аргумент
         """Пример инлайн-команды. Использование: @bot example [аргументы]"""
         await self.new_method(inline_query, args)
 

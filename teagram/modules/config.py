@@ -37,7 +37,7 @@ class ConfigMod(loader.Module):
         self.inline_bot = self.bot.bot
         self._dp = self.bot._dp
         self.DEFAULT_ATTRS = [
-            'all_modules', 'author', 'bot', 'callback_handlers',
+            'manager', 'author', 'bot', 'callback_handlers',
             'command_handlers', 'inline_handlers', 'bot_username',
             'message_handlers', 'name', 'version', 'watcher_handlers',
             'boot_time', 'client', '_client'
@@ -48,7 +48,7 @@ class ConfigMod(loader.Module):
         self.pending_module = False
 
     def get_module(self, data: str) -> loader.Module:
-        return next((module for module in self.all_modules.modules if module.name.lower() in data.lower()), None)
+        return next((module for module in self.manager.modules if module.name.lower() in data.lower()), None)
     
     def validate(self, attribute):
         if isinstance(attribute, str):
@@ -85,7 +85,7 @@ class ConfigMod(loader.Module):
 
         me = await self.client.get_me()
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
-        modules = [mod for mod in self.all_modules.modules]
+        modules = [mod for mod in self.manager.modules]
         message: Message = await self.inline_bot.send_message(me.id, 'Модули', reply_markup=inline_keyboard)
 
         if self.pending:

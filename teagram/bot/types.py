@@ -17,7 +17,7 @@ class Item:
         """
         Initialize the class.
         """
-        self._all_modules: types.ModulesManager = None
+        self._manager: types.ModulesManager = None
         self._db: database.Database = None
         self._app: TelegramClient = None
 
@@ -46,7 +46,7 @@ class Item:
             if not coro:
                 return False
         else:
-            if update_type.from_user.id != self._all_modules.me.id:
+            if update_type.from_user.id != self._manager.me.id:
                 return False
 
         return True
