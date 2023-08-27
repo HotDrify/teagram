@@ -41,13 +41,13 @@ class AboutMod(loader.Module):
 
         default = f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  <code>{me}</code>
-<b><emoji id=6334741148560524533>🆔</emoji> Версия</b>:  <code>{version}</code>
+<b><emoji id=6334741148560524533>🐧</emoji> Версия</b>:  <code>{version}</code>
 
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  <code>{utils.get_cpu()}%</code>
-<b>💾 RAM</b>:  <code>{utils.get_ram()}MB</code>
+<b>📀 RAM</b>:  <code>{utils.get_ram()}MB</code>
 
-<b><emoji id=5974081491901091242>🕒</emoji> Аптайм</b>:  <code>{uptime}</code>
-<b><emoji id=5377399247589088543>📱</emoji> Версия telethon: <code>{telethon.__version__}</code></b>
+<b><emoji id=5974081491901091242>⌚</emoji> Аптайм</b>:  <code>{uptime}</code>
+<b><emoji id=5377399247589088543>💧</emoji> Версия telethon: <code>{telethon.__version__}</code></b>
 
 <b>{platform}</b>
 """
