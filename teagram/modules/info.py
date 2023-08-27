@@ -47,7 +47,7 @@ class AboutMod(loader.Module):
 <b>📀 RAM</b>:  <code>{utils.get_ram()}MB</code>
 
 <b><emoji id=5974081491901091242>⌚</emoji> Аптайм</b>:  <code>{uptime}</code>
-<b><emoji id=5377399247589088543>💧</emoji> Версия telethon: <code>{telethon.__version__}</code></b>
+<b><emoji id=5377399247589088543>📱</emoji> Версия telethon: <code>{telethon.__version__}</code></b>
 
 <b>{platform}</b>
 """
