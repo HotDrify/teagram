@@ -22,6 +22,12 @@ class AboutMod(loader.Module):
                 '',
                 self.db.get('UserBot', 'customText') or '',
                 validators.String()
+            ), # type: ignore
+            ConfigValue(
+                'customImage',
+                '',
+                self.db.get('UserBot', 'customImage') or '',
+                validators.String()
             ) # type: ignore
         )
         self.bot: BotManager = self.bot
@@ -53,6 +59,7 @@ class AboutMod(loader.Module):
 """
 
         custom = self.config.get('customText')
+        custom_avatar = self.config.get('customImage')
 
         if custom:
             custom = custom.format(
@@ -67,7 +74,7 @@ class AboutMod(loader.Module):
         
         await utils.answer(
             message,
-            'assets/bot_avatar.png',
+            custom_avatar or 'assets/bot_avatar.png',
             photo=True,
             caption=custom or default
         )
