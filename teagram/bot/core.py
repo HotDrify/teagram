@@ -51,10 +51,13 @@ class BotManager(Events, TokenManager):
         logging.info("Loading bot manager...")
         error_text = "The userbot requires a bot. Resolve the bot creation issue and restart the userbot."
 
-        self._token = self._token or await self._create_bot()
-        if self._token is False:
-            logging.error(error_text)
-            return sys.exit(1)
+        self._token = self._token or await self._revoke_token()
+
+        if not self._token:
+            self._token = await self._create_bot()
+            if not self._token:
+                logging.error(error_text)
+                sys.exit(1)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
@@ -67,6 +70,7 @@ class BotManager(Events, TokenManager):
             else:
                 self._token = result
 
+        self._db.set('teagram.bot', 'token', self._token)
         self._dp = Dispatcher(self.bot)
         self._register_handlers()
 

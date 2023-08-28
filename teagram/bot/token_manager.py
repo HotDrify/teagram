@@ -122,7 +122,7 @@ class TokenManager(Item):
                 if found:
                     break
                 else:
-                    return logging.error("No created material bot")
+                    return False
 
             time.sleep(1)
             response = await conv.get_response()

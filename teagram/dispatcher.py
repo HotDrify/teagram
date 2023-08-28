@@ -9,6 +9,7 @@ from telethon.tl.custom import Message
 
 from . import loader, utils
 
+import traceback
 
 async def check_filters(
     func: FunctionType,
@@ -80,12 +81,13 @@ class DispatcherManager:
             else:
                 await func(message)
         except Exception as error:
+            error = traceback.format_exc()
+
             logging.exception(error)
             await utils.answer(
                 message,
-                        f"❌ Произошла ошибка при выполнении команды.\n"
-                        f"Запрос был: <code>{message.text}</code>\n"
-                        f"Подробности можно найти в <code>{prefix}logs</code>"
+                f"<b>❌ Произошла ошибка при выполнении команды:</b> <code>{message.text}</code>\n"
+                f"<b>❔ Логи:</b>\n<code>{error}</code>"
             )
 
         return message
