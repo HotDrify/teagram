@@ -28,7 +28,6 @@ class TesterMod(loader.Module):
     """Тест чего-то"""
 
     async def logs_cmd(self, message: types.Message, args: str):
-        self.client.me = await self.manager.client.get_me()
         """Отправляет логи. Использование: logs <уровень>"""
         if not args:
             args = "40"
@@ -50,8 +49,10 @@ class TesterMod(loader.Module):
         logs = io.BytesIO(logs)
         logs.name = "teagram.log"
 
-        return await message.reply_document(
-            document=logs,
+        return await utils.answer(
+            message,
+            logs,
+            document=True,
             caption=f"📤 Teagram Логи с {lvl} ({logging.getLevelName(lvl)}) уровнем"
             )
     

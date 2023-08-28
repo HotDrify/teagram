@@ -3,12 +3,12 @@ import asyncio
 import sys
 import traceback
 import inspect
-import json
 
 from aiogram import Bot, Dispatcher, exceptions
 from aiogram.types import InlineKeyboardMarkup, InlineQuery, InputTextMessageContent, InlineQueryResultArticle
 from telethon import TelegramClient
 from telethon.types import Message
+from telethon.tl.functions.messages import StartBotRequest
 
 from typing import Union, NoReturn
 from loguru import logger
@@ -51,9 +51,15 @@ class BotManager(Events, TokenManager):
         logging.info("Loading bot manager...")
         error_text = "The userbot requires a bot. Resolve the bot creation issue and restart the userbot."
 
-        self._token = self._token or await self._revoke_token()
+        new = False
 
         if not self._token:
+            self._token = await self._revoke_token()
+            new = True
+
+        if not self._token:
+            new = True
+            
             self._token = await self._create_bot()
             if not self._token:
                 logging.error(error_text)
@@ -65,10 +71,16 @@ class BotManager(Events, TokenManager):
             logging.error("Invalid token. Attempting to recreate the token.")
 
             result = await self._revoke_token()
+            new = True
+            
             if not result:
                 self._token = await self._create_bot() or logging.error(error_text) or sys.exit(1)
             else:
                 self._token = result
+
+        if new:
+            name = (await self.bot.get_me()).username
+            await self._app(StartBotRequest(name, name, 'start'))
 
         self._db.set('teagram.bot', 'token', self._token)
         self._dp = Dispatcher(self.bot)
