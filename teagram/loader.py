@@ -71,19 +71,17 @@ class StringLoader(SourceLoader):
 
 def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
     """Возвращает словарь из названий с функциями команд"""
-    return {
-        method_name[:-4].lower() if method_name.endswith('_cmd') else method_name[:-3].lower(): getattr(
-            instance, method_name
-        ) for method_name in dir(instance)
-        if (
-            callable(getattr(instance, method_name))
-            and len(method_name) > 4
-            and (
-                method_name.endswith("_cmd") or
-                method_name.endswith("cmd")
-            )
-        )
-    }
+    command_handlers = {}
+    for method_name in dir(instance):
+        if callable(getattr(instance, method_name)) and len(method_name) > 4:
+            if method_name.endswith("_cmd"):
+                command_handlers[method_name[:-4].lower()] = getattr(instance, method_name)
+            elif method_name.endswith("cmd"):
+                command_handlers[method_name[:-3].lower()] = getattr(instance, method_name)
+            elif hasattr(getattr(instance, method_name), "is_command"):
+                command_handlers[method_name] = getattr(instance, method_name)
+
+    return command_handlers
 
 def get_watcher_handlers(instance: Module) -> List[FunctionType]:
     return [
@@ -134,6 +132,19 @@ def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
         )
     }
 
+def command(*args, **kwargs) -> FunctionType:
+    def decorator(func: FunctionType):
+        setattr(func, 'is_command', True)
+
+        for arg in args:
+            setattr(func, arg, True)
+
+        for kwarg, value in kwargs.items():
+            setattr(func, kwarg, value)
+
+        return func
+    
+    return decorator
 
 def on_bot(custom_filters: LambdaType) -> FunctionType:
     """Создает фильтр для команды бота
