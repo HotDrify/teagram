@@ -207,6 +207,9 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, data: data.data == 'aaa') # type: ignore
     async def aaa_callback_handler(self, call: CallbackQuery):
+        if len(self.pending_id) == 50:
+            return await call.answer('Перезагрузите конфиг')
+        
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
     @loader.on_bot(lambda self, msg: len(self.pending_id) != 50) # type: ignore
