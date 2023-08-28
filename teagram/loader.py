@@ -280,19 +280,13 @@ class ModulesManager:
             spec = ModuleSpec(module_name, StringLoader(
                 module_source, origin), origin=origin)
             instance = self.register_instance(module_name, spec=spec)
-        except ImportError as error:
-            logger.error(error)
-
+        except (ImportError, ModuleNotFoundError) as error:
             if did_requirements:
                 return True
             try:
-                requirements = list(
-                    filter(
-                        lambda x: x and x[0] not in ("-", "_", "."),
-                        map(str.strip, VALID_PIP_PACKAGES.search(module_source)[1].split(" ")),
-                    )
-                )
-            except TypeError:
+                requirements = " ".join(re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source))
+            except TypeError as error:
+                logger.error(traceback.format_exc())
                 return logging.warn("Не указаны пакеты для установки")
 
             logging.info(f"Установка пакетов: {', '.join(requirements)}...")
@@ -305,7 +299,7 @@ class ModulesManager:
                         "pip",
                         "install",
                         "--user",
-                        *requirements,
+                        requirements,
                     ]
                 )
             except subprocess.CalledProcessError as error:

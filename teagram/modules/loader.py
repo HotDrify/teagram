@@ -12,7 +12,7 @@ import requests
 
 from typing import List
 
-from telethon import TelegramClient, types
+from telethon import types
 from telethon.tl.custom import Message
 from .. import loader, utils
 
@@ -100,16 +100,19 @@ class LoaderMod(loader.Module):
                 )
 
         module_name = await self.manager.load_module(_file)
+        module = '_'.join(module_name.lower().split())
 
         if module_name is True:
+            with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
+                file.write(_file)
+
             return await utils.answer(
-                message, "✅ Зависимости установлены. Требуется перезагрузка")
+                message, "✅ <b>Зависимости установлены. Требуется перезагрузка</b>")
 
         if not module_name:
             return await utils.answer(
-                message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
+                message, "❌ <b>Не удалось загрузить модуль. Подробности смотри в логах</b>")
         
-        module = '_'.join(module_name.lower().split())
         with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
             file.write(_file)
         
