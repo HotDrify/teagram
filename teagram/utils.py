@@ -226,6 +226,20 @@ def get_cpu() -> float:
     except:
         return 0
     
+def get_display_name(entity: Union[types.User, types.Chat]) -> str:
+    """
+    Get CPU usage as a percentage.
+
+    Returns:
+        entity: Union[types.User, types.Chat].
+    """
+    return getattr(entity, "title", None) or (
+        entity.first_name or "" + (
+            " " + entity.last_name
+            if entity.last_name else ""
+        )
+    )
+
 def get_platform() -> str:
     """
     Get the platform information.

@@ -28,7 +28,7 @@ class TesterMod(loader.Module):
     """Тест чего-то"""
 
     async def logs_cmd(self, message: types.Message, args: str):
-        self._client.me = await self.manager._client.get_me()
+        self.client.me = await self.manager.client.get_me()
         """Отправляет логи. Использование: logs <уровень>"""
         if not args:
             args = "40"
