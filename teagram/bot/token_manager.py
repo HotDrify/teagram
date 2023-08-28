@@ -58,7 +58,10 @@ class TokenManager(Item):
             response = await conv.get_response()
 
             search = re.search(r"(?<=<code>)(.*?)(?=</code>)", response.text)
-            if not search:
+            if not search and not (search := re.search(
+                r"\d{1,}:[0-9a-zA-Z_-]{35}",
+                response.text
+            )):
                 logging.error("An error occurred while creating the bot. @BotFather's response:")
                 return logging.error(response.text)
 
