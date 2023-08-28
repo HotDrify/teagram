@@ -228,7 +228,7 @@ def get_cpu() -> float:
     
 def get_display_name(entity: Union[types.User, types.Chat]) -> str:
     """
-    Get CPU usage as a percentage.
+    Get display name of user or chat.
 
     Returns:
         entity: Union[types.User, types.Chat].
