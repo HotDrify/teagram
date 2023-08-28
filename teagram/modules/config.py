@@ -175,37 +175,41 @@ class ConfigMod(loader.Module):
         attribute = data[1]
 
         module = self.get_module(module)
+        self.get_attrs(module)
+
+        docs = self.config.get_doc(attribute)
 
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3)
 
         keyboard = InlineKeyboardMarkup()
-
         keyboard.row(
             InlineKeyboardButton(
                 'Сменить атрибут',
                 callback_data='aaa'
-            ),
+            ), # type: ignore
             InlineKeyboardButton(
                 '🔄 Назад',
                 callback_data='send_cfg'
-            ),
+            ),# type: ignore
         )
 
         await self.inline_bot.edit_message_text(
-            f'🆔 Модуль: <b>{self.pending_module.name}</b>\n➡ Атрибут: <b>{attribute}</b>',
+            f'🆔 Модуль: <b>{self.pending_module.name}</b>\n'
+            f'➡ Атрибут: <b>{attribute}</b>\n'
+            f'❔ Описание: <b>{docs or "Не указано"}</b>',
             self.chat,
             self.message
         )
 
         await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
-    @loader.on_bot(lambda _, data: data.data == 'aaa')
+    @loader.on_bot(lambda _, data: data.data == 'aaa') # type: ignore
     async def aaa_callback_handler(self, call: CallbackQuery):
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    @loader.on_bot(lambda self, msg: len(self.pending_id) != 50)
+    @loader.on_bot(lambda self, msg: len(self.pending_id) != 50) # type: ignore
     async def change_message_handler(self, message: Message):
         if self.pending_id in message.text:
             attr = message.text.replace(self.pending_id, '').strip()

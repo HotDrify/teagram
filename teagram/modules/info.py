@@ -21,7 +21,8 @@ class AboutMod(loader.Module):
                 'customText',
                 '',
                 self.db.get('UserBot', 'customText') or '',
-                validators.String()
+                validators.String(),
+                "Ключевые слова: cpu, raw, tele, owner, uptime, version, platform"
             ), # type: ignore
             ConfigValue(
                 'customImage',

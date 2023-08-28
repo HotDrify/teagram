@@ -50,6 +50,7 @@ class ConfigValue:
     default: Any = None
     value: Any = field(default_factory=WaitForDefault)
     validator: Union[Integer, String, Boolean] = None
+    docstring: str = ""
     
     def __post_init__(self):
         if isinstance(self.value, WaitForDefault):
@@ -77,6 +78,9 @@ class Config(dict):
 
     def get_default(self, key: str) -> str:
         return self.config[key].default
+
+    def get_doc(self, key: str) -> Union[str, None]:
+        return self.config[key].docstring
 
     def __getitem__(self, key: str) -> Any:
         try:
