@@ -34,8 +34,7 @@ Teagram — это юзер бот для телеграма со многими
 
 <h1>Установка</h1>
 <pre lang="bash">
-git clone https://github.com/HotDrify/teagram && cd teagram 
-pip3 install -r requirements.txt
+wget -qO- https://github.com/HotDrify/teagram/raw/main/install.sh
 </pre>
 
 Также, вы можете установить зависимости для ускорения работы:
