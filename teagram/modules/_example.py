@@ -85,17 +85,13 @@ class ExampleMod(loader.Module):  # Example - название класса мо
         await utils.answer(message, f'Это пример команды' + (
             args or ""
         ))
-    
-    # Команде можно добавить обязательный фильтр
-    # Например если сообщение использована не владельцем
-    @loader.command()
-    @loader.on(lambda _, msg: not msg.out or msg.out)
-    async def example2(self, message: types.Message):
-        await utils.answer(message, 'Это команда которая разрешена всем')
 
-    # Так же есть вотчеры, и им можно добавить фильтр
+    # Можно сделать команду с помощью окончания _cmd/cmd
+    async def example_cmd(self, message: types.Message):
+        await utils.answer(message, 'Это команда которая не использует декоратор')
+
+    # Так же есть вотчеры
     # Их можно создавать до бесконечности, но нужно делать приписку "watcher"
-    @loader.on(lambda _, msg: msg.text == 'teagram')
     async def watcher(self, message: types.Message):
         await utils.answer(message, 'Это вотчер теаграма')
 

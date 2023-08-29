@@ -15,11 +15,11 @@ from importlib.abc import SourceLoader
 from importlib.machinery import ModuleSpec
 from importlib.util import spec_from_file_location, module_from_spec
 
-from typing import Union, List, Dict, Any
+from typing import Union, List, Dict, Any, Callable
 from types import FunctionType, LambdaType
 from loguru import logger
 
-from telethon import TelegramClient, types
+from telethon import TelegramClient, types, events
 from . import dispatcher, utils, database, bot
 
 VALID_URL = r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
@@ -164,13 +164,6 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
     """
     def decorator(func: FunctionType):
         """Декоратор для обработки команды бота"""
-        func._filters = custom_filters
-        return func
-    
-    return decorator
-
-def on(custom_filters: LambdaType) -> FunctionType:
-    def decorator(func: FunctionType):
         func._filters = custom_filters
         return func
     
