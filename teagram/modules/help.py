@@ -22,13 +22,13 @@ class HelpMod(loader.Module):
                     f"<code>{command}</code>" for command in module.command_handlers
                 )
 
-                inline = " <b>| [🤖]</b>: " if module.inline_handlers else ""
+                inline = " <b>| 🤖</b>: " if module.inline_handlers else ""
                 inline += " <b>|</b> ".join(
                     f"<code>{inline_command}</code>" for inline_command in module.inline_handlers
                 )
 
                 if commands or inline:
-                    text += f"\n<b>{module.name}</b> - " + (commands if commands else '`Команд не найдено`') + inline
+                    text += f"\n<b>{module.name}</b> - " + (commands if commands else '<b>Команд не найдено</b>') + inline
 
             modules_count = len(self.manager.modules) - 1
             bot_inline_info = f"<emoji id=5228968570863496802>🤖</emoji> Инлайн бот: <b>{self.bot_username}</b>\n"

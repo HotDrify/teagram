@@ -1,8 +1,8 @@
 import os
+import git
 import sys
 import time
 import atexit
-import logging
 
 from telethon import TelegramClient, types
 from subprocess import check_output
@@ -11,7 +11,7 @@ from ..types import Config, ConfigValue
 from loguru import logger
 
 from aiogram import Bot
-from aiogram.utils.exceptions import CantParseEntities, CantInitiateConversation, BotBlocked
+from aiogram.utils.exceptions import CantParseEntities, CantInitiateConversation, BotBlocked, Unauthorized
 
 @loader.module(name="Updater", author='teagram')
 class UpdateMod(loader.Module):
@@ -37,13 +37,23 @@ class UpdateMod(loader.Module):
 
         bot: Bot = self.bot.bot
         me = await self.client.get_me()
-        _me = await bot.get_me()
+
+        try:
+            _me = await bot.get_me()
+        except Unauthorized:
+            self.db.set('teagram.bot', 'token', None)
+            def restart() -> None:
+                os.execl(sys.executable, sys.executable, "-m", "teagram")
+
+            atexit.register(restart)
+            logger.error("Bot is unauthorized, restarting.")
+            return sys.exit(0)
 
         last = None
 
         try:
-            last = check_output('git log -1', shell=True).decode().split()[1].strip()
-            diff = check_output('git rev-parse HEAD', shell=True).decode().strip()
+            last = (await utils.run_sync(check_output, 'git log -1', shell=True)).decode().split()[1].strip()
+            diff = (await utils.run_sync(check_output, 'git rev-parse HEAD', shell=True)).decode().strip()
 
             if last != diff:
                 await bot.send_message(

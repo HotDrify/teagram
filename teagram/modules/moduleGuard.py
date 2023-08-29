@@ -76,10 +76,10 @@ class ModuleGuardMod(loader.Module):
 
             message_text = """
 <b>ModuleGuard</b>
-    """
+"""
             basic_text = """
 <b>ModuleGuard</b>
-    """
+"""
             for file_name in file_list:
                 if not file_name.endswith('.py'):
                     continue

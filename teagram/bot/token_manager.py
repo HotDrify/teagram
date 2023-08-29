@@ -109,7 +109,7 @@ class TokenManager(Item):
                 return logging.error("No created bots")
 
             if not response.reply_markup:
-                logging.warn('reply_markup not found')
+                logger.warning('reply_markup not found')
                 time.sleep(1.5)
                 response = await conv.get_response()
 
@@ -118,6 +118,8 @@ class TokenManager(Item):
                 for button in row.buttons:
                     search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button.text)
                     if search:
+                        self.bot_username = button.text
+
                         await conv.ask(button.text)
                         found = True
                         break
@@ -132,7 +134,6 @@ class TokenManager(Item):
             search = re.search(r"\d{1,}:[0-9a-zA-Z_-]{35}", response.text)
 
             if search:
-                logger.success("Bot revoked successfully")
                 return str(search.group(0))
             else:
                 token = response.text.split()[-1]

@@ -51,7 +51,7 @@ async def main():
             ):
                 await app.edit_message(_id[0], _id[1], restarted_text)
         except:
-            print(restarted_text)
+            await db.cloud.send_data(restarted_text)
 
         db.pop("teagram.loader", "restart")
     else:

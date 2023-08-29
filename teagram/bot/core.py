@@ -6,9 +6,11 @@ import inspect
 
 from aiogram import Bot, Dispatcher, exceptions
 from aiogram.types import InlineKeyboardMarkup, InlineQuery, InputTextMessageContent, InlineQueryResultArticle
-from telethon import TelegramClient
+
 from telethon.types import Message
+from telethon import TelegramClient, errors
 from telethon.tl.functions.messages import StartBotRequest
+from telethon.tl.functions.contacts import UnblockRequest
 
 from typing import Union, NoReturn
 from loguru import logger
@@ -52,10 +54,12 @@ class BotManager(Events, TokenManager):
         error_text = "The userbot requires a bot. Resolve the bot creation issue and restart the userbot."
 
         new = False
+        revoke = False
 
         if not self._token:
             self._token = await self._revoke_token()
             new = True
+            revoke = True
 
         if not self._token:
             new = True
@@ -72,6 +76,7 @@ class BotManager(Events, TokenManager):
 
             result = await self._revoke_token()
             new = True
+            revoke = True
             
             if not result:
                 self._token = await self._create_bot() or logging.error(error_text) or sys.exit(1)
@@ -82,6 +87,26 @@ class BotManager(Events, TokenManager):
             name = (await self.bot.get_me()).username
             await self._app(StartBotRequest(name, name, 'start'))
 
+            if revoke:
+                from ..fsm import Conversation
+
+                async with Conversation(self._app, "@BotFather") as conv:
+                    try:
+                        await conv.ask("/cancel")
+                    except errors.UserIsBlockedError:
+                        await self._app(UnblockRequest('@BotFather'))
+                    
+                    await conv.ask("/setinline")
+                    await conv.get_response()
+
+                    await conv.ask(self.bot_username)
+                    await conv.get_response()
+
+                    await conv.ask("~teagram~ $")
+                    await conv.get_response()
+
+                    logger.success("Bot revoked successfully")
+
         self._db.set('teagram.bot', 'token', self._token)
         self._dp = Dispatcher(self.bot)
         self._register_handlers()
@@ -89,7 +114,6 @@ class BotManager(Events, TokenManager):
         asyncio.ensure_future(self._dp.start_polling())
 
         self.bot.manager = self
-        logger.success("Bot manager successfully loaded")
         return True
 
     def _register_handlers(self) -> None:
