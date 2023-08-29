@@ -10,10 +10,13 @@ from .. import (  # ".." - т.к. модули находятся в папке 
     loader, utils, validators)
 from ..types import Config, ConfigValue
 
-                            # loader, modules, bot - файлы из папки teagram
 
+# Можно добавить зависимости
+# required: Сюда пишите ваши зависимости через пробел
 
-@loader.module(name="Example", author="teagram", version=1)  # name модуля ("name" обязательный аргумент, остальное — нет), author - автор, version - версия
+#                 Обязательно   Необязательно   Необязательно
+#                  Название        Автор          Версия
+@loader.module(name="Example", author="teagram", version=1) 
 class ExampleMod(loader.Module):  # Example - название класса модуля
                                   # Mod в конце названия обязательно
     """Описание модуля"""
@@ -24,7 +27,8 @@ class ExampleMod(loader.Module):  # Example - название класса мо
                 'Это тестовый атрибут',        # Название атрибута
                 'Дефолтное значение атрибута', # Дефолтное значение
                 'Значение атрибута',           # Можно подгрузить из базы данных
-                validators.String()            # Тип значения
+                validators.String(),           # Тип значения
+                'Это описание'                 # Докстринг/Описание
             ) # type: ignore
         )
 
@@ -37,16 +41,14 @@ class ExampleMod(loader.Module):  # Example - название класса мо
         #           self.bot     - инлайн бот
         # Их можно использовать в любой части кода (В пределах класса)
 
-    # Если написать в лс/чате где есть бот "тест message_handler", то он ответит
-    @loader.on_bot(lambda self, message: 'тест message_handler' in message.text)  # Сработает только если текст сообщения равняется "ты дурак?"
-    async def example_message_handler(self, message: Message):  # _message_handler на конце функции чтобы обозначить что это хендлер сообщения
-        """Пример хендлера сообщения"""
-        await message.reply(
-            "Да это message_handler, а что?")
-
-    async def example_inline_handler(self, inline_query: InlineQuery, args: str):  # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
-                                                                                   # args - аргументы после команды. необязательный аргумент
-        """Пример инлайн-команды. Использование: @bot example [аргументы]"""
+    # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
+    # args - аргументы после команды. необязательный аргумент
+    async def example_inline_handler(self, inline_query: InlineQuery, args: str):  
+        """
+        Пример инлайн-команды. Использование: @bot example [аргументы]
+        Если вы хотите использовать команду в коде то надо использовать метод, invoke_inline.
+        Пример ниже
+        """
         await self.new_method(inline_query, args)
 
     async def new_method(self, inline_query, args):
@@ -66,39 +68,39 @@ class ExampleMod(loader.Module):  # Example - название класса мо
                 )
             ]
         )
-
-    @loader.on_bot(lambda self, call: call.data == "example_button_callback")  # Сработает только если каллбек дата равняется "example_button_callback"
-    async def example_callback_handler(self, call: CallbackQuery):  # _callback_handler на конце функции чтобы обозначить что это каллбек-хендлер
+        
+    # Сработает только если каллбек дата равняется "example_button_callback"
+    # _callback_handler на конце функции чтобы обозначить что это каллбек-хендлер
+    @loader.on_bot(lambda self, call: call.data == "example_button_callback")  
+    async def example_callback_handler(self, call: CallbackQuery):  
         """Пример каллбека"""
         await call.answer(
             "Ого пример каллбека", show_alert=True)
 
-    async def example_cmd(self, message: types.Message, args: str):  # cmd на конце функции чтобы обозначить что это команда
-                                                                            # args - аргументы после команды. необязательный аргумент
-        """Описание команды. Использование: example [аргументы]"""
-        await utils.answer(  # utils.answer - это отправка сообщений, код можно посмотреть в utils
-            message, "Ого пример команды" + (
-                f"\nАргументы: {args}" if args
-                else ""
-            )
-        )
-
-        await sleep(2.5)  # никогда не используй time.sleep, потому что это не асинхронная функция, она остановит весь юзербот
-        await utils.answer(
-            message, "Прошло 2.5 секунды!")
-
-    @loader.on(lambda _, m: "тест" in getattr(m, "text", ""))  # Сработает только если есть "тест" в сообщении с командой
-    async def example2_cmd(self, message: types.Message):
-        """Описание для второй команды с фильтрами"""
-        await utils.answer(
-            message, f"Да, {self.test_attribute = }")
-
-    @loader.on(lambda _, m: m and m.text == "Привет, это вотчер детка")
-    async def watcher(self, message: types.Message):  # watcher - функция которая работает при получении нового сообщения
-        await message.reply(
-            "Привет, все работает отлично")
+    # Можно сделать команду без окончания _cmd/cmd
+    @loader.command()
+    async def example(self, message: types.Message, args: str):
+        # args это аргументы команды
+        # .example [аргументы]
+        await utils.answer(message, f'Это пример команды' + (
+            args or ""
+        ))
     
-    # Можно добавлять несколько вотчеров, главное чтобы функция начиналась с "watcher"
-    async def watcher_(self, message: types.Message):
-        if message.text == "Привет":
-            await message.reply("Привет!")
+    # Команде можно добавить обязательный фильтр
+    # Например если сообщение использована не владельцем
+    @loader.command()
+    @loader.on(lambda _, msg: not msg.out or msg.out)
+    async def example2(self, message: types.Message):
+        await utils.answer(message, 'Это команда которая разрешена всем')
+
+    # Так же есть вотчеры, и им можно добавить фильтр
+    # Их можно создавать до бесконечности, но нужно делать приписку "watcher"
+    @loader.on(lambda _, msg: msg.text == 'teagram')
+    async def watcher(self, message: types.Message):
+        await utils.answer(message, 'Это вотчер теаграма')
+
+        # Тут мы используем инлайн команду нашего бота
+        await self.bot.invoke_inline(
+            message,
+            'example'
+        )
