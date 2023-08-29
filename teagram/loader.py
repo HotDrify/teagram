@@ -152,7 +152,7 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
     Параметры:
         custom_filters (``types.FunctionType`` | ``types.LambdaType``):
             Фильтры.
-            Функция должна принимать параметры self, app, message/call/inline_query
+            Функция должна принимать параметры self, message/call/inline_query
 
     Пример:
         >>> @on_bot(lambda self, call: call.from_user.id == self.manager.me.id)
@@ -164,6 +164,13 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
     """
     def decorator(func: FunctionType):
         """Декоратор для обработки команды бота"""
+        func._filters = custom_filters
+        return func
+    
+    return decorator
+
+def on(custom_filters: LambdaType) -> FunctionType:
+    def decorator(func: FunctionType):
         func._filters = custom_filters
         return func
     
