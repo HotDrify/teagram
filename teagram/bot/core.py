@@ -5,9 +5,12 @@ import traceback
 import inspect
 
 from aiogram import Bot, Dispatcher, exceptions
-from aiogram.types import InlineKeyboardMarkup, InlineQuery, InputTextMessageContent, InlineQueryResultArticle
+from aiogram.types import (
+    InlineKeyboardMarkup, InlineQuery, InputTextMessageContent,
+    InlineQueryResultArticle, InlineQueryResultDocument, InlineQueryResultPhoto
+)
 
-from telethon.types import Message
+from telethon.types import Message, Photo, Document
 from telethon import TelegramClient, errors
 from telethon.tl.functions.messages import StartBotRequest
 from telethon.tl.functions.contacts import UnblockRequest
@@ -139,6 +142,8 @@ class BotManager(Events, TokenManager):
         text: str,
         message: Message, 
         reply_markup: Union[InlineKeyboardMarkup, None] = None,
+        photo: Photo = None,
+        doc: Document = None
     ):
         unit_id = utils.random_id()
         self._units[unit_id] = {
@@ -148,6 +153,8 @@ class BotManager(Events, TokenManager):
             'text': text,
             'keyboard': reply_markup,
             'message': message,
+            'photo': photo,
+            'doc': doc,
             'top_msg_id': message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id
         }
 
@@ -202,21 +209,57 @@ class BotManager(Events, TokenManager):
             text = form.get('text')
             keyboard = form.get('keyboard')
 
-            await inline_query.answer(
-                [
-                    InlineQueryResultArticle(
-                        id=utils.random_id(),
-                        title=form.get('title'),
-                        description=form.get('description'),
-                        input_message_content=InputTextMessageContent(
-                            text,
-                            parse_mode='HTML',
-                            disable_web_page_preview=True
-                        ),
-                        reply_markup=keyboard
-                    )
-                ]
-            )
+            if not form['photo'] and not form['doc']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultArticle(
+                            id=utils.random_id(),
+                            title=form.get('title'),
+                            description=form.get('description'),
+                            input_message_content=InputTextMessageContent(
+                                text,
+                                parse_mode='HTML',
+                                disable_web_page_preview=True
+                            ),
+                            reply_markup=keyboard
+                        )
+                    ]
+                )
+            elif form['photo']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultPhoto(
+                            id=utils.random_id(),
+                            title=form.get('title'),
+                            description=form.get('description'),
+                            input_message_content=InputTextMessageContent(
+                                text,
+                                parse_mode='HTML',
+                                disable_web_page_preview=True
+                            ),
+                            reply_markup=keyboard,
+                            photo_url=form['photo'],
+                            thumb_url=form['photo']
+                        )
+                    ]
+                )
+            elif form['doc']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultDocument(
+                            id=utils.random_id(),
+                            title=form.get('title'),
+                            description=form.get('description'),
+                            input_message_content=InputTextMessageContent(
+                                text,
+                                parse_mode='HTML',
+                                disable_web_page_preview=True
+                            ),
+                            reply_markup=keyboard,
+                            document_url=form['doc']
+                        )
+                    ]
+                )
         except KeyError:
             pass
         except Exception as error:
