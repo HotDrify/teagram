@@ -217,6 +217,8 @@ class BotManager(Events, TokenManager):
                     )
                 ]
             )
+        except KeyError:
+            pass
         except Exception as error:
             traceback.print_exc()
 
