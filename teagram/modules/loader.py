@@ -36,6 +36,7 @@ class LoaderMod(loader.Module):
         
         try:
             response = await utils.run_sync(requests.get, args)
+            
             module = await self.manager.load_module(response.text, response.url)
 
             if module is True:
@@ -46,6 +47,8 @@ class LoaderMod(loader.Module):
                 return await utils.answer(
                     message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
 
+            with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
+                file.write(response.text)
             
             await utils.answer(
                 message, 
