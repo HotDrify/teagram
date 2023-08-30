@@ -149,7 +149,7 @@ class SettingsMod(loader.Module):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
         
-        msg = await utils.answer(message, "☕")
+        msg = await message._client.send_message(utils.get_chat(message), "☕")
         
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
 
@@ -158,7 +158,7 @@ class SettingsMod(loader.Module):
             f"🕒 <b>Время отлика Telegram</b>: <code>{ping}ms</code>"
         )
 
-        await msg[0].delete()
+        await msg.delete()
 
     @loader.command()
     async def adduser(self, message: types.Message):
