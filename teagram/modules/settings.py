@@ -23,15 +23,15 @@ handler = CustomStreamHandler()
 log = logging.getLogger()
 log.addHandler(handler)
 
-@loader.module(name="Tester", author="teagram")
-class TesterMod(loader.Module):
-    """Тест чего-то"""
+@loader.module(name="Settings", author="teagram")
+class SettingsMod(loader.Module):
+    """Настройки юзер бота
+       Userbot's settings"""
 
     async def logs_cmd(self, message: types.Message, args: str):
         """Отправляет логи. Использование: logs <уровень>"""
         if not args:
             args = "40"
-
 
         lvl = int(args)
 
@@ -149,14 +149,73 @@ class TesterMod(loader.Module):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
         
-        await utils.answer(message, "☕")
+        msg = await utils.answer(message, "☕")
         
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
 
+        await msg[0].delete()
+
         await utils.answer(
             message,
-            f"""
-🕒 <b>Время отлика Telegram</b>: <code>{ping}ms</code>
-            """
+            f"🕒 <b>Время отлика Telegram</b>: <code>{ping}ms</code>"
         )
 
+    @loader.command()
+    async def adduser(self, message: types.Message):
+        if not (reply := await message.message.get_reply_message()):
+            return await utils.answer(
+                message,
+                '❌ Вы не указали реплай'
+            )
+
+        if reply.sender_id == (_id := (await self.client.get_me()).id):
+            return await utils.answer(
+                message,
+                '❌ Нельзя указывать самого себя'
+            )
+
+        if message.message.sender_id != _id:
+            return await utils.answer(
+                message,
+                '❌ Команда разрешена только владельцу'
+            )
+        
+        user = reply.sender_id
+        users = self.db.get('teagram.loader', 'users', [])
+        self.db.set('teagram.loader', 'users', users + [user])
+
+        await utils.answer(message, '✔ Вы успешно добавили юзера')
+
+    @loader.command()
+    async def rmuser(self, message: types.Message):
+        if not (reply := await message.message.get_reply_message()):
+            return await utils.answer(
+                message,
+                '❌ Вы не указали реплай'
+            )
+
+        if reply.sender_id == (_id := (await self.client.get_me()).id):
+            return await utils.answer(
+                message,
+                '❌ Нельзя указывать самого себя'
+            )
+
+        if message.message.sender_id != _id:
+            return await utils.answer(
+                message,
+                '❌ Команда разрешена только владельцу'
+            )
+        
+        user = reply.sender_id
+        users = self.db.get('teagram.loader', 'users', [])
+        self.db.set('teagram.loader', 'users', list(filter(lambda x: x != user, users)))
+
+        await utils.answer(message, '✔ Вы успешно удалили юзера')
+
+    @loader.command()
+    async def users(self, message: types.Message):
+        _users = self.db.get('teagram.loader', 'users', [])
+        await utils.answer(
+            message,
+            ('➡ Юзеры: <code>' + ', '.join(_users) + '</code>') if _users else "❔ Юзеры не найдены"
+        )

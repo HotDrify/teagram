@@ -253,6 +253,13 @@ class ConfigMod(loader.Module):
 
     async def config_cmd(self, message: types.Message):
         """Настройка через inline"""
+
+        if message.message.sender_id != _id:
+            return await utils.answer(
+                message,
+                '❌ Команда разрешена только владельцу'
+            )
+
         bot = await self.inline_bot.get_me()
         await utils.invoke_inline(message, bot.username, 'cfg')
 

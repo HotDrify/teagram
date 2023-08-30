@@ -11,31 +11,33 @@ from . import loader, utils
 
 import traceback
 
-async def check_filters(
-    func: FunctionType,
-    message: Union[types.Message, Message]
-) -> bool:
-    """Проверка фильтров"""
-    if (custom_filters := getattr(func, "_filters", None)):
-        coro = custom_filters(message)
-        if iscoroutine(coro):
-            coro = await coro
-
-        if not coro:
-            return False
-    else:
-        if not message.out:
-            return False
-
-    return True
-
-
 class DispatcherManager:
     """Менеджер диспетчера"""
 
     def __init__(self, app: TelegramClient, modules: "loader.ModulesManager") -> None:
         self.app = app
         self.modules = modules
+    
+    async def check_filters(
+        self,
+        func: FunctionType,
+        message: Union[types.Message, Message]
+    ) -> bool:
+        """Проверка фильтров"""
+        if (custom_filters := getattr(func, "_filters", None)):
+            coro = custom_filters(message)
+            if iscoroutine(coro):
+                coro = await coro
+
+            if not coro:
+                return False
+        else:
+            _users = self.modules._db.get('teagram.loader', 'users', [])
+            
+            if not message.out and message.sender_id not in _users:
+                return False
+
+        return True
 
     async def load(self) -> bool:
         """Загружает менеджер диспетчера"""
@@ -67,7 +69,7 @@ class DispatcherManager:
         if not func:
             return
     
-        if not await check_filters(func, message):
+        if not await self.check_filters(func, message):
             return
         
         setattr(message, '_client', self.app)

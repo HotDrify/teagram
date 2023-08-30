@@ -101,6 +101,7 @@ async def answer(
     """
     messages: List[Message] = []
     client: TelegramClient = message._client  # type: ignore
+    me = await client.get_me()
     chat = get_chat(message)
 
     if isinstance(message, list):
@@ -132,7 +133,8 @@ async def answer(
             ) # type: ignore
         ) # type: ignore
 
-        await client.delete_messages(chat, message.id)
+        if message.sender_id == me.id:
+            await client.delete_messages(chat, message.id)
 
     return messages
 
