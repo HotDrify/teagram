@@ -188,11 +188,11 @@ class ConfigMod(loader.Module):
             InlineKeyboardButton(
                 'Сменить атрибут',
                 callback_data='aaa'
-            ), # type: ignore
+            ),
             InlineKeyboardButton(
                 '🔄 Назад',
                 callback_data='send_cfg'
-            ),# type: ignore
+            ),
         )
 
         await self.inline_bot.edit_message_text(
@@ -205,14 +205,14 @@ class ConfigMod(loader.Module):
 
         await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
-    @loader.on_bot(lambda _, data: data.data == 'aaa') # type: ignore
+    @loader.on_bot(lambda _, data: data.data == 'aaa')
     async def aaa_callback_handler(self, call: CallbackQuery):
         if len(self.pending_id) == 50:
             return await call.answer('Перезагрузите конфиг')
         
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    @loader.on_bot(lambda self, msg: len(self.pending_id) != 50) # type: ignore
+    @loader.on_bot(lambda self, msg: len(self.pending_id) != 50)
     async def change_message_handler(self, message: Message):
         if self.pending_id in message.text:
             attr = message.text.replace(self.pending_id, '').strip()

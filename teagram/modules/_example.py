@@ -29,7 +29,7 @@ class ExampleMod(loader.Module):  # Example - название класса мо
                 'Значение атрибута',           # Можно подгрузить из базы данных
                 validators.String(),           # Тип значения
                 'Это описание'                 # Докстринг/Описание
-            ) # type: ignore
+            )
         )
 
     async def on_load(self):

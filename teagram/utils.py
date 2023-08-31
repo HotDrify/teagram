@@ -5,7 +5,6 @@ import string
 import yaml
 import os
 import contextlib
-import aiohttp
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
 
@@ -100,7 +99,7 @@ async def answer(
         await utils.answer(message, response_image_path, photo=True, caption="Here's an image for you.")
     """
     messages: List[Message] = []
-    client: TelegramClient = message._client  # type: ignore
+    client: TelegramClient = message._client  #
     me = await client.get_me()
     chat = get_chat(message)
 
@@ -130,8 +129,8 @@ async def answer(
                 parse_mode=parse_mode,
                 reply_to=message.id,
                 **kwargs
-            ) # type: ignore
-        ) # type: ignore
+            )
+        )
 
         if message.sender_id == me.id:
             await client.delete_messages(chat, message.id)
@@ -154,7 +153,7 @@ async def invoke_inline(
     Returns:
         Awaitable: The result of the invoked inline query.
     """
-    client: TelegramClient = message._client # type: ignore
+    client: TelegramClient = message._client
     query: custom.InlineResults = await client.inline_query(bot_username, inline_id)
 
     return await query[0].click(
@@ -316,27 +315,3 @@ def get_langpack() -> Union[Any, List]:
             pack = yaml.safe_load(file)
 
         return pack
-
-async def paste_neko(code: str):
-    """
-    Paste code on nekobin.com and get the URL.
-
-    Parameters:
-        code (str): The code to be pasted.
-
-    Returns:
-        str: The URL of the pasted code.
-    """
-
-    try:
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
-            async with session.post(
-                "https://nekobin.com/api/documents",
-                json={"content": code},
-            ) as paste:
-                paste.raise_for_status()
-                result = await paste.json()
-    except Exception:
-        return "Pasting failed"
-    else:
-        return f"nekobin.com/{result['result']['key']}.py"

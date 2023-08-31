@@ -21,14 +21,14 @@ class TranslatorMod(loader.Module):
                 'en',
                 language,
                 validators.String()
-            ) # type: ignore
+            )
         )
 
     @loader.command()
     async def translate(self, message: types.Message, args):
         """Перевод"""
         if not (text := args):
-            if not (text := (await message.get_reply_message()).raw_text): # type: ignore
+            if not (text := (await message.get_reply_message()).raw_text):
                 return await utils.answer(
                     message,
                     '❌ Текст не найден'
@@ -40,7 +40,7 @@ class TranslatorMod(loader.Module):
                 f'❌ Неправильный язык (`{lang}`)'
             )
         
-        translated: Translated = Translator().translate(text, dest=lang) # type: ignore
+        translated: Translated = Translator().translate(text, dest=lang)
         
         await utils.answer(
             message,

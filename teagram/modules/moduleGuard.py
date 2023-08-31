@@ -19,7 +19,7 @@ class ModuleGuardMod(loader.Module):
                 default=True,
                 value=value,
                 validator=validators.Boolean()
-            ) # type: ignore
+            )
         )
 
     async def on_load(self):

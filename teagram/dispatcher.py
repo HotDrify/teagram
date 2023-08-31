@@ -100,7 +100,7 @@ class DispatcherManager:
             try:
                 setattr(message, '_client', self.app)
 
-                if not await check_filters(watcher, message):
+                if not await self.check_filters(watcher, message):
                     continue
 
                 await watcher(message)

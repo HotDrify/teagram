@@ -1,5 +1,5 @@
 from types import FunctionType
-from typing import Any, Dict, List, Union, Callable
+from typing import Any, Dict, List, Union
 
 from telethon import TelegramClient, types
 

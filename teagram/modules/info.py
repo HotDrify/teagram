@@ -23,13 +23,13 @@ class AboutMod(loader.Module):
                 self.db.get('UserBot', 'customText') or '',
                 validators.String(),
                 "Ключевые слова: cpu, raw, tele, owner, uptime, version, platform"
-            ), # type: ignore
+            ),
             ConfigValue(
                 'customImage',
                 '',
                 self.db.get('UserBot', 'customImage') or '',
                 validators.String()
-            ) # type: ignore
+            )
         )
         self.bot: BotManager = self.bot
     

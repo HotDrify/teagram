@@ -39,7 +39,7 @@ class SettingsMod(loader.Module):
             return await utils.answer(
                 message, "❌ Вы не указали уровень или указали неверный уровень логов")
 
-        handler: CustomStreamHandler = log.handlers[1] # type: ignore
+        handler: CustomStreamHandler = log.handlers[1]
         logs = '\n'.join(str(error) for error in handler.logs).encode('utf-8')
         
         if not logs:

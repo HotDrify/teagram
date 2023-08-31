@@ -5,7 +5,6 @@ from typing import List, Union
 
 from telethon import TelegramClient, types
 from telethon.tl.functions.messages import DeleteMessagesRequest
-from telethon.tl.custom.message import Message
 
 
 class Conversation:

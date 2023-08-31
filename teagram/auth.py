@@ -11,9 +11,7 @@ from telethon.password import compute_check
 from telethon import TelegramClient, errors, types
 from telethon.tl.functions.account import GetPasswordRequest
 from telethon.tl.functions.auth import CheckPasswordRequest
-
 from qrcode.main import QRCode
-
 
 from . import __version__
 
@@ -26,7 +24,8 @@ class Auth:
 
         self.app: TelegramClient = TelegramClient(
             session=session_name, app_version=f"v{__version__}",
-            api_id=int(config.get('telethon', 'api_id')), api_hash=config.get('telethon', 'api_hash')
+            api_id=int(config.get('telethon', 'api_id')),
+            api_hash=config.get('telethon', 'api_hash')
         )
 
     def _check_api_tokens(self) -> bool:
@@ -43,7 +42,7 @@ class Auth:
         return True
 
     async def _2fa(self) -> str:
-        password = await self.app(GetPasswordRequest()) # type: ignore
+        password = await self.app(GetPasswordRequest()) 
         
         while True:
             twofa = getpass('Enter 2FA password: ')
@@ -54,15 +53,13 @@ class Auth:
                             CheckPasswordRequest(
                                 compute_check(password, twofa.strip())
                             )
-                        ) # type: ignore
+                        )
                     ).user
                 )
             except errors.PasswordHashInvalidError:
                 logging.error('Wrong password!')
             else:
                 return twofa
-        
-
 
     async def send_code(self) -> Tuple[str, str]:
         """Enter phone number"""
@@ -96,7 +93,7 @@ class Auth:
                 phone,
                 code,
                 phone_code_hash=phone_code_hash
-            ) # type: ignore
+            )
 
             return user
         except errors.SessionPasswordNeededError:
@@ -107,7 +104,7 @@ class Auth:
                 code,
                 password=twofa,
                 phone_code_hash=phone_code_hash
-            ) # type: ignore
+            ) 
 
 
     async def authorize(self) -> Union[Tuple[types.User, TelegramClient], NoReturn]:
@@ -115,7 +112,7 @@ class Auth:
         await self.app.connect()
 
         try:
-            me = await self.app.get_me() # type: ignore
+            me = await self.app.get_me() 
             if not me:
                 raise errors.AuthKeyUnregisteredError('?')
         except errors.AuthKeyUnregisteredError:
@@ -147,13 +144,13 @@ class Auth:
                 
                 await self._2fa()
 
-                me = await self.app.get_me() # type: ignore
+                me = await self.app.get_me() 
                     
             else:
-                phone, phone_code_hash = await self.send_code() # type: ignore
+                phone, phone_code_hash = await self.send_code() 
                 await self.enter_code(phone, phone_code_hash)
                 
-                me: types.User = await self.app.get_me() # type: ignore
+                me: types.User = await self.app.get_me() 
         except errors.SessionRevokedError:
             logging.error("The session was terminated, delete the session and re-auth")
             self.app.disconnect()

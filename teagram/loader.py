@@ -19,7 +19,7 @@ from typing import Union, List, Dict, Any, Callable
 from types import FunctionType, LambdaType
 from loguru import logger
 
-from telethon import TelegramClient, types, events
+from telethon import TelegramClient, types
 from . import dispatcher, utils, database, bot
 
 VALID_URL = r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
@@ -79,7 +79,10 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
             elif method_name.endswith("cmd"):
                 command_handlers[method_name[:-3].lower()] = getattr(instance, method_name)
             elif hasattr(getattr(instance, method_name), "is_command"):
+                method_name = method_name.replace('_cmd', '').replace('cmd', '')
                 command_handlers[method_name] = getattr(instance, method_name)
+            else:
+                pass
 
     return command_handlers
 

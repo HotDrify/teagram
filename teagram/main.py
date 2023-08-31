@@ -57,7 +57,7 @@ async def main():
     else:
         await db.cloud.send_data('Userbot has started (Prefix - "{}")'.format(prefix))
 
-    await app.run_until_disconnected() # type: ignore
+    await app.run_until_disconnected()
 
     logging.info("Завершение работы...")
     return True
