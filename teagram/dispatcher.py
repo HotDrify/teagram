@@ -41,7 +41,6 @@ class DispatcherManager:
 
     async def load(self) -> bool:
         """Загружает менеджер диспетчера"""
-        self.owner = await self.app.get_me()
         logging.info("Загрузка диспетчера...")
 
         self.app.add_event_handler(

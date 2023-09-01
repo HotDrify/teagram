@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 
@@ -7,6 +8,7 @@ import subprocess
 import logging
 import string
 import random
+import traceback
 
 import requests
 import inspect
@@ -28,6 +30,57 @@ VALID_PIP_PACKAGES = re.compile(
     re.MULTILINE,
 )
 
+
+class Loop:
+    def __init__(
+        self,
+        func,
+        interval: Union[int, float],
+        autostart: bool,
+        *args,
+        **kwargs
+    ):
+        self.func = func
+        self.interval = interval
+        self.autostart = autostart
+        self.status = False
+        self.task = None
+
+        if self.autostart:
+            self.start(*args, **kwargs)
+            self.status = True
+
+    def start(self, *args, **kwargs):
+        if self.task:
+            return False
+
+        self.task = asyncio.ensure_future(self.loop(*args, **kwargs))
+
+    def stop(self):
+        if self.task:
+            logger.info("{}' loop have stopped".format(self.func))
+            self.task.cancel()
+
+            return True
+
+        return False
+
+    async def loop(self, *args, **kwargs):
+        while self.status:
+            if self.interval <= 0:
+                logger.exception('Interval must be higher than zero')
+                break
+
+            try:
+                await self.func(self.method, *args, **kwargs)
+            except Exception as error:
+                logger.error(error)
+
+            await asyncio.sleep(self.interval)
+
+        self.status = False
+
+
 def module(
     name: str,
     author: Union[str, None] = None,
@@ -38,7 +91,7 @@ def module(
         instance.author = author
         instance.version = version
         return instance
-    
+
     return decorator
 
 
@@ -50,6 +103,7 @@ class Module:
 
     async def on_load(self) -> Any:
         print(f'[INFO] - module {self.name} loaded')
+
 
 class StringLoader(SourceLoader):
     def __init__(self, data: str, origin: str) -> None:
@@ -69,6 +123,7 @@ class StringLoader(SourceLoader):
     def get_data(self, _: str) -> str:
         return self.data
 
+
 def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
     """Возвращает словарь из названий с функциями команд"""
     command_handlers = {}
@@ -85,6 +140,7 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
                 pass
 
     return command_handlers
+
 
 def get_watcher_handlers(instance: Module) -> List[FunctionType]:
     return [
@@ -135,8 +191,42 @@ def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
         )
     }
 
-def command(*args, **kwargs) -> FunctionType:
+
+def get_loops(instance: Module):
+    loops = []
+
+    for method in dir(instance):
+        func = getattr(instance, method)
+        if (
+            callable(getattr(instance, method)) and
+            hasattr(func, 'loop') and
+            method.startswith('loop') or
+            method.endswith('loop')
+        ):
+            loops.append(func)
+
+    return loops
+
+
+def loop(interval: Union[int, float], autostart: bool = True):
+    """"""
     def decorator(func: FunctionType):
+        _loop = Loop(func, interval, autostart)
+        setattr(func, 'loop', True)
+        setattr(func, '_loop', _loop)
+        setattr(func, 'interval', interval)
+        setattr(func, 'autostart', autostart)
+
+        return _loop
+
+    return decorator
+
+
+def command(docs: str = None, *args, **kwargs) -> FunctionType:
+    def decorator(func: FunctionType):
+        if docs:
+            func.__doc__ = docs
+
         setattr(func, 'is_command', True)
 
         for arg in args:
@@ -146,8 +236,9 @@ def command(*args, **kwargs) -> FunctionType:
             setattr(func, kwarg, value)
 
         return func
-    
+
     return decorator
+
 
 def on_bot(custom_filters: LambdaType) -> FunctionType:
     """Создает фильтр для команды бота
@@ -165,12 +256,14 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
             ):
         >>>     ...
     """
+
     def decorator(func: FunctionType):
         """Декоратор для обработки команды бота"""
         func._filters = custom_filters
         return func
-    
+
     return decorator
+
 
 class ModulesManager:
     """Manager of modules"""
@@ -188,6 +281,7 @@ class ModulesManager:
         self.message_handlers: Dict[str, FunctionType] = {}
         self.inline_handlers: Dict[str, FunctionType] = {}
         self.callback_handlers: Dict[str, FunctionType] = {}
+        self.loops = []
 
         self._local_modules_path: str = "./teagram/modules"
 
@@ -212,7 +306,7 @@ class ModulesManager:
 
         for local_module in filter(
             lambda file_name: file_name.endswith(".py")
-                and not file_name.startswith("_"), os.listdir(self._local_modules_path)
+            and not file_name.startswith("_"), os.listdir(self._local_modules_path)
         ):
             module_name = f"teagram.modules.{local_module[:-3]}"
             file_path = os.path.join(
@@ -265,6 +359,7 @@ class ModulesManager:
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)
                 instance.watcher_handlers = get_watcher_handlers(instance)
+                instance.loops = get_loops(instance)
 
                 instance.message_handlers = get_message_handlers(instance)
                 instance.callback_handlers = get_callback_handlers(instance)
@@ -273,10 +368,15 @@ class ModulesManager:
                 self.modules.append(instance)
                 self.command_handlers.update(instance.command_handlers)
                 self.watcher_handlers.extend(instance.watcher_handlers)
+                self.loops.append(*instance.loops) if instance.loops else None
 
                 self.message_handlers.update(instance.message_handlers)
                 self.callback_handlers.update(instance.callback_handlers)
                 self.inline_handlers.update(instance.inline_handlers)
+
+                if instance.loops:
+                    for loop in self.loops:
+                        setattr(loop, 'method', instance)
 
         if not instance:
             logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
@@ -301,7 +401,7 @@ class ModulesManager:
                 requirements = " ".join(re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source))
             except TypeError as error:
                 logger.error(traceback.format_exc())
-                return logging.warn("Не указаны пакеты для установки")
+                return logger.warning("Не указаны пакеты для установки")
 
             logging.info(f"Установка пакетов: {', '.join(requirements)}...")
 
@@ -361,7 +461,7 @@ class ModulesManager:
             if (get_module := inspect.getmodule(module)).__spec__.origin != "<string>":
                 set_modules = set(self._db.get(__name__, "modules", []))
                 self._db.set("teagram.loader", "modules",
-                            list(set_modules - {get_module.__spec__.origin}))
+                             list(set_modules - {get_module.__spec__.origin}))
 
             for alias, command in self.aliases.copy().items():
                 if command in module.command_handlers:
@@ -381,6 +481,9 @@ class ModulesManager:
         )
         self.callback_handlers = dict(
             set(self.callback_handlers.items()) ^ set(module.callback_handlers.items())
+        )
+        self.loops = list(
+            set(*self.loops) ^ set(module.loops)
         )
 
         return module.name
