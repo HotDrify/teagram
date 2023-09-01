@@ -40,7 +40,11 @@ class EvalMod(loader.Module):
                 'self': self,
                 'client': self.client,
                 'app': self.client,
+                'manager': self.manager,
+                'bot': self.bot,
+                'db': self.db,
                 'message': message,
+                'reply': await message.get_reply_message(),
                 'args': args
             }
         )
