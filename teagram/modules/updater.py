@@ -62,9 +62,9 @@ class UpdateMod(loader.Module):
                 )
                 
         except CantInitiateConversation:
-            logger.error(f'Updater | Вы заблокировали ботом, пожалуйста разблокируйте бота ({_me.username})')
-        except BotBlocked:
             logger.error(f'Updater | Вы не начали диалог с ботом, пожалуйста напишите боту /start ({_me.username})')
+        except BotBlocked:
+            logger.error(f'Updater | Вы заблокировали ботом, пожалуйста разблокируйте бота ({_me.username})')
 
         except CantParseEntities:
             await bot.send_message(

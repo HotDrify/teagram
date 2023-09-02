@@ -4,6 +4,8 @@ import random
 import string
 import yaml
 import os
+import io
+
 import git
 import contextlib
 from types import FunctionType
@@ -101,24 +103,40 @@ async def answer(
         await utils.answer(message, response_image_path, photo=True, caption="Here's an image for you.")
     """
     messages: List[Message] = []
-    client: TelegramClient = message._client  #
-    me = await client.get_me()
+    client: TelegramClient = message._client
     chat = get_chat(message)
 
     if isinstance(message, list):
         message: Message = message[0]
 
     if isinstance(response, str) and not (photo or document):
-        try:
-            msg = await client.edit_message(
-                chat,
-                message.id,
-                response,
-                parse_mode=parse_mode,
+        if len(response) > 4096:
+            file = io.BytesIO(response.encode())
+            file.name = 'response.txt'
+
+            msg = await client.send_file(
+                chat, 
+                file,
+                caption=f'📁 <b>Сообщение отправлено файлом</b> (<code>{len(response)}/4096</code>)',
+                parse_mode='HTML',
+                reply_to=message.id,
                 **kwargs
             )
-        except:
-            msg = await message.reply(response, parse_mode=parse_mode, **kwargs)
+            
+            if message.out:
+                await message.delete()
+        
+        else:
+            try:
+                msg = await client.edit_message(
+                    chat,
+                    message.id,
+                    response,
+                    parse_mode=parse_mode,
+                    **kwargs
+                )
+            except: 
+                msg = await message.reply(response, parse_mode=parse_mode, **kwargs)
 
         messages.append(msg)
 
@@ -134,8 +152,8 @@ async def answer(
             )
         )
 
-        if message.sender_id == me.id:
-            await client.delete_messages(chat, message.id)
+        if message.out:
+            await message.delete()
 
     return messages
 
