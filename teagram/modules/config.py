@@ -6,7 +6,7 @@ from aiogram.types import (
 )
 from inspect import getmembers, isroutine
 from telethon import TelegramClient, types
-from asyncio import sleep
+from aiogram import Bot
 
 from .. import loader, utils, database, validators
 from ..types import ConfigValue
@@ -40,16 +40,20 @@ class ConfigMod(loader.Module):
             'manager', 'author', 'bot', 'callback_handlers',
             'command_handlers', 'inline_handlers', 'bot_username',
             'message_handlers', 'name', 'version', 'watcher_handlers',
-            'boot_time', 'client', '_client'
+            'boot_time', 'client', '_client', 'loops'
         ]
         self.config = None  # Пoявляется после get_attrs
         self.pending = False
         self.pending_id = utils.random_id(50)
         self.pending_module = False
 
+        self.message = None
+        self.chat = None
+        self._def = False
+
     def get_module(self, data: str) -> loader.Module:
         return next((module for module in self.manager.modules if module.name.lower() in data.lower()), None)
-    
+
     def validate(self, attribute):
         if isinstance(attribute, str):
             try:
@@ -74,19 +78,26 @@ class ConfigMod(loader.Module):
             self.config_db: database.Database = attrs[1][1]
 
             return attrs[0][1]
-        
+
         return []
-        
+
 
     @loader.on_bot(lambda _, call: call.data == "send_cfg")
     async def config_callback_handler(self, call: CallbackQuery):
-        if call.from_user.id != (await self.client.get_me()).id:
+        if call.from_user.id != (me := await self.client.get_me()).id:
             return await call.answer('Ты не владелец')
 
-        me = await self.client.get_me()
+        if self.message:
+            await self.inline_bot.delete_message(self.chat, self.message)
+
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.manager.modules]
-        message: Message = await self.inline_bot.send_message(me.id, 'Модули', reply_markup=inline_keyboard)
+        message: Message = await self.inline_bot.send_message(
+            me.id,
+            text='☕ <b>Teagram modules | Config</b> ',
+            reply_markup=inline_keyboard,
+            parse_mode='HTML'
+        )
 
         if self.pending:
             self.pending, self.pending_module, self.pending_id = False, utils.random_id(50), False
@@ -94,7 +105,7 @@ class ConfigMod(loader.Module):
         count = 1
         buttons = []
 
-        for module in modules:
+        for module in sorted(modules, key=lambda x: len(str(x))):
             name = module.name
 
             if 'config' in name.lower():
@@ -150,14 +161,14 @@ class ConfigMod(loader.Module):
             keyboard.row(*buttons)
 
         keyboard.add(InlineKeyboardButton('🔄 Назад', callback_data='send_cfg'))
-        
+
         attributes = []
         for key, value in attrs.items():
             formated = str(value)
             if isinstance(value, tuple):
                 formated = ', '.join(f"{k}: {v}" for k, v in value)
 
-            attributes.append(f'➡ <b>(Тип {type(value).__name__})</b> <b>{key}</b>: <code>{formated}</code>')
+            attributes.append(f'➡ <b>(Тип {type(value).__name__})</b> <b>{key}</b>: <code>{formated or "Не указано"}</code>')
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
@@ -165,29 +176,37 @@ class ConfigMod(loader.Module):
             self.chat,
             self.message
         )
-        
+
         await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
     @loader.on_bot(lambda _, call: call.data.startswith('ch_attr_'))
     async def change_attribute_callback_handler(self, call: CallbackQuery):
+        if not self.chat:
+            return await call.answer('Перезапустите конфиг')
+
         data = call.data.replace('ch_attr_', '').split('_')
         module = data[0]
         attribute = data[1]
 
         module = self.get_module(module)
-        self.get_attrs(module)
+        value = self.get_attrs(module).get(attribute)
 
         docs = self.config.get_doc(attribute)
+        default = self.config.get_default(attribute)
 
         self.pending = attribute
         self.pending_module = module
-        self.pending_id = utils.random_id(3)
+        self.pending_id = utils.random_id(3).lower()
 
         keyboard = InlineKeyboardMarkup()
         keyboard.row(
             InlineKeyboardButton(
-                'Сменить атрибут',
-                callback_data='aaa'
+                '✒ Изменить',
+                callback_data='change'
+            ),
+            InlineKeyboardButton(
+                '↪ По умолчанию',
+                callback_data='change_def'
             ),
             InlineKeyboardButton(
                 '🔄 Назад',
@@ -196,21 +215,38 @@ class ConfigMod(loader.Module):
         )
 
         await self.inline_bot.edit_message_text(
-            f'🆔 Модуль: <b>{self.pending_module.name}</b>\n'
-            f'➡ Атрибут: <b>{attribute}</b>\n'
-            f'❔ Описание: <b>{docs or "Не указано"}</b>',
+            f'⚙ <b>Модуль</b>: <code>{self.pending_module.name}</code>\n'
+            f'➡ <b>Атрибут</b>: <code>{attribute}</code>\n'
+            f'➡ <b>Значение</b>: <code>{str(value) or "Не указано"}</code>\n'
+            f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n'
+            f'❔ <b>Описание</b>: <code>{docs or "Не указано"}</code>',
             self.chat,
             self.message
         )
 
         await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
-    @loader.on_bot(lambda _, data: data.data == 'aaa')
-    async def aaa_callback_handler(self, call: CallbackQuery):
+    @loader.on_bot(lambda _, call: call.data.startswith('change'))
+    async def _change_callback_handler(self, call: CallbackQuery):
         if len(self.pending_id) == 50:
             return await call.answer('Перезагрузите конфиг')
-        
-        await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
+
+        if 'def' in call.data:
+            attr = self.config.get_default(self.pending)
+
+            self.config[self.pending] = attr
+            self.config_db.set(
+                self.pending_module.name,
+                self.pending,
+                attr
+            )
+
+            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
+            self._def = False
+
+            await call.answer('✔ Вы успешно изменили значение по умолчанию')
+        else:
+            await call.answer(f'✒ Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
     @loader.on_bot(lambda self, msg: len(self.pending_id) != 50)
     async def change_message_handler(self, message: Message):
@@ -218,6 +254,11 @@ class ConfigMod(loader.Module):
             attr = message.text.replace(self.pending_id, '').strip()
 
             attribute: ConfigValue = self.config[self.pending]
+            default = self.config.get_default(self.pending)
+
+            if self._def:
+                a
+
             self.config[self.pending] = self.validate(attr)
             self.config_db.set(
                 self.pending_module.name,
@@ -229,10 +270,6 @@ class ConfigMod(loader.Module):
 
             message = await message.reply('✔ Атрибут успешно изменен!')
 
-            await sleep(2)
-
-            await message.delete()
-
     async def cfg_inline_handler(self, inline_query: InlineQuery):
         if inline_query.from_user.id == (await self.client.get_me()).id:
             await self.set_cfg(inline_query)
@@ -242,10 +279,10 @@ class ConfigMod(loader.Module):
             [
                 InlineQueryResultArticle(
                     id=utils.random_id(),
-                    title="Конфиг модулей",
-                    input_message_content=InputTextMessageContent("Настройка конфига"),
+                    title="Modules's config",
+                    input_message_content=InputTextMessageContent("⚙ Конфиг..."),
                     reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton("Отправить конфиг", callback_data="send_cfg")
+                        InlineKeyboardButton("🔑 Открыть конфиг", callback_data="send_cfg")
                     )
                 )
             ]
@@ -255,4 +292,4 @@ class ConfigMod(loader.Module):
         """Настройка через inline"""
         bot = await self.inline_bot.get_me()
         await utils.invoke_inline(message, bot.username, 'cfg')
-
+        await message.delete()

@@ -40,7 +40,7 @@ class AboutMod(loader.Module):
         uptime_raw = round(time.time() - self.boot_time)
         uptime = (timedelta(seconds=uptime_raw))
         
-        last = str(await bash_exec('git log -1')).split()[1].strip()
+        last = utils.git_hash()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
         version = f'v{__version__}' + (' <b>Доступно обновление</b>' if last != now else "")
 
@@ -48,7 +48,7 @@ class AboutMod(loader.Module):
 
         default = f"""
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  <code>{me}</code>
-<b><emoji id=6334741148560524533>🐧</emoji> Версия</b>:  <code>{version}</code>
+<b><emoji id=6334741148560524533>🐧</emoji> Версия</b>:  <code>{version}</code> (<a href="https://github.com/itzlayz/teagram-tl/commit/{last}">{last[:7]}</a>)
 
 <b><emoji id=5357480765523240961>🧠</emoji> CPU</b>:  <code>{utils.get_cpu()}%</code>
 <b>📀 RAM</b>:  <code>{utils.get_ram()}MB</code>

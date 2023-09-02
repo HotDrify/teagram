@@ -52,13 +52,13 @@ class UpdateMod(loader.Module):
         last = None
 
         try:
-            last = (await utils.run_sync(check_output, 'git log -1', shell=True)).decode().split()[1].strip()
+            last = utils.git_hash()
             diff = (await utils.run_sync(check_output, 'git rev-parse HEAD', shell=True)).decode().strip()
 
             if last != diff:
                 await bot.send_message(
                     me.id,
-                    f"✔ Доступно обновление (<a href='https://github.com/HotDrify/teagram/commit/{last}'>{last[:6]}...</a>)"
+                    f"✔ Доступно обновление (<a href='https://github.com/itzlayz/teagram-tl/commit/{last}'>{last[:6]}...</a>)"
                 )
                 
         except CantInitiateConversation:

@@ -4,6 +4,7 @@ import random
 import string
 import yaml
 import os
+import git
 import contextlib
 from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
@@ -15,6 +16,7 @@ from telethon.tl import custom
 from . import database
 
 Message = Union[custom.Message, types.Message]
+git_hash = lambda: git.Repo().head.commit.hexsha
 
 def get_full_command(message: Message) -> Union[
     Tuple[Literal[""], Literal[""], Literal[""]], Tuple[str, str, str]
