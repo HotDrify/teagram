@@ -35,9 +35,9 @@ async def main():
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
-            f"✅ Перезагрузка прошла успешно! ({round(time.time())-int(restart['start'])} сек.)"
+            f"<b>✅ Перезагрузка прошла успешно! ({round(time.time())-int(restart['start'])} сек.)</b>"
             if restart["type"] == "restart"
-            else f"✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)"
+            else f"<b>✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)</b>"
         )
         
         try:
@@ -49,7 +49,7 @@ async def main():
                     restarted_text
                 )
             ):
-                await app.edit_message(_id[0], _id[1], restarted_text)
+                await app.edit_message(_id[0], _id[1], restarted_text, parse_mode='html')
         except:
             await db.cloud.send_data(restarted_text)
 

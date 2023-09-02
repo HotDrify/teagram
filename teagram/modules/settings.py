@@ -4,7 +4,7 @@ import os
 import logging
 from logging import StreamHandler
 
-from telethon import TelegramClient, types
+from telethon import types
 
 from .. import loader, utils
 

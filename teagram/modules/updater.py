@@ -80,7 +80,7 @@ class UpdateMod(loader.Module):
 
     async def update_cmd(self, message: types.Message):
         try:
-            await utils.answer(message, 'Попытка обновления...')
+            await utils.answer(message, '<b>🛠 Попытка обновления...</b>')
             
             update_req = False
             if 'requirements.txt' in check_output('git diff', shell=True).decode():
@@ -94,7 +94,7 @@ class UpdateMod(loader.Module):
 
             
             if 'Already up to date.' in output:
-                return await utils.answer(message, 'У вас установлена последняя версия ✔')
+                return await utils.answer(message, '<b>✔ У вас установлена последняя версия</b>')
             
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
