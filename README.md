@@ -20,7 +20,7 @@ Advantages:
 
 <h1>Install</h1>
 <pre lang="bash">
-git clone https://github.com/HotDrify/teagram && cd teagram
+git clone https://github.com/itzlayz/teagram-tl && cd teagram-tl
 pip3 install -r requirements.txt
 </pre>
 
