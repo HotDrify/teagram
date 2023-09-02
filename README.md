@@ -1,59 +1,35 @@
-<p align="center">
-    <img src="./assets/bot_avatar.png" width="500" alt="teagram-UB">
-    <br>
-    <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — юзербот который использует <a href="https://github.com/LonamiWebs/Telethon">Telethon</a>
-    <br>
-    <a href='https://github.com/hotdrify/teagram#установка'>
-        Установка
-    </a>
-    •
-    <a href='https://github.com/hotdrify/teagram#комьюнити'>
-        Комьюнити
-    </a>
-    <br>
-    <br>
-    <img alt="last commit" src="https://img.shields.io/github/last-commit/HotDrify/teagram?style=for-the-badge">
-    <img alt="stars" src="https://img.shields.io/github/stars/HotDrify/teagram?style=for-the-badge">
-</p>
+<center><img src='assets/bot_avatar.png' width='250' height='250'></center>
+
+[![Teagram](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=Teagram+Userbot)](https://t.me/UBteagram)
+
+<b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — userbot which uses <a href="https://github.com/LonamiWebs/Telethon">Telethon</a>
+<br>
 
 
+Teagram is a telegram user bot with many features such as translator, terminal, eval, etc. <br>
+User bot allows you to create modules that do not require much knowledge
 
-<h1>Описание</h1>
-
-Teagram — это юзер бот для телеграма со многими возможностями такие как: переводчик, терминал, eval и т.д. <br>
-Юзер бот позволяет создавать модули которые не требуют много знаний
-
-Преимущества:
+Advantages:
 <ul>
-    <li>Легко используемый</li>
-    <li>Маленькое потребление памяти</li>
-    <li>Загрузка модулей через гит</li>
-    <li>Логин через QR код</li>
-    <li>Инлайн бот</li>
+    <li>Easy to use</li>
+    <li>Low memory consumption</li>
+    <li>Loading modules via git</li>
+    <li>Login via QR code</li>
+    <li>Inline bot</li>
 </ul>
 
-<h1>Установка</h1>
+<h1>Install</h1>
 <pre lang="bash">
-git clone https://github.com/HotDrify/teagram && cd teagram 
+git clone https://github.com/HotDrify/teagram && cd teagram
 pip3 install -r requirements.txt
 </pre>
 
-Также, вы можете установить зависимости для ускорения работы:
-<pre lang="bash">
-pip3 install -r requirements-speedup.txt
-</pre>
+<h1>Launch</h1>
 
-
-<h1>Запуск</h1>
-
-> Для запуска нужны api_id и api_hash. Их можно получить на <a href="https://my.telegram.org">my.telegram.org</a>
+> You need api_id and api_hash to run. You can get them at <a href="https://my.telegram.org">my.telegram.org</a>
 
 <pre lang="bash">
 python3 -m teagram
 </pre>
 
-> Примеры модуля в <a href="./teagram/modules/_example.py">_example.py</a>
-
-<h1>Комьюнити</h1>
-<b><a href="https://t.me/UBteagram">Telegram (RU/EN)</a></b>
-<b><a href="https://discord.gg/s37xWt9Rr7">Discord (RU/EN)</a></b>
+> Module examples in <a href="./teagram/modules/_example.py">_example.py</a>
