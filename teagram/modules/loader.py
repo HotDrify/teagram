@@ -116,7 +116,7 @@ class LoaderMod(loader.Module):
                 except requests.exceptions.RequestException:
                     continue
 
-                if not (module_name := await self.all_modules.load_module(r.text, r.url)):
+                if not (module_name := await self.manager.load_module(r.text, r.url)):
                     continue
 
                 self.db.set("teagram.loader", "modules",
@@ -131,7 +131,7 @@ class LoaderMod(loader.Module):
                 if r.status_code != 200:
                     raise requests.exceptions.ConnectionError
 
-                module_name = await self.all_modules.load_module(r.text, r.url)
+                module_name = await self.manager.load_module(r.text, r.url)
                 if module_name is True:
                     error_text = "✅ Зависимости установлены. Требуется перезагрузка"
 
