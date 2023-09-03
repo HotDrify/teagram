@@ -217,8 +217,8 @@ class ConfigMod(loader.Module):
             f'⚙ <b>{self.pending_module.name}</b>\n'
             f'➡ <b>Атрибут</b>: <code>{attribute}</code>\n'
             f'➡ <b>Значение</b>: <code>{str(value) or "Не указано"}</code>\n'
-            f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n\n'
-            f'❔ <code>{docs}</code>' if docs else "",
+            f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n\n'+
+            (f'❔ <code>{docs}</code>' if docs else ""),
             self.chat,
             self.message
         )
