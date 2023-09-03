@@ -5,11 +5,10 @@ from aiogram.types import (
     Message
 )
 from inspect import getmembers, isroutine
-from telethon import TelegramClient, types
-from aiogram import Bot
+from telethon import types
 
-from .. import loader, utils, database, validators
-from ..types import ConfigValue
+from .. import loader, utils, database
+from ..types import ConfigValue, Config
 
 # distutils will be deleted in python 3.12
 # distutils будет удалена в python 3.12
@@ -138,12 +137,12 @@ class ConfigMod(loader.Module):
         mod = self.get_module(data)
         attrs = self.get_attrs(mod)
 
-        if not attrs:
+        if not attrs or not isinstance(attrs, Config):
             return await call.answer('У этого модуля нету атрибутов', show_alert=True)
 
         buttons = []
         count = 1
-
+        
         for name in attrs:
             buttons.append(
                 InlineKeyboardButton(
@@ -161,18 +160,18 @@ class ConfigMod(loader.Module):
             keyboard.row(*buttons)
 
         keyboard.add(InlineKeyboardButton('🔄 Назад', callback_data='send_cfg'))
-
         attributes = []
+     
         for key, value in attrs.items():
             formated = str(value)
             if isinstance(value, tuple):
                 formated = ', '.join(f"{k}: {v}" for k, v in value)
 
-            attributes.append(f'➡ <b>(Тип {type(value).__name__})</b> <b>{key}</b>: <code>{formated or "Не указано"}</code>')
+            attributes.append(f'➡ <i>{type(value).__name__}</i> <b>{key}</b>: <code>{formated or "Не указано"}</code>')
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
-            f'🆔 Модуль: {mod.name}\n\n{attributes_text}',
+            f'<b>🆔 Модуль: {mod.name}</b>\n\n{attributes_text}',
             self.chat,
             self.message
         )
