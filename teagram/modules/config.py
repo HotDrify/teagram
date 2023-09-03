@@ -171,7 +171,7 @@ class ConfigMod(loader.Module):
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
-            f'<b>🆔 Модуль: {mod.name}</b>\n\n{attributes_text}',
+            f'<b>⚙ {mod.name}</b>\n\n{attributes_text}',
             self.chat,
             self.message
         )
@@ -214,11 +214,11 @@ class ConfigMod(loader.Module):
         )
 
         await self.inline_bot.edit_message_text(
-            f'⚙ <b>Модуль</b>: <code>{self.pending_module.name}</code>\n'
+            f'⚙ <b>{self.pending_module.name}</b>\n'
             f'➡ <b>Атрибут</b>: <code>{attribute}</code>\n'
             f'➡ <b>Значение</b>: <code>{str(value) or "Не указано"}</code>\n'
-            f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n'
-            f'❔ <b>Описание</b>: <code>{docs or "Не указано"}</code>',
+            f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n\n'
+            f'❔ <code>{docs}</code>' if docs else "",
             self.chat,
             self.message
         )
@@ -252,12 +252,6 @@ class ConfigMod(loader.Module):
         if self.pending_id in message.text:
             attr = message.text.replace(self.pending_id, '').strip()
 
-            attribute: ConfigValue = self.config[self.pending]
-            default = self.config.get_default(self.pending)
-
-            if self._def:
-                a
-
             self.config[self.pending] = self.validate(attr)
             self.config_db.set(
                 self.pending_module.name,
@@ -279,7 +273,7 @@ class ConfigMod(loader.Module):
                 InlineQueryResultArticle(
                     id=utils.random_id(),
                     title="Modules's config",
-                    input_message_content=InputTextMessageContent("⚙ Конфиг..."),
+                    input_message_content=InputTextMessageContent("⚙ <b>Конфиг...</b>", 'html'),
                     reply_markup=InlineKeyboardMarkup().add(
                         InlineKeyboardButton("🔑 Открыть конфиг", callback_data="send_cfg")
                     )
