@@ -113,21 +113,20 @@ class TokenManager(Item):
                 time.sleep(1.5)
                 response = await conv.get_response()
 
-            found = False
-            for row in response.reply_markup.rows:
-                for button in row.buttons:
-                    search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button.text)
-                    if search:
-                        self.bot_username = button.text
+            try:
+                for row in response.reply_markup.rows:
+                    for button in row.buttons:
+                        search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button.text)
+                        if search:
+                            self.bot_username = button.text
 
-                        await conv.ask(button.text)
-                        found = True
-                        break
-
-                if found:
-                    break
-                else:
-                    return False
+                            await conv.ask(button.text)
+                            break
+                    else:
+                        return False
+            except:
+                logger.exception('Error, trying again')
+                return self._revoke_token()
 
             time.sleep(1)
             response = await conv.get_response()
