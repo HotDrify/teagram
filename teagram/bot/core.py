@@ -45,6 +45,7 @@ class BotManager(Events, TokenManager):
 
         self._token = self._db.get("teagram.bot", "token", None)
         self._units = {}
+        self.cfg = {}
 
     async def load(self) -> Union[bool, NoReturn]:
         """
@@ -204,6 +205,11 @@ class BotManager(Events, TokenManager):
                 ], cache_time=0
             )
         
+        query_ = query.split()
+
+        cmd = query_[0]
+        args = " ".join(query_[1:])
+
         try:
             form = self._units[query]
             text = form.get('text')
@@ -264,11 +270,45 @@ class BotManager(Events, TokenManager):
             pass
         except Exception as error:
             traceback.print_exc()
+        try:
+            if (data := self.cfg[cmd]):
+                if not args:
+                    return await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="Teagram",
+                                description='Укажите значение',
+                                input_message_content=InputTextMessageContent(
+                                    "❌ Вы не указали значение")
+                            )
+                        ], cache_time=0
+                    )
+                else:
+                    attr = data['attr']
 
-        query_ = query.split()
+                    data['cfg'][attr] = utils.validate(args)
+                    self._db.set(
+                        data['mod'].name,
+                        attr,
+                        utils.validate(args)
+                    )
 
-        cmd = query_[0]
-        args = " ".join(query_[1:])
+                    await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="Вы изменили атрибут!",
+                                description='Изменив аргументы вы изменяете атрибут',
+                                input_message_content=InputTextMessageContent(
+                                    "✔ Вы успешно изменили атрибут!")
+                            )
+                        ], cache_time=0
+                    )
+        except KeyError:
+            pass
+
+        
 
         func = self._manager.inline_handlers.get(cmd)
         if not func:

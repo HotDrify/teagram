@@ -196,12 +196,13 @@ class ConfigMod(loader.Module):
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3).lower()
+        self.bot.cfg[self.pending_id] = {'cfg': self.config, 'attr': attribute, 'mod': module}
 
         keyboard = InlineKeyboardMarkup()
         keyboard.row(
             InlineKeyboardButton(
                 '✒ Изменить',
-                callback_data='change'
+                switch_inline_query_current_chat=self.pending_id + ' '
             ),
             InlineKeyboardButton(
                 '↪ По умолчанию',
@@ -245,7 +246,7 @@ class ConfigMod(loader.Module):
 
             await call.answer('✔ Вы успешно изменили значение по умолчанию')
         else:
-            await call.answer(f'✒ Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
+            await call.answer(f'✒ Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"')
 
     @loader.on_bot(lambda self, msg: len(self.pending_id) != 50)
     async def change_message_handler(self, message: Message):

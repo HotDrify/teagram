@@ -62,6 +62,36 @@ def get_full_command(message: Message) -> Union[
 def get_chat(message: Message):
     return (message.chat.id if message.chat else None or message._chat_peer)
 
+def strtobool(val):
+    # distutils.util.strtobool
+    """Convert a string representation of truth to true (1) or false (0).
+
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return 1
+    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return 0
+    else:
+        raise ValueError("invalid truth value %r" % (val,))
+    
+def validate(attribute):
+    """Делает валидацию типа из строки (в int, bool)
+        Validation type from string (in int, bool)"""
+    if isinstance(attribute, str):
+        try:
+            attribute = int(attribute)
+        except:
+            try:
+                attribute = bool(strtobool(attribute))
+            except:
+                pass
+
+    return attribute
+
 async def create_group(
     app: TelegramClient,
     title: str,
