@@ -23,6 +23,15 @@ class Events(Item):
         Returns:
             Message: The processed message.
         """
+        if message.text == '/start':
+            await message.reply_photo(
+                photo='https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true',
+                caption='☕ Добро пожаловать! Это инлайн бот <b>Teagram</b>\n'
+                '✒ Предлагаем вам настроить конфиг\n'
+                '✒ Используйте инлайн команду <b>префикс</b><code>config</code>',
+                parse_mode='html'
+            )
+
         for func in self._manager.message_handlers.values():
             if not await self._check_filters(func, func.__self__, message):
                 continue

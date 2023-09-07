@@ -18,17 +18,18 @@ class AboutMod(loader.Module):
         self.boot_time = time.time()
         self.config = Config(
             ConfigValue(
-                'customText',
-                '',
-                self.db.get('UserBot', 'customText') or '',
-                validators.String(),
-                "Ключевые слова: cpu, raw, tele, owner, uptime, version, platform"
+                option='customText',
+                default='',
+                value=self.db.get('UserBot', 'customText', ''),
+                validator=validators.String(),
+                docstring="Ключевые слова: cpu, raw, tele, owner, uptime, version, platform"
             ),
             ConfigValue(
-                'customImage',
-                '',
-                self.db.get('UserBot', 'customImage') or '',
-                validators.String()
+                option='customImage',
+                docstring='',
+                default='',
+                value=self.db.get('UserBot', 'customImage', ''),
+                validator=validators.String()
             )
         )
         self.bot: BotManager = self.bot

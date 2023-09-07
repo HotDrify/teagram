@@ -47,10 +47,10 @@ class WaitForDefault:
 @dataclass
 class ConfigValue:
     option: str 
+    docstring: str = ''
     default: Any = None
     value: Any = field(default_factory=WaitForDefault)
     validator: Union[Integer, String, Boolean] = None
-    docstring: str = ""
     
     def __post_init__(self):
         if isinstance(self.value, WaitForDefault):

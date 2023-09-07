@@ -18,6 +18,7 @@ class TranslatorMod(loader.Module):
         self.config = Config(
             ConfigValue(
                 'language',
+                'Язык'
                 'en',
                 language,
                 validators.String()

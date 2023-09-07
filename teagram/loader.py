@@ -50,15 +50,17 @@ class Loop:
             self.start(*args, **kwargs)
             self.status = True
 
-    def start(self, *args, **kwargs):
+    def start(self, interval: int = None, *args, **kwargs):
         if self.task:
             return False
+        if interval:
+            self.interval = interval
 
         self.task = asyncio.ensure_future(self.loop(*args, **kwargs))
 
     def stop(self):
         if self.task:
-            logger.info("{}' loop have stopped".format(self.func))
+            logger.info("{} loop have stopped".format(self.func.__name__))
             self.task.cancel()
 
             return True
@@ -209,7 +211,6 @@ def get_loops(instance: Module):
 
 
 def loop(interval: Union[int, float], autostart: bool = True):
-    """"""
     def decorator(func: FunctionType):
         _loop = Loop(func, interval, autostart)
         setattr(func, 'loop', True)
@@ -467,6 +468,10 @@ class ModulesManager:
                 if command in module.command_handlers:
                     del self.aliases[alias]
                     del self.command_handlers[command]
+            
+            for loop in self.loops:
+                if loop in module.loops:
+                    loop.stop()
 
         self.modules.remove(module)
         self.command_handlers = dict(
@@ -483,7 +488,7 @@ class ModulesManager:
             set(self.callback_handlers.items()) ^ set(module.callback_handlers.items())
         )
         self.loops = list(
-            set(*self.loops) ^ set(module.loops)
+            set(self.loops) ^ set(module.loops)
         )
 
         return module.name

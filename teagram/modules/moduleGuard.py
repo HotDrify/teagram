@@ -16,6 +16,7 @@ class ModuleGuardMod(loader.Module):
         self.config = Config(
             ConfigValue(
                 option='send',
+                docstring='Проверять модули или нет',
                 default=True,
                 value=value,
                 validator=validators.Boolean()

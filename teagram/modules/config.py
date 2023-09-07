@@ -99,7 +99,7 @@ class ConfigMod(loader.Module):
         )
 
         if self.pending:
-            self.pending, self.pending_module, self.pending_id = False, utils.random_id(50), False
+            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
 
         count = 1
         buttons = []
