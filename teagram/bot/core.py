@@ -43,7 +43,8 @@ class BotManager(
         self._all_modules = all_modules
 
         self._token = self._db.get("teagram.bot", "token", None)
-
+        self.cfg = {}
+        
     async def load(self) -> Union[bool, NoReturn]:
         """Загружает менеджер бота"""
         logging.info("Загрузка менеджера бота...")

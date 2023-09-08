@@ -286,6 +286,20 @@ def get_platform() -> str:
     
     return platform
 
+def validate(attribute):
+    """Делает валидацию типа из строки (в int, bool)
+        Validation type from string (in int, bool)"""
+    if isinstance(attribute, str):
+        try:
+            attribute = int(attribute)
+        except:
+            try:
+                attribute = bool(strtobool(attribute))
+            except:
+                pass
+
+    return attribute
+
 def random_id(size: int = 10) -> str:
     """Возвращает рандомный идентификатор заданной длины
 

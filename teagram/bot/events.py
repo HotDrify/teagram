@@ -3,7 +3,7 @@ import logging
 
 from aiogram.types import (CallbackQuery, InlineQuery,
                         InlineQueryResultArticle, InputTextMessageContent,
-                        Message, InputFile)
+                        Message, InlineKeyboardButton, InlineKeyboardMarkup)
 
 from .. import utils
 from .types import Item
@@ -34,6 +34,24 @@ class Events(Item):
 
     async def _callback_handler(self, call: CallbackQuery) -> CallbackQuery:
         """Обработчик каллбек-хендлеров"""
+        if call.data.startswith('cfg'):
+            if (attr := call.data.replace('cfgyes', '')):
+                attr = attr.split('|')
+                data = self.cfg[attr[0]]
+                data['cfg'][attr[1]] = utils.validate(data['toset'])
+
+                self._db.set(
+                    data['mod'].name,
+                    attr[1],
+                    utils.validate(data['toset'])
+                )
+
+                await self.bot.edit_message_text(inline_message_id=call.inline_message_id,
+                                                 text='✔ Вы изменили атрибут!',
+                                                 reply_markup=InlineKeyboardMarkup().add(
+                                                     InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                                                 ))
+                
         for func in self._all_modules.callback_handlers.values():
             if not await self._check_filters(func, func.__self__, call):
                 continue
@@ -74,6 +92,53 @@ class Events(Item):
         cmd = query_[0]
         args = " ".join(query_[1:])
 
+        try:
+            if inline_query.from_user.id != (await self._app.get_me()).id:
+                await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="Teagram",
+                                description='Вы не владелец',
+                                input_message_content=InputTextMessageContent(
+                                    "❌ Вы не владелец")
+                            )
+                        ], cache_time=0
+                    )
+        
+            if (data := self.cfg[cmd]):
+                if not args:
+                    return await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="Teagram",
+                                description='Укажите значение',
+                                input_message_content=InputTextMessageContent(
+                                    "❌ Вы не указали значение")
+                            )
+                        ], cache_time=0
+                    )
+                else:
+                    attr = data['attr']
+                    data['toset'] = args
+
+                    await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="☕ Teagram",
+                                input_message_content=InputTextMessageContent(
+                                    "Вы уверены что хотите изменить атрибут?"),
+                                reply_markup=InlineKeyboardMarkup()
+                                .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
+                                .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg')) # type: ignore
+                            )
+                        ], cache_time=0
+                    )
+        except KeyError:
+            pass
+
         func = self._all_modules.inline_handlers.get(cmd)
         if not func:
             return await inline_query.answer(
@@ -82,8 +147,7 @@ class Events(Item):
                         id=utils.random_id(),
                         title="Ошибка",
                         input_message_content=InputTextMessageContent(
-                            "❌ Такой инлайн-команды нет"),
-#                        thumb_url="ссылку на фото"
+                            "❌ Такой инлайн-команды нет")
                     )
                 ], cache_time=0
             )

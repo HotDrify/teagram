@@ -47,7 +47,8 @@ class ConfigMod(loader.Module):
         self.pending_id = utils.random_id(50)
         self.pending_module = False
 
-        self.me = None
+        self.bbot = None
+        self.me = self.all_modules.me.id
 
     def get_module(self, data: str) -> loader.Module:
         return next((module for module in self.all_modules.modules if module.name.lower() in data.lower()), None)
@@ -191,13 +192,14 @@ class ConfigMod(loader.Module):
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3).lower()
+        self.bot.cfg[self.pending_id] = {'cfg': self.config, 'attr': attribute, 'mod': module}
 
         keyboard = InlineKeyboardMarkup()
 
         keyboard.row(
             InlineKeyboardButton(
                 'Сменить атрибут',
-                callback_data='aaa'
+                switch_inline_query_current_chat=self.pending_id + ' '
             ),
             InlineKeyboardButton(
                 '🔄 Назад',
@@ -218,31 +220,28 @@ class ConfigMod(loader.Module):
         
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    async def watcher_change(self, app: Client, message: types.Message):        
-        if self.pending_id in message.text and len(self.pending_id) == 3:
-            if message.from_user.id != self.me:
-                return
+    # async def watcher_change(self, app: Client, message: types.Message):        
+    #     if self.pending_id in message.text and len(self.pending_id) == 3:
+    #         if message.from_user.id != self.me:
+    #             return
             
-            await app.delete_messages(message.chat.id, message.id)
-            attr = message.text.replace(self.pending_id, '').strip()
+    #         await app.delete_messages(message.chat.id, message.id)
+    #         attr = message.text.replace(self.pending_id, '').strip()
 
-            self.config[self.pending] = self.validate(attr)
-            self.config_db.set(
-                self.pending_module.name,
-                self.pending,
-                self.validate(attr)
-            )
+    #         self.config[self.pending] = self.validate(attr)
+    #         self.config_db.set(
+    #             self.pending_module.name,
+    #             self.pending,
+    #             self.validate(attr)
+    #         )
 
-            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
+    #         self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
 
-            await app.send_message(message.chat.id,
-                                    '✔ Атрибут успешно изменен!',
-                                    reply_to_message_id=self.message)
+    #         await app.send_message(message.chat.id,
+    #                                 '✔ Атрибут успешно изменен!',
+    #                                 reply_to_message_id=self.message)
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
-        if not self.me:
-            self.me = self.all_modules.me.id
-
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
@@ -263,5 +262,8 @@ class ConfigMod(loader.Module):
     async def config_cmd(self, app: Client, message: types.Message):
         """Настройка через inline"""
         bot = await self.inline_bot.get_me()
-        await utils.answer_inline(message, bot.username, 'cfg')
+        if not self.bbot:
+            self.bbot = bot.username
+
+        await utils.answer_inline(message, self.bbot, 'cfg')
 
