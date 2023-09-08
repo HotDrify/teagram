@@ -82,10 +82,9 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, __, call: call.data == "send_cfg")
     async def config_callback_handler(self, app: Client, call: CallbackQuery):
-        if call.from_user.id != (await app.get_me()).id:
+        if call.from_user.id != self.me:
             return await call.answer('Ты не владелец')
         
-        self.me = (await app.get_me()).id
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.all_modules.modules]
         await self.inline_bot.edit_message_text(inline_message_id=call.inline_message_id,
@@ -241,6 +240,7 @@ class ConfigMod(loader.Module):
                                     reply_to_message_id=self.message)
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
+        self.me = (await app.get_me()).id
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
