@@ -208,7 +208,7 @@ class ConfigMod(loader.Module):
         keyboard.row(
             InlineKeyboardButton(
                 '✒ Изменить',
-                switch_inline_query_current_chat=self.pending_id + ' '
+                switch_inline_query_current_chat=f'{self.pending_id} '
             ),
             InlineKeyboardButton(
                 '↪ По умолчанию',
@@ -229,6 +229,23 @@ class ConfigMod(loader.Module):
             reply_markup=keyboard,
             inline_message_id=call.inline_message_id
         )
+
+    @loader.on_bot(lambda _, call: call.data.startswith('change'))
+    async def _change_callback_handler(self, call: CallbackQuery):
+        if 'def' in call.data:
+            attr = self.config.get_default(self.pending)
+
+            self.config[self.pending] = attr
+            self.config_db.set(
+                self.pending_module.name,
+                self.pending,
+                attr
+            )
+
+            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
+            self._def = False
+
+            await call.answer('✔ Вы успешно изменили значение по умолчанию')
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
         if inline_query.from_user.id == (await self.client.get_me()).id:
