@@ -356,6 +356,7 @@ class ModulesManager:
                 value.manager = self
                 value.client = self._client
                 value.bot = self.bot_manager
+                value.get_prefix = lambda: self._db.get('teagram.loader', 'prefix', ['.'])
 
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)

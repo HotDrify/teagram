@@ -7,7 +7,8 @@ import inspect
 from aiogram import Bot, Dispatcher, exceptions
 from aiogram.types import (
     InlineKeyboardMarkup, InlineQuery, InputTextMessageContent,
-    InlineQueryResultArticle, InlineQueryResultDocument, InlineQueryResultPhoto
+    InlineQueryResultArticle, InlineQueryResultDocument, InlineQueryResultPhoto,
+    InlineKeyboardButton
 )
 
 from telethon.types import Message, Photo, Document
@@ -270,7 +271,21 @@ class BotManager(Events, TokenManager):
             pass
         except Exception as error:
             traceback.print_exc()
+            
         try:
+            if inline_query.from_user.id != (await self._app.get_me()).id:
+                await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="Teagram",
+                                description='Вы не владелец',
+                                input_message_content=InputTextMessageContent(
+                                    "❌ Вы не владелец")
+                            )
+                        ], cache_time=0
+                    )
+        
             if (data := self.cfg[cmd]):
                 if not args:
                     return await inline_query.answer(
@@ -286,22 +301,18 @@ class BotManager(Events, TokenManager):
                     )
                 else:
                     attr = data['attr']
-
-                    data['cfg'][attr] = utils.validate(args)
-                    self._db.set(
-                        data['mod'].name,
-                        attr,
-                        utils.validate(args)
-                    )
+                    data['toset'] = args
 
                     await inline_query.answer(
                         [
                             InlineQueryResultArticle(
                                 id=utils.random_id(),
-                                title="Вы изменили атрибут!",
-                                description='Изменив аргументы вы изменяете атрибут',
+                                title="☕ Teagram",
                                 input_message_content=InputTextMessageContent(
-                                    "✔ Вы успешно изменили атрибут!")
+                                    "Вы уверены что хотите изменить атрибут?"),
+                                reply_markup=InlineKeyboardMarkup()
+                                .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
+                                .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
                             )
                         ], cache_time=0
                     )

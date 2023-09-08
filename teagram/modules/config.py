@@ -91,8 +91,8 @@ class ConfigMod(loader.Module):
 
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.manager.modules]
-        message: Message = await self.inline_bot.send_message(
-            me.id,
+        message: Message = await self.inline_bot.edit_message_text(
+            inline_message_id=call.inline_message_id,
             text='☕ <b>Teagram modules | Config</b> ',
             reply_markup=inline_keyboard,
             parse_mode='HTML'
@@ -106,11 +106,15 @@ class ConfigMod(loader.Module):
 
         for module in sorted(modules, key=lambda x: len(str(x))):
             name = module.name
+            attrs = self.get_attrs(self.get_module(name))
+
+            if not attrs or not isinstance(attrs, Config):
+                continue
 
             if 'config' in name.lower():
                 continue
 
-            data = f'mod_{name}|{message.message_id}|{message.chat.id}'
+            data = f'mod_{name}|{call.inline_message_id}'
             buttons.append(InlineKeyboardButton(name, callback_data=str(data)))
 
             if count % 3 == 0:
@@ -122,16 +126,19 @@ class ConfigMod(loader.Module):
         if buttons:
             inline_keyboard.row(*buttons)
 
-        await self.inline_bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=inline_keyboard)
+        await self.inline_bot.edit_message_text(
+            inline_message_id=call.inline_message_id,
+            text='☕ <b>Teagram modules | Config</b> ',
+            reply_markup=inline_keyboard,
+            parse_mode='HTML'
+        )
 
     @loader.on_bot(lambda _, call: call.data.startswith('mod'))
     async def answer_callback_handler(self, call: CallbackQuery):
+        if call.from_user.id != (me := await self.client.get_me()).id:
+            return await call.answer('Ты не владелец')
+        
         data = call.data
-        data_parts = data.split('|')
-        message = int(data_parts[1])
-        chat = int(data_parts[2])
-        self.chat = chat
-        self.message = message
 
         keyboard = InlineKeyboardMarkup()
         mod = self.get_module(data)
@@ -171,17 +178,16 @@ class ConfigMod(loader.Module):
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
-            f'<b>⚙ {mod.name}</b>\n\n{attributes_text}',
-            self.chat,
-            self.message
+            inline_message_id=call.inline_message_id,
+            text=f'<b>⚙ {mod.name}</b>\n\n{attributes_text}',
+            reply_markup=keyboard,
+            parse_mode='HTML'
         )
-
-        await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
     @loader.on_bot(lambda _, call: call.data.startswith('ch_attr_'))
     async def change_attribute_callback_handler(self, call: CallbackQuery):
-        if not self.chat:
-            return await call.answer('Перезапустите конфиг')
+        if call.from_user.id != (me := await self.client.get_me()).id:
+            return await call.answer('Ты не владелец')
 
         data = call.data.replace('ch_attr_', '').split('_')
         module = data[0]
@@ -220,49 +226,9 @@ class ConfigMod(loader.Module):
             f'➡ <b>Значение</b>: <code>{str(value) or "Не указано"}</code>\n'
             f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n\n'+
             (f'❔ <code>{docs}</code>' if docs else ""),
-            self.chat,
-            self.message
+            reply_markup=keyboard,
+            inline_message_id=call.inline_message_id
         )
-
-        await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
-
-    @loader.on_bot(lambda _, call: call.data.startswith('change'))
-    async def _change_callback_handler(self, call: CallbackQuery):
-        if len(self.pending_id) == 50:
-            return await call.answer('Перезагрузите конфиг')
-
-        if 'def' in call.data:
-            attr = self.config.get_default(self.pending)
-
-            self.config[self.pending] = attr
-            self.config_db.set(
-                self.pending_module.name,
-                self.pending,
-                attr
-            )
-
-            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
-            self._def = False
-
-            await call.answer('✔ Вы успешно изменили значение по умолчанию')
-        else:
-            await call.answer(f'✒ Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"')
-
-    @loader.on_bot(lambda self, msg: len(self.pending_id) != 50)
-    async def change_message_handler(self, message: Message):
-        if self.pending_id in message.text:
-            attr = message.text.replace(self.pending_id, '').strip()
-
-            self.config[self.pending] = self.validate(attr)
-            self.config_db.set(
-                self.pending_module.name,
-                self.pending,
-                self.validate(attr)
-            )
-
-            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
-
-            message = await message.reply('✔ Атрибут успешно изменен!')
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
         if inline_query.from_user.id == (await self.client.get_me()).id:

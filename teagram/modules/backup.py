@@ -71,6 +71,8 @@ class BackupMod(loader.Module):
     async def toloop(self):
         if not (interval := self.config['backupInterval']):
             await asyncio.sleep(10)
+        
+        await asyncio.sleep(interval)
 
         self.client: TelegramClient
         backup = await create_backup('./teagram/modules/', '')
@@ -89,8 +91,6 @@ class BackupMod(loader.Module):
                 self.strings['error'],
                 parse_mode='html'
             )
-        
-        await asyncio.sleep(interval)
 
     @loader.command('Backup mods')
     async def backupmods(self, message: types.Message):

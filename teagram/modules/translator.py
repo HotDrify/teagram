@@ -10,18 +10,13 @@ class TranslatorMod(loader.Module):
     """Переводчик"""
     
     def __init__(self):
-        language = self.db.get('Translator', 'language')
-        
-        if language is None:
-            language = 'en'
-
         self.config = Config(
             ConfigValue(
-                'language',
-                'Язык'
-                'en',
-                language,
-                validators.String()
+                option='language',
+                docstring='Язык',
+                default='en',
+                value=self.db.get('Translator', 'language', 'en'),
+                validator=validators.String()
             )
         )
 

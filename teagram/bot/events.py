@@ -1,9 +1,8 @@
-
 import logging
 
-from aiogram.types import CallbackQuery, Message
-
+from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
 from .types import Item
+from .. import utils
 
 class Events(Item):
     """
@@ -55,6 +54,24 @@ class Events(Item):
         Returns:
             CallbackQuery: The processed callback query.
         """
+        if call.data.startswith('cfg'):
+            if (attr := call.data.replace('cfgyes', '')):
+                attr = attr.split('|')
+                data = self.cfg[attr[0]]
+                data['cfg'][attr[1]] = utils.validate(data['toset'])
+
+                self._db.set(
+                    data['mod'].name,
+                    attr[1],
+                    utils.validate(data['toset'])
+                )
+
+                await self.bot.edit_message_text(inline_message_id=call.inline_message_id,
+                                                 text='✔ Вы изменили атрибут!',
+                                                 reply_markup=InlineKeyboardMarkup().add(
+                                                     InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                                                 ))
+
         for func in self._manager.callback_handlers.values():
             if not await self._check_filters(func, func.__self__, call):
                 continue
