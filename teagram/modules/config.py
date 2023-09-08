@@ -241,8 +241,8 @@ class ConfigMod(loader.Module):
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
         if not self.me:
-            self.me = (await app.get_me()).id
-            
+            self.me = self.all_modules.me.id
+
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
