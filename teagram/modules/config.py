@@ -219,7 +219,6 @@ class ConfigMod(loader.Module):
         
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    @loader.on(lambda _, app, msg: msg.from_user.id == (await app.get_me()).id)
     async def watcher_change(self, app: Client, message: types.Message):        
         if self.pending_id in message.text and len(self.pending_id) == 3:
             if message.from_user.id != self.me:
