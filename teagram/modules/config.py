@@ -9,7 +9,7 @@ from pyrogram import Client, types
 from asyncio import sleep
 
 from .. import loader, utils, database, validators
-from ..types import ConfigValue
+from ..types import Config
 
 # distutils will be deleted in python 3.12
 # distutils будет удалена в python 3.12
@@ -47,6 +47,8 @@ class ConfigMod(loader.Module):
         self.pending_id = utils.random_id(50)
         self.pending_module = False
 
+        self.me = None
+
     def get_module(self, data: str) -> loader.Module:
         return next((module for module in self.all_modules.modules if module.name.lower() in data.lower()), None)
     
@@ -82,11 +84,13 @@ class ConfigMod(loader.Module):
     async def config_callback_handler(self, app: Client, call: CallbackQuery):
         if call.from_user.id != (await app.get_me()).id:
             return await call.answer('Ты не владелец')
-
-        me = await app.get_me()
+        
+        self.me = (await app.get_me()).id
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.all_modules.modules]
-        message: Message = await self.inline_bot.send_message(me.id, 'Модули', reply_markup=inline_keyboard)
+        await self.inline_bot.edit_message_text(inline_message_id=call.inline_message_id,
+                                                 text='Модули',
+                                                   reply_markup=inline_keyboard)
 
         if self.pending:
             self.pending, self.pending_module, self.pending_id = False, utils.random_id(50), False
@@ -96,11 +100,16 @@ class ConfigMod(loader.Module):
 
         for module in modules:
             name = module.name
+            mod = self.get_module(name)
+            attrs = self.get_attrs(mod)
+
+            if not attrs or not isinstance(attrs, Config):
+                continue
 
             if 'config' in name.lower():
                 continue
 
-            data = f'mod_{name}|{message.message_id}|{message.chat.id}'
+            data = f'mod_{name}'
             buttons.append(InlineKeyboardButton(name, callback_data=str(data)))
 
             if count % 3 == 0:
@@ -112,16 +121,17 @@ class ConfigMod(loader.Module):
         if buttons:
             inline_keyboard.row(*buttons)
 
-        await self.inline_bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=inline_keyboard)
+        await self.inline_bot.edit_message_text(inline_message_id=call.inline_message_id,
+                                                 text='Модули',
+                                                   reply_markup=inline_keyboard)
 
     @loader.on_bot(lambda _, __, call: call.data.startswith('mod'))
     async def answer_callback_handler(self, app: Client, call: CallbackQuery):
+        if call.from_user.id != self.me:
+            return await call.answer('Ты не владелец')
+        
         data = call.data
-        data_parts = data.split('|')
-        message = int(data_parts[1])
-        chat = int(data_parts[2])
-        self.chat = chat
-        self.message = message
+        self.message = call.inline_message_id
 
         keyboard = InlineKeyboardMarkup()
         mod = self.get_module(data)
@@ -161,15 +171,18 @@ class ConfigMod(loader.Module):
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
-            f'🆔 Модуль: {mod.name}\n\n{attributes_text}',
-            self.chat,
-            self.message
+            text=f'🆔 Модуль: {mod.name}\n\n{attributes_text}',
+            inline_message_id=call.inline_message_id
         )
         
-        await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
+        await self.inline_bot.edit_message_reply_markup(inline_message_id=call.inline_message_id,
+                                                         reply_markup=keyboard)
 
     @loader.on_bot(lambda _, __, call: call.data.startswith('ch_attr_'))
     async def change_attribute_callback_handler(self, app: Client, call: CallbackQuery):
+        if call.from_user.id != self.me:
+            return await call.answer('Ты не владелец')
+        
         data = call.data.replace('ch_attr_', '').split('_')
         module = data[0]
         attribute = data[1]
@@ -178,7 +191,7 @@ class ConfigMod(loader.Module):
 
         self.pending = attribute
         self.pending_module = module
-        self.pending_id = utils.random_id(3)
+        self.pending_id = utils.random_id(3).lower()
 
         keyboard = InlineKeyboardMarkup()
 
@@ -194,25 +207,27 @@ class ConfigMod(loader.Module):
         )
 
         await self.inline_bot.edit_message_text(
-            f'🆔 Модуль: <b>{self.pending_module.name}</b>\n➡ Атрибут: <b>{attribute}</b>',
-            self.chat,
-            self.message
+            text=f'🆔 Модуль: <b>{self.pending_module.name}</b>\n➡ Атрибут: <b>{attribute}</b>',
+            inline_message_id=self.message,
+            reply_markup=keyboard
         )
-
-        await self.inline_bot.edit_message_reply_markup(self.chat, self.message, reply_markup=keyboard)
 
     @loader.on_bot(lambda _, __, data: data.data == 'aaa')
     async def aaa_callback_handler(self, app: Client, call: CallbackQuery):
+        if call.from_user.id != self.me:
+            return await call.answer('Ты не владелец')
+        
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    @loader.on_bot(lambda self, __, msg: len(self.pending_id) != 50)
-    async def change_message_handler(self, app: Client, message: Message):
-        if self.pending_id in message.text:
+    @loader.on(lambda _, app, msg: msg.from_user.id == (await app.get_me()).id)
+    async def watcher_change(self, app: Client, message: types.Message):        
+        if self.pending_id in message.text and len(self.pending_id) == 3:
+            if message.from_user.id != self.me:
+                return
+            
+            await app.delete_messages(message.chat.id, message.id)
             attr = message.text.replace(self.pending_id, '').strip()
 
-            await app.delete_messages(message.chat.id, message.message_id)
-
-            attribute: ConfigValue = self.config[self.pending]
             self.config[self.pending] = self.validate(attr)
             self.config_db.set(
                 self.pending_module.name,
@@ -222,14 +237,12 @@ class ConfigMod(loader.Module):
 
             self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
 
-            message = await message.reply('✔ Атрибут успешно изменен!')
-
-            await sleep(2)
-
-            await message.delete()
+            await app.send_message(message.chat.id,
+                                    '✔ Атрибут успешно изменен!',
+                                    reply_to_message_id=self.message)
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
-        if inline_query.from_user.id == (await app.get_me()).id:
+        if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
     async def set_cfg(self, inline_query):
