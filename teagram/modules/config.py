@@ -240,7 +240,9 @@ class ConfigMod(loader.Module):
                                     reply_to_message_id=self.message)
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
-        self.me = (await app.get_me()).id
+        if not self.me:
+            self.me = (await app.get_me()).id
+            
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
