@@ -50,6 +50,7 @@ class ConfigMod(loader.Module):
         self.chat = None
         self._def = False
         self.me = None
+        self.bbot = None
 
     def get_module(self, data: str) -> loader.Module:
         return next((module for module in self.manager.modules if module.name.lower() in data.lower()), None)
@@ -275,6 +276,9 @@ class ConfigMod(loader.Module):
 
     async def config_cmd(self, message: types.Message):
         """Настройка через inline"""
-        bot = await self.inline_bot.get_me()
+        if not self.bbot:
+            self.bbot = await self.inline_bot.get_me()
+
+        bot = self.bbot
         await utils.invoke_inline(message, bot.username, 'cfg')
         await message.delete()
