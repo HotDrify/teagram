@@ -49,6 +49,7 @@ class ConfigMod(loader.Module):
         self.message = None
         self.chat = None
         self._def = False
+        self.me = None
 
     def get_module(self, data: str) -> loader.Module:
         return next((module for module in self.manager.modules if module.name.lower() in data.lower()), None)
@@ -83,7 +84,7 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, call: call.data == "send_cfg")
     async def config_callback_handler(self, call: CallbackQuery):
-        if call.from_user.id != (me := await self.client.get_me()).id:
+        if call.from_user.id != self.me:
             return await call.answer('Ты не владелец')
 
         if self.message:
@@ -91,7 +92,8 @@ class ConfigMod(loader.Module):
 
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.manager.modules]
-        message: Message = await self.inline_bot.edit_message_text(
+
+        await self.inline_bot.edit_message_text(
             inline_message_id=call.inline_message_id,
             text='☕ <b>Teagram modules | Config</b> ',
             reply_markup=inline_keyboard,
@@ -135,7 +137,7 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, call: call.data.startswith('mod'))
     async def answer_callback_handler(self, call: CallbackQuery):
-        if call.from_user.id != (me := await self.client.get_me()).id:
+        if call.from_user.id != self.me:
             return await call.answer('Ты не владелец')
         
         data = call.data
@@ -186,7 +188,7 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, call: call.data.startswith('ch_attr_'))
     async def change_attribute_callback_handler(self, call: CallbackQuery):
-        if call.from_user.id != (me := await self.client.get_me()).id:
+        if call.from_user.id != self.me:
             return await call.answer('Ты не владелец')
 
         data = call.data.replace('ch_attr_', '').split('_')
@@ -232,6 +234,9 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, call: call.data.startswith('change'))
     async def _change_callback_handler(self, call: CallbackQuery):
+        if call.from_user.id != self.me:
+            return await call.answer('Ты не владелец')
+        
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)
 
@@ -248,10 +253,13 @@ class ConfigMod(loader.Module):
             await call.answer('✔ Вы успешно изменили значение по умолчанию')
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
-        if inline_query.from_user.id == (await self.client.get_me()).id:
+        if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
     async def set_cfg(self, inline_query):
+        if not self.me:
+            self.me = self.manager.me.id
+
         await inline_query.answer(
             [
                 InlineQueryResultArticle(
