@@ -254,13 +254,13 @@ class ConfigMod(loader.Module):
             await call.answer('✔ Вы успешно изменили значение по умолчанию')
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
+        if not self.me:
+            self.me = self.manager.me.id
+            
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
     async def set_cfg(self, inline_query):
-        if not self.me:
-            self.me = self.manager.me.id
-
         await inline_query.answer(
             [
                 InlineQueryResultArticle(
