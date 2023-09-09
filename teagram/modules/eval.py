@@ -47,7 +47,9 @@ class EvalMod(loader.Module):
                 'chat': message.chat,
                 'm': message,
                 'a': app,
-                'r': message.reply_to_message
+                'r': message.reply_to_message,
+                'manager': self.all_modules,
+                'bot': self.bot
             }
         )
         await utils.answer(
