@@ -382,7 +382,7 @@ class ModulesManager:
                         setattr(loop, 'method', instance)
                 
                 if (name := getattr(instance, 'strings', '')):
-                    if name.lower() in [
+                    if name.get('name', '').lower() in [
                         'backup',
                         'config',
                         'eval',
