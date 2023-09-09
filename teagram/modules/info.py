@@ -83,7 +83,7 @@ class AboutMod(loader.Module):
                     photo_url=avatar,
                     caption=default or custom,
                     reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton('❓ Саппорт чат', url='https://t.me/UBteagram')
+                        InlineKeyboardButton('❓ Teagram', url='https://t.me/UBteagram')
                     ).add(
                         InlineKeyboardButton('🤖 Github', url='https://github.com/itzlayz/teagram-tl')
                     )

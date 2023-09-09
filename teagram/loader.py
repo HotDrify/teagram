@@ -1,6 +1,7 @@
 import asyncio
 import os
 import sys
+import json
 
 import re
 import subprocess
@@ -379,6 +380,23 @@ class ModulesManager:
                 if instance.loops:
                     for loop in self.loops:
                         setattr(loop, 'method', instance)
+                
+                if (name := getattr(instance, 'strings', '')):
+                    if name.lower() in [
+                        'backup',
+                        'config',
+                        'eval',
+                        'help',
+                        'info',
+                        'loader',
+                        'moduleGuard',
+                        'settings',
+                        'terminal',
+                        'translator',
+                        'updater'
+                    ]:
+                        a = utils.get_langpack()
+                        instance.strings = a.get(name.get('name'))
 
         if not instance:
             logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")

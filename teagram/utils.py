@@ -350,18 +350,20 @@ def random_id(length: int = 10) -> str:
 
 def get_langpack() -> Union[Any, List]:
     """
-    Get the language pack.
+    Get the strings.
+    
+    Paramerts:
+        name (str): Name of langpack (language is getting automatically)
 
     Returns:
         Union[Any, List]: The language pack.
     """
-
     if not (lang := database.db.get('teagram.loader', 'lang')):
         database.db.set('teagram.loader', 'lang', 'en')
 
         get_langpack()
     else:
-        with open(f'teagram/langpacks/{lang}.yml') as file:
+        with open(f'teagram/langpacks/{lang}.yml', encoding='utf-8') as file:
             pack = yaml.safe_load(file)
 
         return pack
