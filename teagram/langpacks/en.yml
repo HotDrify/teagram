@@ -1,7 +1,20 @@
-Help:
-  command: "🍵 In total {} commands."
-  no_command: "🚫 <b>Command</b> <code>{}</code> <b> not found!</b>"
-  no_modules: "🚫 There is no module in repo.!"
+config:
+  noowner: "❌ You are not the owner"
+  opencfg: "Open config"
+  cfg: "Config"
+  chdef: '✔ You have successfully changed the default value'
+  ch: 'Change'
+  attr: 'Attribute'
+  value: 'Value'
+  def: 'Default'
+  no: 'Not specified'
+  back: 'Back'
+
+backup:
+  docstring: '⌛ Time after which the backup will be made (In seconds)'
+  attempt: '👀 Attempting backup...'
+  done: "✅ Successfully created."
+  error: "🚫 Error, check the logs. possible backup: ({backup})"
 
 settings:
   no_logs: "❌ <b>You did not specify the level or indicated the wrong log level</b>"

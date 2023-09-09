@@ -46,17 +46,13 @@ def create_backup(src: str, dest: str, db=False):
 @loader.module(name="Backuper", author='teagram')
 class BackupMod(loader.Module):
     """С помощью этого модуля вы сможете делать бекапы модов и всего ЮБ"""
-    strings = {
-        'success': '<b>✔ Успешно сохранено ({})</b>'.format,
-        'error': '<b>❌ Ошибка, проверьте логи</b>',
-        'reply': '<b>❌ Ошибка, вы не указали реплай с файлом</b>'
-    }
+    strings = {'name': 'backup'}
 
     def __init__(self):
         self.config = Config(
             ConfigValue(
                 option='backupInterval',
-                docstring='⌛ Время через которое будет сделан бекап (В секундах)',
+                docstring=self.strings['docstring'],
                 default=86400,
                 value=self.db.get('Backuper', 'backupInterval', 86400),
                 validator=validators.Integer(minimum=43200)
@@ -81,7 +77,7 @@ class BackupMod(loader.Module):
             await self.client.send_file(
                 await self.db.cloud.get_chat(),
                 backup[0],
-                caption=self.strings['success'](''),
+                caption=self.strings['done'],
                 parse_mode='html'
             )
         else:
@@ -97,7 +93,7 @@ class BackupMod(loader.Module):
         """Бекап модулей"""
         await utils.answer(
             message,
-            '👀 Попытка бекапа...'
+            self.strings['attempt']
         )
 
         backup = await create_backup('./teagram/modules/', '')
@@ -107,7 +103,7 @@ class BackupMod(loader.Module):
                 message,
                 backup[0],
                 document=True,
-                caption=self.strings['success']('')
+                caption=self.strings['done']
             )
         else:
             logger.error(backup[0])
@@ -121,7 +117,7 @@ class BackupMod(loader.Module):
     async def backupdb(self, message: types.Message):
         await utils.answer(
             message,
-            '👀 Попытка бекапа...'
+            self.strings['attempt']
         )
 
         backup = await create_backup('.', '', True)
@@ -129,7 +125,7 @@ class BackupMod(loader.Module):
         if backup[1]:
             await utils.answer(
                 message,
-                self.strings['success'](backup[0])
+                self.strings['done']
             )
         else:
             logger.error(backup[0])

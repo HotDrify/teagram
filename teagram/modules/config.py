@@ -86,7 +86,7 @@ class ConfigMod(loader.Module):
     @loader.on_bot(lambda _, call: call.data == "send_cfg")
     async def config_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
-            return await call.answer('Ты не владелец')
+            return await call.answer(self.strings['noowner'])
 
         if self.message:
             await self.inline_bot.delete_message(self.chat, self.message)
@@ -139,16 +139,13 @@ class ConfigMod(loader.Module):
     @loader.on_bot(lambda _, call: call.data.startswith('mod'))
     async def answer_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
-            return await call.answer('Ты не владелец')
+            return await call.answer(self.strings['noowner'])
         
         data = call.data
 
         keyboard = InlineKeyboardMarkup()
         mod = self.get_module(data)
         attrs = self.get_attrs(mod)
-
-        if not attrs or not isinstance(attrs, Config):
-            return await call.answer('У этого модуля нету атрибутов', show_alert=True)
 
         buttons = []
         count = 1
@@ -177,7 +174,7 @@ class ConfigMod(loader.Module):
             if isinstance(value, tuple):
                 formated = ', '.join(f"{k}: {v}" for k, v in value)
 
-            attributes.append(f'➡ <i>{type(value).__name__}</i> <b>{key}</b>: <code>{formated or "Не указано"}</code>')
+            attributes.append(f'➡ <i>{type(value).__name__}</i> <b>{key}</b>: <code>{formated or self.strings["no"]}</code>')
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
@@ -190,7 +187,7 @@ class ConfigMod(loader.Module):
     @loader.on_bot(lambda _, call: call.data.startswith('ch_attr_'))
     async def change_attribute_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
-            return await call.answer('Ты не владелец')
+            return await call.answer(self.strings['noowner'])
 
         data = call.data.replace('ch_attr_', '').split('_')
         module = data[0]
@@ -210,24 +207,24 @@ class ConfigMod(loader.Module):
         keyboard = InlineKeyboardMarkup()
         keyboard.row(
             InlineKeyboardButton(
-                '✒ Изменить',
+                '✒ '+self.strings['ch'],
                 switch_inline_query_current_chat=f'{self.pending_id} '
             ),
             InlineKeyboardButton(
-                '↪ По умолчанию',
+                '↪ '+self.strings['def'],
                 callback_data='change_def'
             ),
             InlineKeyboardButton(
-                '🔄 Назад',
+                '🔄 '+self.strings['back'],
                 callback_data='send_cfg'
             ),
         )
 
         await self.inline_bot.edit_message_text(
             f'⚙ <b>{self.pending_module.name}</b>\n'
-            f'➡ <b>Атрибут</b>: <code>{attribute}</code>\n'
-            f'➡ <b>Значение</b>: <code>{str(value) or "Не указано"}</code>\n'
-            f'↪ <b>Дефолт</b>: <code>{default or "Не указано"}</code>\n\n'+
+            f'➡ <b>{self.strings["attr"]}</b>: <code>{attribute}</code>\n'
+            f'➡ <b>{self.strings["value"]}</b>: <code>{str(value) or self.strings["no"]}</code>\n'
+            f'↪ <b>{self.strings["def"]}</b>: <code>{default or self.strings["no"]}</code>\n\n'+
             (f'❔ <code>{docs}</code>' if docs else ""),
             reply_markup=keyboard,
             inline_message_id=call.inline_message_id
@@ -236,7 +233,7 @@ class ConfigMod(loader.Module):
     @loader.on_bot(lambda _, call: call.data.startswith('change'))
     async def _change_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
-            return await call.answer('Ты не владелец')
+            return await call.answer(self.strings['noowner'])
         
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)
@@ -251,7 +248,7 @@ class ConfigMod(loader.Module):
             self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
             self._def = False
 
-            await call.answer('✔ Вы успешно изменили значение по умолчанию')
+            await call.answer(self.strings['chdef'])
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
         if not self.me:
@@ -266,9 +263,9 @@ class ConfigMod(loader.Module):
                 InlineQueryResultArticle(
                     id=utils.random_id(),
                     title="Modules's config",
-                    input_message_content=InputTextMessageContent("⚙ <b>Конфиг...</b>", 'html'),
+                    input_message_content=InputTextMessageContent(f"⚙ <b>{self.strings['cfg']}...</b>", 'html'),
                     reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton("🔑 Открыть конфиг", callback_data="send_cfg")
+                        InlineKeyboardButton("🔑 "+self.strings['cfg'], callback_data="send_cfg")
                     )
                 )
             ]
