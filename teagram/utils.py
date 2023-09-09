@@ -313,17 +313,17 @@ def get_platform() -> str:
             IS_WSL = True
 
     if IS_TERMUX:
-        platform = "<emoji id=5407025283456835913>📱</emoji> Termux"
+        platform = "📱 Termux"
     elif IS_DOCKER:
-        platform = "<emoji id=5431815452437257407>🐳</emoji> Docker"
+        platform = "🐳 Docker"
     elif IS_GOORM:
-        platform = "<emoji id=5215584860063669771>💚</emoji> Goorm"
+        platform = "💚 Goorm"
     elif IS_WSL:
-        platform = "<emoji id=6327609909416298142>🧱</emoji> WSL"
+        platform = "🧱 WSL"
     elif IS_WIN:
-        platform = "<emoji id=5309880373126113150>💻</emoji> Windows"
+        platform = "💻 Windows"
     elif IS_CODESPACES:
-        platform = "<emoji id=5467643451145199431>👨‍💻</emoji> Github Codespaces"
+        platform = "👨‍💻 Github Codespaces"
     elif IS_TRIGGER:
         platform = "🌍 TriggerEarth"
     else:

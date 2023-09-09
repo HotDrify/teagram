@@ -129,7 +129,8 @@ class BotManager(Events, TokenManager):
         self._dp.register_inline_handler(self._inline_handler, lambda _: True)
         self._dp.register_callback_query_handler(self._callback_handler, lambda _: True)
 
-    async def invoke_inline(self, inline_id: str, message: Message) -> Message:
+    #     hikka compatibility
+    async def invoke_unit(self, inline_id: str, message: Message) -> Message:
         return await utils.invoke_inline(
             message,
             (await self.bot.get_me()).username,
