@@ -75,7 +75,6 @@ class Conversation:
     async def ask_media(
         self,
         file_path: str,
-        media_type: str,
         *args,
         **kwargs
     ) -> types.Message:
@@ -84,27 +83,9 @@ class Conversation:
         Параметры:
             file_path (``str``):
                 Ссылка или путь до файла
-
-            media_type (``str``):
-                Тип отправляемого медиа
-
-            args (``list``, optional):
-                Аргументы отправки сообщения
-
-            kwargs (``dict``, optional):
-                Параметры отправки сообщения
         """
-        available_media = [
-            "animation", "audio",
-            "document", "photo",
-            "sticker", "video",
-            "video_note", "voice"
-        ]
-        if media_type not in available_media:
-            raise TypeError("Такой тип медиа не поддерживается")
 
-        message = await getattr(self.app, "send_" + media_type)(
-            self.chat_id, file_path, *args, **kwargs)
+        message = await self.app.send_file(self.chat_id, file_path, *args, **kwargs)
 
         self.messagee_to_purge.append(message)
         return message
