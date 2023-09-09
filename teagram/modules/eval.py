@@ -44,7 +44,10 @@ class EvalMod(loader.Module):
                 'args': args,
                 'reply': message.reply_to_message,
                 'db': self.db,
-                'chat': message.chat
+                'chat': message.chat,
+                'm': message,
+                'a': app,
+                'r': message.reply_to_message
             }
         )
         await utils.answer(
