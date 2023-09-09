@@ -45,7 +45,7 @@ class EvalMod(loader.Module):
                 'db': self.db,
                 'utils': utils,
                 'loader': loader,
-                'telethon': __import__('telethon')
+                'telethon': __import__('telethon'),
                 'message': message,
                 'reply': await message.get_reply_message(),
                 'args': args
