@@ -2,9 +2,8 @@
 
 [![Teagram](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=Teagram+Userbot)](https://t.me/UBteagram)
 
-<b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — userbot which uses <a href="https://github.com/LonamiWebs/Telethon">Telethon</a>
-<br>
-
+<b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — userbot which uses <a href="https://github.com/LonamiWebs/Telethon">Telethon</a><br>
+Teagram based on <a href=https://github.com/sh1tn3t/sh1t-ub>sh1t-ub</a>
 
 Teagram is a telegram user bot with many features such as translator, terminal, eval, etc. <br>
 User bot allows you to create modules that do not require much knowledge
