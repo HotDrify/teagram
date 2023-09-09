@@ -49,7 +49,8 @@ class EvalMod(loader.Module):
                 'a': app,
                 'r': message.reply_to_message,
                 'manager': self.all_modules,
-                'bot': self.bot
+                'bot': self.bot,
+                'pyrogram': __import__('pyrogram')
             }
         )
         await utils.answer(
