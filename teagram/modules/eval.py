@@ -42,7 +42,8 @@ class EvalMod(loader.Module):
                 'app': app,
                 'message': message,
                 'args': args,
-                'reply': message.reply_to_message
+                'reply': message.reply_to_message,
+                'db': self.db
             }
         )
         await utils.answer(
