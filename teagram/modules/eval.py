@@ -41,7 +41,8 @@ class EvalMod(loader.Module):
                 'client': app,
                 'app': app,
                 'message': message,
-                'args': args
+                'args': args,
+                'reply': message.reply_to_message
             }
         )
         await utils.answer(
