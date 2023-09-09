@@ -389,7 +389,7 @@ class ModulesManager:
                         'help',
                         'info',
                         'loader',
-                        'moduleGuard',
+                        'moduleguard',
                         'settings',
                         'terminal',
                         'translator',
