@@ -17,16 +17,16 @@ info:
   uptime: "Uptime"
 
 config:
-  noowner: "<b>❌ You are not the owner</b>"
-  opencfg: "<b>Open config</b>"
-  cfg: "Config"
-  chdef: '<b>✔ You have successfully changed the default value</b>'
-  ch: '<b>Change</b>'
+  noowner: "❌ You are not the owner"
+  opencfg: "Open config"
+  cfg: "<b>Config</b>"
+  chdef: '✔ You have successfully changed the default value'
+  ch: 'Change'
   attr: '<b>Attribute</b>'
   value: '<b>Value</b>'
-  def: '<b>Default</b>'
+  def: 'Default'
   no: '<b>Not specified</b>'
-  back: '<b>Back</b>'
+  back: 'Back'
 
 backup:
   docstring: '<b>⌛ Time after which the backup will be made (In seconds)</b>'
