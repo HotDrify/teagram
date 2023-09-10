@@ -52,7 +52,7 @@ class BackupMod(loader.Module):
         self.config = Config(
             ConfigValue(
                 option='backupInterval',
-                docstring=self.strings['docstring'],
+                docstring='⌛ Время, по истечении которого будет создана резервная копия (в секундах)',
                 default=86400,
                 value=self.db.get('Backuper', 'backupInterval', 86400),
                 validator=validators.Integer(minimum=43200)
