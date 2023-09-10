@@ -198,8 +198,12 @@ class ConfigMod(loader.Module):
 
         keyboard.row(
             InlineKeyboardButton(
-                'Сменить атрибут',
+                '✒ Сменить атрибут',
                 switch_inline_query_current_chat=self.pending_id + ' '
+            ),
+            InlineKeyboardButton(
+                '↪ По умолчанию',
+                callback_data='change_def'
             ),
             InlineKeyboardButton(
                 '🔄 Назад',
@@ -220,26 +224,25 @@ class ConfigMod(loader.Module):
         
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    # async def watcher_change(self, app: Client, message: types.Message):        
-    #     if self.pending_id in message.text and len(self.pending_id) == 3:
-    #         if message.from_user.id != self.me:
-    #             return
-            
-    #         await app.delete_messages(message.chat.id, message.id)
-    #         attr = message.text.replace(self.pending_id, '').strip()
+    @loader.on_bot(lambda _, call: call.data.startswith('change'))
+    async def _change_callback_handler(self, call: CallbackQuery):
+        if call.from_user.id != self.me:
+            return await call.answer(self.strings['noowner'])
+        
+        if 'def' in call.data:
+            attr = self.config.get_default(self.pending)
 
-    #         self.config[self.pending] = self.validate(attr)
-    #         self.config_db.set(
-    #             self.pending_module.name,
-    #             self.pending,
-    #             self.validate(attr)
-    #         )
+            self.config[self.pending] = attr
+            self.config_db.set(
+                self.pending_module.name,
+                self.pending,
+                attr
+            )
 
-    #         self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
+            self.pending, self.pending_id, self.pending_module = False, utils.random_id(50), False
+            self._def = False
 
-    #         await app.send_message(message.chat.id,
-    #                                 '✔ Атрибут успешно изменен!',
-    #                                 reply_to_message_id=self.message)
+            await call.answer('✔ Значение изменено по умолчанию')
 
     async def cfg_inline_handler(self, app: Client, inline_query: InlineQuery):
         if inline_query.from_user.id == self.me:
