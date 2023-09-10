@@ -19,7 +19,7 @@ info:
 config:
   noowner: "<b>❌ You are not the owner</b>"
   opencfg: "<b>Open config</b>"
-  cfg: "<b>Config</b>"
+  cfg: "Config"
   chdef: '<b>✔ You have successfully changed the default value</b>'
   ch: '<b>Change</b>'
   attr: '<b>Attribute</b>'
