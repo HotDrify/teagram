@@ -31,7 +31,7 @@ def strtobool(val):
 @loader.module(name="config", author="teagram", version=1)
 class ConfigMod(loader.Module):
     """Настройка модулей"""
-
+    strings = {'name': 'config'}
     def __init__(self):
         self.inline_bot = self.bot.bot
         self._dp = self.bot._dp
