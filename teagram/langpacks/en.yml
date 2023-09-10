@@ -1,45 +1,63 @@
+help:
+  no: "<b>No description available for the command</b>"
+  nomd: "<b>No description available for the module</b>"
+  nocmd: "<b>Command not found</b>"
+  nomod: "No such module"
+  ebot: "<b>An error occurred, please restart the bot</b>"
+  ibot: "Inline Bot"
+  mods: "Available Modules"
+  author: "Author"
+  version: "Version"
+  desc: "Description"
+
+info:
+  update: "<b>Update available</b>"
+  owner: "Owner"
+  version: "Version"
+  uptime: "Uptime"
+
 config:
-  noowner: "❌ You are not the owner"
-  opencfg: "Open config"
-  cfg: "Config"
-  chdef: '✔ You have successfully changed the default value'
-  ch: 'Change'
-  attr: 'Attribute'
-  value: 'Value'
-  def: 'Default'
-  no: 'Not specified'
-  back: 'Back'
+  noowner: "<b>❌ You are not the owner</b>"
+  opencfg: "<b>Open config</b>"
+  cfg: "<b>Config</b>"
+  chdef: '<b>✔ You have successfully changed the default value</b>'
+  ch: '<b>Change</b>'
+  attr: '<b>Attribute</b>'
+  value: '<b>Value</b>'
+  def: '<b>Default</b>'
+  no: '<b>Not specified</b>'
+  back: '<b>Back</b>'
 
 backup:
-  docstring: '⌛ Time after which the backup will be made (In seconds)'
-  attempt: '👀 Attempting backup...'
-  done: "✅ Successfully created."
-  error: "🚫 Error, check the logs. possible backup: ({backup})"
+  docstring: '<b>⌛ Time after which the backup will be made (In seconds)</b>'
+  attempt: '<b>👀 Attempting backup...</b>'
+  done: "<b>✅ Successfully created.</b>"
+  error: "<b>🚫 Error, check the logs.</b>"
 
 settings:
-  no_logs: "❌ <b>You did not specify the level or indicated the wrong log level</b>"
-  no_lvl: "❌ <b>Invalid log level {lvl} ({name})</b>"
-  logs: "📤 Logs with {lvl} ({name}) level"
-  wprefix: "❔ What prefix should I change to?"
-  prefix: "✅ The prefix has been changed to {prefixes}"
-  wlang: "❔ What language should I change to?"
-  elang: "❌ Language not found. Available languages: <code>{langs}</code>"
-  lang: "✅ The language has been changed to {language}"
-  walias: "❔ What alias should I add?"
-  ealias: "❌ The arguments specified are incorrect. Correct: addalias <new alias> <command>"
-  nalias: "❌ Such an alias already exists"
-  calias: "❌ There is no such command"
-  alias: "✅ The alias <code>{alias}</code> for the command <code>{cmd}</code> has been added"
-  dwalias: "❔ Which alias should be deleted?"
-  dealias: "❌ There is no such alias"
-  dalias: "✅ Alias ​​<code>{}</code> has been removed"
-  noalias: "There is no aliases"
-  allalias: "🗄 All aliases:\n"
-  ping: "Telegram response time"
-  noreply: "❌ You didn't specify the replay"
-  yourself: "❌ You cannot indicate yourself"
-  owner: "❌ The command is allowed only to the owner"
-  adduser: "✔ You have successfully added a user"
-  deluser: "✔ You have successfully deleted a user"
-  nouser: "❔ No users found"
-  user: "Users:"
+  no_logs: "<b>❌ <b>You did not specify the level or indicated the wrong log level</b>"
+  no_lvl: "<b>❌ <b>Invalid log level {lvl} ({name})</b>"
+  logs: "<b>📤 Logs with {lvl} ({name}) level</b>"
+  wprefix: "<b>❔ What prefix should I change to?</b>"
+  prefix: "<b>✅ The prefix has been changed to {prefixes}</b>"
+  wlang: "<b>❔ What language should I change to?</b>"
+  elang: "<b>❌ Language not found. Available languages: <code>{langs}</code></b>"
+  lang: "<b>✅ The language has been changed to {language}</b>"
+  walias: "<b>❔ What alias should I add?</b>"
+  ealias: "<b>❌ The arguments specified are incorrect. Correct: addalias <new alias> <command></b>"
+  nalias: "<b>❌ Such an alias already exists</b>"
+  calias: "<b>❌ There is no such command</b>"
+  alias: "<b>✅ The alias <code>{alias}</code> for the command <code>{cmd}</code> has been added</b>"
+  dwalias: "<b>❔ Which alias should be deleted?</b>"
+  dealias: "<b>❌ There is no such alias</b>"
+  dalias: "<b>✅ Alias <code>{}</code> has been removed</b>"
+  noalias: "<b>There are no aliases</b>"
+  allalias: "<b>🗄 All aliases:</b>\n"
+  ping: "<b>Telegram response time</b>"
+  noreply: "<b>❌ You didn't specify the reply</b>"
+  yourself: "<b>❌ You cannot indicate yourself</b>"
+  owner: "<b>❌ The command is allowed only to the owner</b>"
+  adduser: "<b>✔ You have successfully added a user</b>"
+  deluser: "<b>✔ You have successfully deleted a user</b>"
+  nouser: "<b>❔ No users found</b>"
+  user: "<b>Users:</b>"

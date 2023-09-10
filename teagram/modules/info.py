@@ -14,6 +14,8 @@ from datetime import timedelta
 @loader.module(name="UserBot", author='teagram')
 class AboutMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
+    strings = {'name': 'info'}
+
     def __init__(self):
         self.boot_time = time.time()
         self.config = Config(
@@ -42,19 +44,19 @@ class AboutMod(loader.Module):
         
         last = utils.git_hash()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
-        version = f'v{__version__}' + (' <b>Доступно обновление</b>' if last != now else "")
+        version = f'v{__version__}' + (' '+self.strings['update'] if last != now else "")
 
         me = (await self.client.get_me()).username
 
         default = f"""
-<b>💎 Владелец</b>:  <code>{me}</code>
-<b>🐧 Версия</b>:  <code>{version}</code> (<a href="https://github.com/itzlayz/teagram-tl/commit/{last}">{last[:7]}</a>)
+<b>💎 {self.strings['owner']}</b>:  <code>{me}</code>
+<b>🐧 {self.strings['version']}</b>:  <code>{version}</code> (<a href="https://github.com/itzlayz/teagram-tl/commit/{last}">{last[:7]}</a>)
 
 <b>🧠 CPU</b>:  <code>{utils.get_cpu()}%</code>
 <b>📀 RAM</b>:  <code>{utils.get_ram()}MB</code>
 
-<b>⌚ Аптайм</b>:  <code>{uptime}</code>
-<b>📱 Версия telethon: <code>{telethon.__version__}</code></b>
+<b>⌚ {self.strings['uptime']}</b>:  <code>{uptime}</code>
+<b>📱 {self.strings['version']} telethon: <code>{telethon.__version__}</code></b>
 
 <b>{platform}</b>
 """
