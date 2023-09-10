@@ -19,7 +19,13 @@ class AboutMod(loader.Module):
                 '',
                 self.db.get('UserBot', 'customText') or '',
                 validators.String()
-            ) # type: ignore
+            ),
+            ConfigValue(
+                'image',
+                'https://github.com/hotdrify/teagram/blob/main/assets/bot_avatar.png?raw=true',
+                'https://github.com/hotdrify/teagram/blob/main/assets/bot_avatar.png?raw=true',
+                validators.String()
+            )
         )
     
     async def info_cmd(self, app: Client, message: types.Message):
@@ -64,7 +70,9 @@ class AboutMod(loader.Module):
         
         await utils.answer(
             message,
-            custom or text
+            self.config.get("image"),
+            photo=True,
+            caption=custom or text
         )
         
     async def teagram_cmd(self, app: Client, message: types.Message, args: str):
