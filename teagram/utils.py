@@ -319,21 +319,7 @@ def get_langpack() -> Union[Any, List]:
 
         get_langpack()
     else:
-        with open(f'teagram/langpacks/{lang}.yml') as file:
+        with open(f'teagram/langpacks/{lang}.yml', encoding='utf-8') as file:
             pack = yaml.safe_load(file)
 
         return pack
-
-async def paste_neko(code: str):
-    try:
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
-            async with session.post(
-                "https://nekobin.com/api/documents",
-                json={"content": code},
-            ) as paste:
-                paste.raise_for_status()
-                result = await paste.json()
-    except Exception:
-        return "Pasting failed"
-    else:
-        return f"nekobin.com/{result['result']['key']}.py"

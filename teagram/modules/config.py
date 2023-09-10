@@ -188,6 +188,7 @@ class ConfigMod(loader.Module):
         attribute = data[1]
 
         module = self.get_module(module)
+        value = self.get_attrs(module).get(attribute)
 
         self.pending = attribute
         self.pending_module = module
@@ -212,7 +213,8 @@ class ConfigMod(loader.Module):
         )
 
         await self.inline_bot.edit_message_text(
-            text=f'🆔 Модуль: <b>{self.pending_module.name}</b>\n➡ Атрибут: <b>{attribute}</b>',
+            text=f'🆔 Модуль: <b>{self.pending_module.name}</b>\n➡ Атрибут: <b>{attribute}</b>\n'
+            f'➡ Значение: <b>{str(value)}</b>',
             inline_message_id=self.message,
             reply_markup=keyboard
         )
@@ -224,10 +226,10 @@ class ConfigMod(loader.Module):
         
         await call.answer(f'Напишите "{self.pending_id} НОВЫЙ_АТРИБУТ"', show_alert=True)
 
-    @loader.on_bot(lambda _, call: call.data.startswith('change'))
-    async def _change_callback_handler(self, call: CallbackQuery):
+    @loader.on_bot(lambda _, __, call: call.data.startswith('change'))
+    async def _change_callback_handler(self, app, call: CallbackQuery):
         if call.from_user.id != self.me:
-            return await call.answer(self.strings['noowner'])
+            return await call.answer('Вы не владелец')
         
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)

@@ -312,6 +312,23 @@ class ModulesManager:
                 self.callback_handlers.update(instance.callback_handlers)
                 self.inline_handlers.update(instance.inline_handlers)
 
+                if (name := getattr(instance, 'strings', '')):
+                    if name.get('name', '').lower() in [
+                        'backup',
+                        'config',
+                        'eval',
+                        'help',
+                        'info',
+                        'loader',
+                        'moduleguard',
+                        'settings',
+                        'terminal',
+                        'translator',
+                        'updater'
+                    ]:
+                        a = utils.get_langpack()
+                        instance.strings = a.get(name.get('name'))
+
         if not instance:
             logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
 
