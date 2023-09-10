@@ -32,6 +32,7 @@ def strtobool(val):
 class ConfigMod(loader.Module):
     """Настройка модулей"""
     strings = {'name': 'config'}
+
     def __init__(self):
         self.inline_bot = self.bot.bot
         self._dp = self.bot._dp
@@ -85,6 +86,13 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, call: call.data == "send_cfg")
     async def config_callback_handler(self, call: CallbackQuery):
+        if not self.me:
+            if not (_id := self.db.get('teagram.loader', 'ownerid', '')):
+                _id = self.manager.me.id
+                self.db.set('teagram.loader', 'ownerid', _id)
+
+            self.me = _id
+
         if call.from_user.id != self.me:
             return await call.answer(self.strings['noowner'])
 
@@ -174,7 +182,7 @@ class ConfigMod(loader.Module):
             if isinstance(value, tuple):
                 formated = ', '.join(f"{k}: {v}" for k, v in value)
 
-            attributes.append(f'➡ <i>{type(value).__name__}</i> <b>{key}</b>: <code>{formated or self.strings["no"]}</code>')
+            attributes.append(f'➡ <i>{type(value).__name__}</i> <b>{key}</b>: <code>{formated or self.strings["nospec"]}</code>')
 
         attributes_text = '\n'.join(attributes)
         await self.inline_bot.edit_message_text(
@@ -223,8 +231,8 @@ class ConfigMod(loader.Module):
         await self.inline_bot.edit_message_text(
             f'⚙ <b>{self.pending_module.name}</b>\n'
             f'➡ <b>{self.strings["attr"]}</b>: <code>{attribute}</code>\n'
-            f'➡ <b>{self.strings["value"]}</b>: <code>{str(value) or self.strings["no"]}</code>\n'
-            f'↪ <b>{self.strings["def"]}</b>: <code>{default or self.strings["no"]}</code>\n\n'+
+            f'➡ <b>{self.strings["value"]}</b>: <code>{str(value) or self.strings["nospec"]}</code>\n'
+            f'↪ <b>{self.strings["def"]}</b>: <code>{default or self.strings["nospec"]}</code>\n\n'+
             (f'❔ <code>{docs}</code>' if docs else ""),
             reply_markup=keyboard,
             inline_message_id=call.inline_message_id
@@ -251,9 +259,6 @@ class ConfigMod(loader.Module):
             await call.answer(self.strings['chdef'])
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
-        if not self.me:
-            self.me = self.manager.me.id
-            
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
 
