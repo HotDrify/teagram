@@ -49,13 +49,13 @@ class HelpMod(loader.Module):
 
         command_descriptions = "\n".join(
             f"👉 <code>{prefix + command}</code>\n"
-            f"    ╰ {(module.command_handlers[command].__doc__ or self.strings['no']).strip()}"
+            f"    ╰ {(module.command_handlers[command].__doc__ or self.strings['nomd']).strip()}"
             for command in module.command_handlers
         )
 
         inline_descriptions = "\n".join(
             f"👉 <code>@{self.bot_username + ' ' + command}</code>\n"
-            f"    ╰ {(module.inline_handlers[command].__doc__ or self.strings['no']).strip()}"
+            f"    ╰ {(module.inline_handlers[command].__doc__ or self.strings['nomd']).strip()}"
             for command in module.inline_handlers
         )
 
