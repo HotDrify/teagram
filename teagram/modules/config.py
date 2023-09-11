@@ -86,18 +86,8 @@ class ConfigMod(loader.Module):
 
     @loader.on_bot(lambda _, call: call.data == "send_cfg")
     async def config_callback_handler(self, call: CallbackQuery):
-        if not self.me:
-            if not (_id := self.db.get('teagram.loader', 'ownerid', '')):
-                _id = self.manager.me.id
-                self.db.set('teagram.loader', 'ownerid', _id)
-
-            self.me = _id
-
         if call.from_user.id != self.me:
             return await call.answer(self.strings['noowner'])
-
-        if self.message:
-            await self.inline_bot.delete_message(self.chat, self.message)
 
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = [mod for mod in self.manager.modules]
@@ -280,6 +270,13 @@ class ConfigMod(loader.Module):
         """Настройка через inline"""
         if not self.bbot:
             self.bbot = await self.inline_bot.get_me()
+
+        if not self.me:
+            if not (_id := self.db.get('teagram.loader', 'ownerid', '')):
+                _id = self.manager.me.id
+                self.db.set('teagram.loader', 'ownerid', _id)
+
+            self.me = _id
 
         bot = self.bbot
         await utils.invoke_inline(message, bot.username, 'cfg')

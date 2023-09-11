@@ -2,6 +2,7 @@ import logging
 
 import os
 import re
+import io
 import sys
 import time
 
@@ -334,6 +335,20 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, f"✅ Модуль \"<code>{module}</code>\" перезагружен")
+    
+    @loader.command('Скинуть модуль из папки модулей')
+    async def showmod(self, message: types.Message, args):
+        if not (mod := args.split()) or mod[0] + '.py' not in os.listdir('teagram/modules'):
+            return await utils.answer(message, '❌ Вы указали неправильный модуль')
+
+        await utils.answer(
+            message, 
+            f'teagram/modules/{mod[0]}.py',
+            document=True,
+            caption=f'⚙ Модуль <code>{mod[0]}</code>\n'
+            f'📁 <b>Чтобы установить модуль, напишите <code>{self.prefix[0]}loadmod</code> реплаем на это сообщение</b>'
+        )
+
 
     async def restart_cmd(self, message: types.Message):
         """Перезагрузка юзербота"""
