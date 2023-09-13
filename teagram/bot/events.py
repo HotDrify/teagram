@@ -1,4 +1,5 @@
-import logging
+from loguru import logger
+
 import inspect
 import traceback
 
@@ -43,7 +44,7 @@ class Events(Item):
             try:
                 await func(message)
             except Exception as error:
-                logging.exception(error)
+                logger.exception(error)
 
         return message
 
@@ -84,7 +85,7 @@ class Events(Item):
             try:
                 await func(call)
             except Exception as error:
-                logging.exception(error)
+                logger.exception(error)
 
         return call
 
@@ -261,6 +262,6 @@ class Events(Item):
             else:
                 await func(inline_query)
         except Exception as error:
-            logging.exception(error)
+            logger.exception(error)
 
         return inline_query

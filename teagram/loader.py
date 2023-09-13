@@ -1,14 +1,9 @@
 import asyncio
 import os
 import sys
-import json
 
 import re
 import subprocess
-
-import logging
-import string
-import random
 import traceback
 
 import requests
@@ -105,7 +100,7 @@ class Module:
     version: Union[int, float]
 
     async def on_load(self) -> Any:
-        print(f'[INFO] - module {self.name} loaded')
+        logger.info(f'module {self.name} loaded')
 
 
 class StringLoader(SourceLoader):
@@ -298,13 +293,12 @@ class ModulesManager:
 
     async def load(self, app: TelegramClient) -> bool:
         """Загружает менеджер модулей"""
+        logger.info("Загрузка менеджера модулей...")
+
         self.dp = dispatcher.DispatcherManager(app, self)
-        await self.dp.load()
-
         self.bot_manager = bot.BotManager(app, self._db, self)
+        await self.dp.load()
         await self.bot_manager.load()
-
-        logging.info("Загрузка модулей...")
 
         for local_module in filter(
             lambda file_name: file_name.endswith(".py")
@@ -318,20 +312,20 @@ class ModulesManager:
             try:
                 self.register_instance(module_name, file_path)
             except Exception as error:
-                logging.exception(
+                logger.exception(
                     f"Ошибка при загрузке локального модуля {module_name}: {error}")
-
-        await self.send_on_loads()
 
         for custom_module in self._db.get(__name__, "modules", []):
             try:
                 r = await utils.run_sync(requests.get, custom_module)
                 await self.load_module(r.text, r.url)
             except requests.exceptions.RequestException as error:
-                logging.exception(
+                logger.exception(
                     f"Ошибка при загрузке стороннего модуля {custom_module}: {error}")
 
-        logging.info("Менеджер модулей загружен")
+        await self.send_on_loads()
+        
+        logger.info("Менеджер модулей загружен")
         return True
 
     def register_instance(
@@ -399,7 +393,7 @@ class ModulesManager:
                         instance.strings = a.get(name.get('name'))
 
         if not instance:
-            logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
+            logger.warning("Не удалось найти класс модуля заканчивающийся на `Mod`")
 
         return instance
 
@@ -423,7 +417,7 @@ class ModulesManager:
                 logger.error(traceback.format_exc())
                 return logger.warning("Не указаны пакеты для установки")
 
-            logging.info(f"Установка пакетов: {', '.join(requirements)}...")
+            logger.info(f"Установка пакетов: {', '.join(requirements)}...")
 
             try:
                 subprocess.run(
@@ -437,11 +431,11 @@ class ModulesManager:
                     ]
                 )
             except subprocess.CalledProcessError as error:
-                logging.exception(f"Ошибка при установке пакетов: {error}")
+                logger.exception(f"Ошибка при установке пакетов: {error}")
 
             return await self.load_module(module_source, origin, True)
         except Exception as error:
-            return logging.exception(
+            return logger.exception(
                 f"Ошибка при загрузке модуля {origin}: {error}")
 
         if not instance:
@@ -450,7 +444,7 @@ class ModulesManager:
         try:
             await self.send_on_load(instance)
         except Exception as error:
-            return logging.exception(error)
+            return logger.exception(error)
 
         return instance.name
 
@@ -466,7 +460,7 @@ class ModulesManager:
         try:
             await module.on_load()
         except Exception as error:
-            return logging.exception(error)
+            return logger.exception(error)
 
         return True
 

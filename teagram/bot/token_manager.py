@@ -1,4 +1,4 @@
-import logging
+
 import time
 import re
 from typing import Union
@@ -23,7 +23,7 @@ class TokenManager(Item):
         Returns:
             Union[str, None]: The bot token or None on failure.
         """
-        logging.info("Starting the process of creating a new bot...")
+        logger.info("Starting the process of creating a new bot...")
 
         async with fsm.Conversation(self._app, "@BotFather") as conv:
             try:
@@ -40,8 +40,8 @@ class TokenManager(Item):
                 phrase not in response.text
                 for phrase in ["That I cannot do.", "Sorry"]
             ):
-                logging.error("An error occurred while creating the bot. @BotFather's response:")
-                logging.error(response.text)
+                logger.error("An error occurred while creating the bot. @BotFather's response:")
+                logger.error(response.text)
 
                 if 'too many attempts' in response.text:
                     seconds = response.text.split()[-2]
@@ -62,8 +62,8 @@ class TokenManager(Item):
                 r"\d{1,}:[0-9a-zA-Z_-]{35}",
                 response.text
             )):
-                logging.error("An error occurred while creating the bot. @BotFather's response:")
-                return logging.error(response.text)
+                logger.error("An error occurred while creating the bot. @BotFather's response:")
+                return logger.error(response.text)
 
             token = search.group(0)
             await conv.ask("/setuserpic")
@@ -106,7 +106,7 @@ class TokenManager(Item):
             response = await conv.get_response()
 
             if "/newbot" in response.text:
-                return logging.error("No created bots")
+                return logger.error("No created bots")
 
             if not response.reply_markup:
                 logger.warning('reply_markup not found')

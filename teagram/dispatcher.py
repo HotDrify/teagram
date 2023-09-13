@@ -1,4 +1,3 @@
-import logging
 from inspect import getfullargspec, iscoroutine
 from types import FunctionType
 
@@ -8,6 +7,7 @@ from typing import Union
 from telethon.tl.custom import Message
 
 from . import loader, utils
+from loguru import logger
 
 import traceback
 
@@ -41,7 +41,7 @@ class DispatcherManager:
 
     async def load(self) -> bool:
         """Загружает менеджер диспетчера"""
-        logging.info("Загрузка диспетчера...")
+        logger.info("Загрузка диспетчера...")
 
         self.app.add_event_handler(
             self._handle_message,
@@ -52,7 +52,7 @@ class DispatcherManager:
             MessageEdited
         )
 
-        logging.info("Диспетчер успешно загружен")
+        logger.info("Диспетчер успешно загружен")
         return True
 
     async def _handle_message(self, message: types.Message) -> types.Message:
@@ -84,7 +84,7 @@ class DispatcherManager:
         except Exception as error:
             error = traceback.format_exc()
 
-            logging.exception(error)
+            logger.exception(error)
             await utils.answer(
                 message,
                 f"<b>❌ Произошла ошибка при выполнении команды:</b> <code>{message.text}</code>\n"
@@ -104,6 +104,6 @@ class DispatcherManager:
 
                 await watcher(message)
             except Exception as error:
-                logging.exception(error)
+                logger.exception(error)
 
         return message

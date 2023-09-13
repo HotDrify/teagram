@@ -1,12 +1,10 @@
 import configparser
-import logging
+import asyncio
 import sys
 
-import asyncio
-
+from loguru import logger
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
-
 from telethon.password import compute_check
 from telethon import TelegramClient, errors, types
 from telethon.tl.functions.account import GetPasswordRequest
@@ -57,7 +55,7 @@ class Auth:
                     ).user
                 )
             except errors.PasswordHashInvalidError:
-                logging.error('Wrong password!')
+                logger.error('Wrong password!')
             else:
                 return twofa
 
@@ -81,7 +79,7 @@ class Auth:
                 error_text = f"An unknown error has occurred: {error}"
 
             if error_text:
-                logging.error(error_text)
+                logger.error(error_text)
 
     async def enter_code(self, phone: str, phone_code_hash: str) -> types.User:
         """Login in account"""
@@ -152,7 +150,7 @@ class Auth:
                 
                 me: types.User = await self.app.get_me() 
         except errors.SessionRevokedError:
-            logging.error("The session was terminated, delete the session and re-auth")
+            logger.error("The session was terminated, delete the session and re-auth")
             self.app.disconnect()
 
             return sys.exit(64)

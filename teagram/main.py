@@ -1,4 +1,3 @@
-import logging
 import time
 
 from telethon import TelegramClient
@@ -7,17 +6,6 @@ from . import auth, database, loader
 
 async def main():
     """Основной цикл юзербота"""
-    me, app = await auth.Auth().authorize()
-    app: TelegramClient
-    await app.connect()
-
-    db = database.db
-    db.init_cloud(app, me)
-
-    modules = loader.ModulesManager(app, db, me)
-    await modules.load(app)
-
-    prefix = db.get("teagram.loader", "prefixes", ["."])[0]
     print(
 """
 
@@ -29,9 +17,19 @@ async def main():
 
 
 """)
+    
+    me, app = await auth.Auth().authorize()
+    app: TelegramClient
+    await app.connect()
+
+    db = database.db
+    db.init_cloud(app, me)
+
+    modules = loader.ModulesManager(app, db, me)
+    await modules.load(app)
+
+    prefix = db.get("teagram.loader", "prefixes", ["."])[0]
     print('Юзербот включен (Префикс - "{}")'.format(prefix))
-    
-    
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
@@ -59,5 +57,5 @@ async def main():
 
     await app.run_until_disconnected()
 
-    logging.info("Завершение работы...")
+    logger.info("Завершение работы...")
     return True

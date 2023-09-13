@@ -1,5 +1,5 @@
 import asyncio
-import logging
+from loguru import logger
 from types import TracebackType
 from typing import List, Union
 
@@ -46,7 +46,7 @@ class Conversation:
         if all(
             [exc_type, exc_value, exc_traceback]
         ):
-            logging.exception(exc_value)
+            logger.exception(exc_value)
         else:
             if self.purge:
                 await self._purge()

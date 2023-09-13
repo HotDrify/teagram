@@ -50,7 +50,7 @@ class CloudDatabase:
         """Send data to the chat."""
         return (
             await self._app.send_message(
-                self.chat, message
+                self.chat, message, parse_mode='html'
             )
             if isinstance(message, str)
             else await self._app.forward_messages(self.chat, message)
