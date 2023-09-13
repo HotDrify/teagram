@@ -50,7 +50,8 @@ class EvalMod(loader.Module):
                 'r': message.reply_to_message,
                 'manager': self.all_modules,
                 'bot': self.bot,
-                'pyrogram': __import__('pyrogram')
+                'pyrogram': __import__('pyrogram'),
+                'os': __import__('os')
             }
         )
         await utils.answer(
