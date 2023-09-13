@@ -1,3 +1,4 @@
+import logging
 import time
 
 from telethon import TelegramClient
@@ -6,18 +7,6 @@ from . import auth, database, loader
 
 async def main():
     """Основной цикл юзербота"""
-    print(
-"""
-
-  _____ _____    _    ____ ____      _    __  __ 
- |_   _| ____|  / \  / ___|  _ \    / \  |  \/  |
-   | | |  _|   / _ \| |  _| |_) |  / _ \ | |\/| |
-   | | | |___ / ___ \ |_| |  _ <  / ___ \| |  | |
-   |_| |_____/_/   \_\____|_| \_\/_/   \_\_|  |_|
-
-
-""")
-    
     me, app = await auth.Auth().authorize()
     app: TelegramClient
     await app.connect()
@@ -29,7 +18,20 @@ async def main():
     await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
+    print(
+"""
+
+  _____ _____    _    ____ ____      _    __  __ 
+ |_   _| ____|  / \  / ___|  _ \    / \  |  \/  |
+   | | |  _|   / _ \| |  _| |_) |  / _ \ | |\/| |
+   | | | |___ / ___ \ |_| |  _ <  / ___ \| |  | |
+   |_| |_____/_/   \_\____|_| \_\/_/   \_\_|  |_|
+
+
+""")
     print('Юзербот включен (Префикс - "{}")'.format(prefix))
+    
+    
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
@@ -57,5 +59,5 @@ async def main():
 
     await app.run_until_disconnected()
 
-    logger.info("Завершение работы...")
+    logging.info("Завершение работы...")
     return True
