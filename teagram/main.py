@@ -1,17 +1,36 @@
-import logging
+from loguru import logger
 import time
 
-from telethon import TelegramClient
-from . import auth, database, loader
+from . import auth, database, loader, utils
 
+import os, sys, atexit
 
 async def main():
     """Основной цикл юзербота"""
-    me, app = await auth.Auth().authorize()
-    app: TelegramClient
-    await app.connect()
-
     db = database.db
+
+    if db.get('teagram.loader', 'web_success', ''):
+        me, app = await auth.Auth().authorize()
+        await app.connect()
+    else:
+        inpt = input('Web or manual (y/n): ')
+        if not inpt:
+            inpt = 'n'
+            
+        if inpt.lower() in ['y', 'yes', 'ye'] and (
+            'windows' in (pl := utils.get_platform().lower()) or 'wsl' in pl
+        ):
+            db.set('teagram.loader', 'web_auth', True)
+            def restart():
+                os.execl(sys.executable, sys.executable, "-m", "teagram")
+
+            atexit.register(restart)
+            sys.exit(1)
+        else:
+            me, app = await auth.Auth().authorize()
+            await app.connect()
+
+    
     db.init_cloud(app, me)
 
     modules = loader.ModulesManager(app, db, me)
@@ -59,5 +78,5 @@ async def main():
 
     await app.run_until_disconnected()
 
-    logging.info("Завершение работы...")
+    logger.info("Завершение работы...")
     return True
