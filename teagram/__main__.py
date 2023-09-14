@@ -1,8 +1,7 @@
-import os
 import sys
 import asyncio
 
-from . import main, database, utils
+from . import main, database
 
 if sys.version_info < (3, 9, 0):
     print("Требуется Python 3.9 или выше")
@@ -16,8 +15,6 @@ if __name__ == "__main__":
     
     if database.db.get('teagram.loader', 'web_auth', ''):
         from .web import server
-        os.system('start '+ os.getcwd() +'/teagram/web/index.html')
-
         async def serve():
             await server.serve()
 

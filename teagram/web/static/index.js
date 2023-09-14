@@ -25,9 +25,9 @@ document.querySelector('#enterTokens').onclick = () => {
         ).then(
             (data) => {
                 if (!data || data == null){
-                    output.innerHTML = alert('Logged in account, restarting')
+                    alert('Logged in account, restarting')
                 }else{
-                    output.innerHTML = data.replace(/["']/g, '')
+                    alert(data.replace(/["']/g, ''))
                 }
             }
         )
@@ -36,7 +36,7 @@ document.querySelector('#enterTokens').onclick = () => {
 
 document.querySelector('#enterPhone').onclick = () => {
     if (!phone.value){
-        return output.innerHTML = 'Enter phone number'
+        return aluert('Enter phone number')
     }else{
         let headers = new Headers()
         headers.append('phone', phone.value)
@@ -76,7 +76,7 @@ document.querySelector('#enterCode').onclick = () => {
             (response) => {return response.text()}
         ).then(
             (data) => {
-                if (!data || data == null){
+                if (!data || data == null || data == 'null'){
                     alert('Logged in account, restarting')
                 }else{
                     alert(data.replace(/["']/g, ''))

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teagram login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
 </head>
 <body>
     <div class="animated-background"></div>
@@ -41,7 +41,6 @@
             <button id="enterCode">Enter phone code (2FA passed automatically)</button>
         </div>
     </div>
-    <a class="output" id="output"></a>
-    <script src="index.js"></script>    
+    <script src="{{ url_for('static', path='/index.js') }}"></script>    
 </body>
 </html>

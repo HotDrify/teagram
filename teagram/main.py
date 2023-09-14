@@ -1,8 +1,7 @@
 from loguru import logger
 import time
 
-from . import auth, database, loader, utils
-
+from . import auth, database, loader
 import os, sys, atexit
 
 async def main():
@@ -13,13 +12,14 @@ async def main():
         me, app = await auth.Auth().authorize()
         await app.connect()
     else:
-        inpt = input('Web or manual (y/n): ')
-        if not inpt:
-            inpt = 'n'
+        if db.get('teagram.loader', 'web_auth', '') is False:
+            inpt = 'yes'
+        else:
+            inpt = input('Web or manual (y/n): ')
+            if not inpt:
+                inpt = 'n'
             
-        if inpt.lower() in ['y', 'yes', 'ye'] and (
-            'windows' in (pl := utils.get_platform().lower()) or 'wsl' in pl
-        ):
+        if inpt.lower() in ['y', 'yes', 'ye']:
             db.set('teagram.loader', 'web_auth', True)
             def restart():
                 os.execl(sys.executable, sys.executable, "-m", "teagram")

@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, templating
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from telethon import TelegramClient
 from .. import database
@@ -17,7 +18,7 @@ login = {
     '2fa': 0
 }
 
-api = FastAPI()
+api = FastAPI(on_startup=print('To login in account, open in browser http://127.0.0.1:8000'))
 api.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,8 +26,9 @@ api.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+api.mount("/static", StaticFiles(directory="teagram/web/static"), name="static")
 
-config = Config(api, host='127.0.0.1', port=8000)
+config = Config(api, host='127.0.0.1', port=8000, log_level=60)
 server = Server(config)
 
 def shutdown():
@@ -36,6 +38,14 @@ def shutdown():
     atexit.register(restart)
     database.db.set('teagram.loader', 'web_success', True)
     database.db.set('teagram.loader', 'web_auth', False)
+
+@api.get('/')
+async def home(request: Request):
+    return templating.Jinja2Templates(
+        directory='teagram/web/'
+    ).TemplateResponse(
+        'index.html', {'request': request}
+    )
 
 @api.post('/tokens')
 async def check_tokens(data: Request):
