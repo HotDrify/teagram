@@ -8,6 +8,7 @@ async def main():
     """Основной цикл юзербота"""
     db = database.db
     if (app := auth.Auth().app):
+        await app.connect()
         if not (me := await app.get_me()):
             if db.get('teagram.loader', 'web_success', ''):
                 me, app = await auth.Auth().authorize()
