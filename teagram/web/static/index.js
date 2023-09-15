@@ -45,7 +45,7 @@ document.querySelector('#enterTokens').onclick = () => {
 
 document.querySelector('#enterPhone').onclick = () => {
     if (!phone.value){
-        return aluert('Enter phone number')
+        return alert('Enter phone number')
     }else{
         let headers = new Headers()
         headers.append('phone', phone.value)

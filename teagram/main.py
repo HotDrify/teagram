@@ -12,6 +12,7 @@ async def main():
         if not (me := await app.get_me()):
             if db.get('teagram.loader', 'web_success', ''):
                 db.pop('teagram.loader', 'web_success')
+                
                 me, app = await auth.Auth().authorize()
                 await app.connect()
             else:
