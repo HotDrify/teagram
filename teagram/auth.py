@@ -16,16 +16,26 @@ from qrcode.main import QRCode
 from . import __version__
 
 class Auth:
-    def __init__(self, session_name: str = "../teagram") -> None:
-        self._check_api_tokens()
+    def __init__(self, session_name: str = "../teagram", manual=True) -> None:
+        if manual:
+            self._check_api_tokens()
 
         config = configparser.ConfigParser()
         config.read("./config.ini")
 
-        self.app: TelegramClient = TelegramClient(
-            session=session_name, app_version=f"v{__version__}",
-            api_id=int(config.get('telethon', 'api_id')),
-            api_hash=config.get('telethon', 'api_hash')
+        try:
+            _id = config.get('telethon', 'api_id')
+            _hash = config.get('telethon', 'api_hash')
+        except:
+            _id = 123
+            _hash = '_'
+
+        self.app = TelegramClient(
+            api_id=_id,
+            api_hash=_hash,
+            session=session_name,
+            app_version=f"v{__version__}"
+            
         )
 
     def _check_api_tokens(self) -> bool:

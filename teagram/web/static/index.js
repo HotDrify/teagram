@@ -6,32 +6,41 @@ let code = document.querySelector('#phonecode')
 let _2fa = document.querySelector('#_2fa')
 
 document.querySelector('#enterTokens').onclick = () => {
-    if (!_id.value || !_hash.value){
-        return alert('Enter all api tokens')
-    }else{
-        let headers = new Headers()
-        headers.append('id', _id.value)
-        headers.append('hash', _hash.value)
-
-        fetch(
-            'http://127.0.0.1:8000/tokens',
-            {
-                method: 'POST',
-                headers: headers
-            }
-        )
-        .then(
-            (response) => {return response.text()}
-        ).then(
-            (data) => {
-                if (!data || data == null){
-                    alert('Logged in account, restarting')
-                }else{
-                    alert(data.replace(/["']/g, ''))
-                }
-            }
-        )
+    let headers = new Headers()
+    if (!_id.value){
+        _id.value = ''
     }
+    if (!_hash.value){
+        _hash.value = ''
+    }
+
+    headers.append('id', _id.value)
+    headers.append('hash', _hash.value)
+
+    fetch(
+        'http://127.0.0.1:8000/tokens',
+        {
+            method: 'POST',
+            headers: headers
+        }
+    )
+    .then(
+        (response) => {return response.text()}
+    ).then(
+        (data) => {
+            data = data.replace(/["']/g, '')
+            
+            if (data == 'Enter all api tokens'){
+                return alert(data)
+            }
+
+            if (!data || data == null){
+                alert('Logged in account, restarting')
+            }else{
+                alert(data)
+            }
+        }
+    )
 }
 
 document.querySelector('#enterPhone').onclick = () => {

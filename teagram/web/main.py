@@ -37,7 +37,7 @@ def shutdown():
 
     atexit.register(restart)
     database.db.set('teagram.loader', 'web_success', True)
-    database.db.set('teagram.loader', 'web_auth', False)
+    database.db.pop('teagram.loader', 'web_auth')
 
 @api.get('/')
 async def home(request: Request):
@@ -53,18 +53,27 @@ async def check_tokens(data: Request):
     
     client = TelegramClient('../teagram', data['id'], data['hash'])
     await client.connect()
-
-    login['id'] = data['id']
-    login['hash'] = data['hash']
-    
     config = configparser.ConfigParser()
-    config["telethon"] = {
-        "api_id": data['id'],
-        "api_hash": data['hash']
-    }
+    try:
+        _id = config.get('telethon', 'api_id')
+        _hash = config.get('telethon', 'api_hash')
+    except:
+        _id = None
+        _hash = None
 
-    with open("./config.ini", "w") as file:
-        config.write(file)
+        if not (data['id'] and data['hash']) and not (_id and _hash):
+            return 'Enter all api tokens'
+        else:
+            config["telethon"] = {
+                "api_id": data['id'],
+                "api_hash": data['hash']
+            }
+              
+            with open("./config.ini", "w") as file:
+                config.write(file)
+
+    login['id'] = data['id'] or _id
+    login['hash'] = data['hash'] or _hash
     
     try:
         if await client.get_me():
