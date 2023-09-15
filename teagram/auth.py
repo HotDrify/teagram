@@ -39,9 +39,16 @@ class Auth:
         config = configparser.ConfigParser()
         config.read("./config.ini")
 
+        try:
+            _id = int(config.get('pyrogram', 'api_id'))
+            _hash = config.get('pyrogram', 'api_hash')
+        except:
+            _id = 123
+            _hash = '_'
+
         self.app = Client(
-            name=session_name, api_id=config.get('pyrogram', 'api_id'),
-            api_hash=config.get('pyrogram', 'api_hash'),
+            name=session_name, api_id=_id,
+            api_hash=_hash,
             app_version=f"v{__version__}"
         )
 
