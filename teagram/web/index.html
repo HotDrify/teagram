@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teagram login</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+    <div class="animated-background"></div>
+    <div class='login'>
+        <h2 class="teagram">TEAGRAM</h2>
+
+        <div class="flexx">
+            <h1>Api id</h1>
+            <input id='api_id' type="text"> 
+        </div>
+        
+        <div class="flexx">
+            <h1>Api hash</h1>
+        <input id='api_hash' type="text"> 
+        </div>
+        <div class="flexx">
+            <h1>Phone number</h1>
+            <input id='phone' type="number"> 
+        </div>
+        
+        <div class="flexx">
+            <h1>Code from telegram</h1>
+            <input id='phonecode' type="text"> 
+        </div>
+        
+        <div class="flexx">
+            <h1>2FA password</h1>
+            <input id='_2fa' type="password"> 
+        </div>
+        
+        <div class="buttons">
+            <button id="enterTokens">Enter api tokens</button>
+            <button id="enterPhone">Enter phone</button>
+            <button id="enterCode">Enter phone code (2FA passed automatically)</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', path='/index.js') }}"></script>    
+</body>
+</html>

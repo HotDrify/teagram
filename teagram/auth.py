@@ -14,12 +14,7 @@ from pyrogram.session.session import Session
 from pyrogram.raw.functions.auth.export_login_token import ExportLoginToken
 
 from qrcode.main import QRCode
-
-
 from . import __version__
-
-Session.notice_displayed: bool = True
-
 
 def colored_input(prompt: str = "", hide: bool = False) -> str:
     """Цветной инпут"""
@@ -37,8 +32,9 @@ def colored_input(prompt: str = "", hide: bool = False) -> str:
 class Auth:
     """Авторизация в аккаунт"""
 
-    def __init__(self, session_name: str = "../teagram") -> None:
-        self._check_api_tokens()
+    def __init__(self, session_name: str = "../teagram", manual=True) -> None:
+        if manual:
+            self._check_api_tokens()
 
         config = configparser.ConfigParser()
         config.read("./config.ini")
