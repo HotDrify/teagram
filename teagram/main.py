@@ -35,7 +35,8 @@ async def main():
                     await app.connect()
     
     db.init_cloud(app, me)
-
+    await db.cloud.get_chat()
+    
     modules = loader.ModulesManager(app, db, me)
     await modules.load(app)
 
@@ -77,6 +78,7 @@ async def main():
 
         db.pop("teagram.loader", "restart")
     else:
+        
         await db.cloud.send_data('Userbot has started (Prefix - "{}")'.format(prefix))
 
     await app.run_until_disconnected()

@@ -2,8 +2,8 @@ from asyncio import sleep
 
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                             InlineKeyboardMarkup, InlineQuery,
-                            InlineQueryResultArticle, InputTextMessageContent,
-                            Message)
+                            InlineQueryResultArticle, InputTextMessageContent
+                            )
 from telethon import types
 
 from .. import (  # ".." - т.к. модули находятся в папке teagram/modules, то нам нужно на уровень выше
@@ -40,6 +40,20 @@ class ExampleMod(loader.Module):  # Example - название класса мо
         #           self.client  - телеграм клиент
         #           self.bot     - инлайн бот
         # Их можно использовать в любой части кода (В пределах класса)
+
+        # Запустим цикл ниже
+        # Это можно делать в команде, например для того чтобы использовать get_me
+        self.testloop.start(testarg='Тестовый аргумент')
+
+
+    # interval - интервал в секундах
+    # autostart - True/False (по умолчанию True)
+    @loader.loop(5, autostart=False)
+    async def testloop(self, testarg): # Цикл должен заканчиваться на loop
+        """
+        Чтобы задать аргументы циклу, посмотрите на 46 строку       
+        """
+        print(testarg)
 
     # _inline_handler на конце функции чтобы обозначить что это инлайн-команда
     # args - аргументы после команды. необязательный аргумент

@@ -21,8 +21,6 @@ class CloudDatabase:
         self._me = me
         self.chat = None
 
-        asyncio.get_event_loop().create_task(self.get_chat())
-
     async def get_chat(self):
         if not self.chat:
             chat = None
@@ -38,7 +36,8 @@ class CloudDatabase:
                     await create_group(
                         self._app,
                         'teagram-logs', 
-                        'Here teagram logs'
+                        'Here teagram logs',
+                        megagroup=True
                     )
                 ).__dict__["chats"][0].__dict__["id"]
             else:
