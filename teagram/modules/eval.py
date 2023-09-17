@@ -89,7 +89,7 @@ class EvalutorMod(loader.Module):
 
             try:
                 result = subprocess.check_output(
-                    ["gcc", "g++", "-o", "code", "code.cpp"],
+                    ["gcc", "code.cpp"],
                     cwd=tempdir,
                     stderr=subprocess.STDOUT,
                 ).decode()
