@@ -5,6 +5,7 @@ from pyrogram import Client, types
 
 import subprocess
 import tempfile
+import os
 
 def insert_returns(body):
     if isinstance(body[-1], ast.Expr):
