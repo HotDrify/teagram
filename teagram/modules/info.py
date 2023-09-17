@@ -60,10 +60,10 @@ class AboutMod(loader.Module):
 
 <b>{platform}</b>
 """
+        davatar = 'https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true'
 
         custom = self.config.get('customText')
-        avatar = self.config.get('customImage',
-                     'https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true')
+        avatar = self.config.get('customImage')
 
         if custom:
             custom = custom.format(
@@ -81,8 +81,8 @@ class AboutMod(loader.Module):
                 InlineQueryResultPhoto(
                     id=utils.random_id(),
                     title='teagram',
-                    thumb_url=avatar,
-                    photo_url=avatar,
+                    thumb_url=avatar or davatar,
+                    photo_url=avatar or davatar,
                     caption=default or custom,
                     reply_markup=InlineKeyboardMarkup().add(
                         InlineKeyboardButton('❓ Teagram', url='https://t.me/UBteagram')
