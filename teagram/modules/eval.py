@@ -98,7 +98,7 @@ class EvalutorMod(loader.Module):
             if not result:
                 try:
                     result = subprocess.check_output(
-                        ["./code"],
+                        ["./code.cpp"],
                         cwd=tempdir,
                         stderr=subprocess.STDOUT,
                     )
