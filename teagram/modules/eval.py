@@ -98,10 +98,10 @@ class EvalutorMod(loader.Module):
             await utils.answer(
                 message,
                 f"""
-                <b>💻 cpp code</b>:
-                <code>{args}</code>
+<b>💻 cpp code</b>:
+<code>{args}</code>
 
-                <b>💻 Output</b>:
-                <code>{result}</code>
+<b>💻 Output</b>:
+<code>{result}</code>
                 """)
                 
