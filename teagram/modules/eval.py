@@ -3,6 +3,9 @@ import ast
 from .. import loader, utils
 from pyrogram import Client, types
 
+import subprocess
+import tempfile
+
 def insert_returns(body):
     if isinstance(body[-1], ast.Expr):
         body[-1] = ast.Return(body[-1].value)
@@ -29,9 +32,9 @@ async def execute_python_code(code, env={}):
     except Exception as error:
         return error
 
-@loader.module(name="Eval", author='teagram')
+@loader.module(name="Evalutor", author='teagram')
 class EvalMod(loader.Module):
-    """Используйте eval прямо через 🍵teagram!"""
+    """Используйте eval разных языков прямо через 🍵teagram!"""
 
     async def e_cmd(self, app: Client, message: types.Message, args: str): # type: ignore
         result = await execute_python_code(
@@ -64,3 +67,36 @@ class EvalMod(loader.Module):
 <code>{result}</code>
     """
         )
+    async def ecpp_cmd(self, app: Client, message: types.Message, args: str): #type: ingnore
+        try:
+            subprocess.check_output(
+                ["gcc", "g++", "--version"],
+                stderr=subprocess.STDOUT,
+            )
+        except Exception:
+            return await utils.answer(
+                message,
+                "🚫 произошла ошибка! проверьте наличие <code>gcc</code> команды на вашем сервере."
+            )
+        await utils.answer(
+            message,
+            "⏳ идет компиляция кола...")
+        with tempfile.TemporaryDirectory() as tempdir: # https://github.com/hikariatama/Hikka/blob/ce1f24f03313f8500de671815dde065fc8d86897/hikka/modules/eval.py#L213
+            file = os.path.join(tmpdir, "code.cpp")
+            with open(file, "w") as f:
+            f.write(args)
+            result = subprocess.check_output(
+                ["gcc", "g++", "-o", "code", "code.cpp"],
+                cwd=tempdir,
+                stderr=subprocess.STDOUT,
+            ).decode()
+            await utils.answer(
+                message,
+                f"""
+                <b>💻 cpp code</b>:
+                <code>{args}</code>
+
+                <b>💻 Output</b>:
+                <code>{result}</code>
+                """)
+                
