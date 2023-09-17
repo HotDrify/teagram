@@ -81,7 +81,7 @@ class EvalutorMod(loader.Module):
             )
         await utils.answer(
             message,
-            "⏳ идет компиляция кола...")
+            "⏳ идет компиляция кода...")
         with tempfile.TemporaryDirectory() as tempdir: # https://github.com/hikariatama/Hikka/blob/ce1f24f03313f8500de671815dde065fc8d86897/hikka/modules/eval.py#L213
             file = os.path.join(tempdir, "code.cpp")
             with open(file, "w") as f:
@@ -126,7 +126,7 @@ class EvalutorMod(loader.Module):
             )
         await utils.answer(
             message,
-            "⏳ идет компиляция кола...")
+            "⏳ идет компиляция кода...")
         with tempfile.TemporaryDirectory() as tempdir: # https://github.com/hikariatama/Hikka/blob/ce1f24f03313f8500de671815dde065fc8d86897/hikka/modules/eval.py#L213
             file = os.path.join(tempdir, "code.js")
             with open(file, "w") as f:
