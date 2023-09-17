@@ -86,11 +86,15 @@ class EvalutorMod(loader.Module):
             file = os.path.join(tempdir, "code.cpp")
             with open(file, "w") as f:
                 f.write(args)
-            result = subprocess.check_output(
-                ["gcc", "g++", "-o", "code", "code.cpp"],
-                cwd=tempdir,
-                stderr=subprocess.STDOUT,
-            ).decode()
+
+            try:
+                result = subprocess.check_output(
+                    ["gcc", "g++", "-o", "code", "code.cpp"],
+                    cwd=tempdir,
+                    stderr=subprocess.STDOUT,
+                ).decode()
+            except subprocess.CalledProcessError as e:
+                result = e.output.decode()
             await utils.answer(
                 message,
                 f"""
