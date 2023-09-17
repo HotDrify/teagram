@@ -113,4 +113,40 @@ class EvalutorMod(loader.Module):
 <b>💻 Output</b>:
 <code>{result}</code>
                 """)
+    async def enode_cmd(self, app: Client, message: types.Message, args: str): #type: ingnore
+        try:
+            subprocess.check_output(
+                ["node", "--version"],
+                stderr=subprocess.STDOUT,
+            )
+        except Exception:
+            return await utils.answer(
+                message,
+                "🚫 произошла ошибка! проверьте наличие <code>node</code> команды на вашем сервере."
+            )
+        await utils.answer(
+            message,
+            "⏳ идет компиляция кола...")
+        with tempfile.TemporaryDirectory() as tempdir: # https://github.com/hikariatama/Hikka/blob/ce1f24f03313f8500de671815dde065fc8d86897/hikka/modules/eval.py#L213
+            file = os.path.join(tempdir, "code.js")
+            with open(file, "w") as f:
+                f.write(args)
+
+            try:
+                result = subprocess.check_output(
+                    ["node", "code.js"],
+                    cwd=tempdir,
+                    stderr=subprocess.STDOUT,
+                ).decode()
+            except subprocess.CalledProcessError as e:
+                result = e.output.decode()
+            await utils.answer(
+                message,
+                f"""
+<b>💻 nodejs code</b>:
+<code>{args}</code>
+
+<b>💻 Output</b>:
+<code>{result}</code>
+                """)
                 
