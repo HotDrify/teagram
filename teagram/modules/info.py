@@ -34,6 +34,9 @@ class AboutMod(loader.Module):
 
         uptime_raw = round(time.time() - self.boot_time)
         uptime = (timedelta(seconds=uptime_raw))
+
+        ram = utils.get_ram()
+        cpu = utils.get_cpu()
         
         last = str(await bash_exec('git log -1')).split()[1].strip()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
@@ -45,8 +48,8 @@ class AboutMod(loader.Module):
 <b><emoji id=5471952986970267163>💎</emoji> Владелец</b>:  `{me}`
 <b><emoji id=5361541227604878624>🐧</emoji> Версия</b>:  {version}
 
-<b>🧠 CPU</b>:  `{utils.get_cpu()}%`
-<b>📀 RAM</b>:  `{utils.get_ram()}MB`
+<b>🧠 CPU</b>:  `{cpu}%`
+<b>📀 RAM</b>:  `{ram}MB`
 
 <b><emoji id=5974081491901091242>⌚</emoji> Аптайм</b>:  `{uptime}`
 <b><emoji id=5377399247589088543>🔥</emoji> Версия pyrogram: `{pyrogram.__version__}`</b>
