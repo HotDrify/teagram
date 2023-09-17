@@ -95,6 +95,15 @@ class EvalutorMod(loader.Module):
                 ).decode()
             except subprocess.CalledProcessError as e:
                 result = e.output.decode()
+            if not result:
+                try:
+                    result = subprocess.check_output(
+                        ["./code"],
+                        cwd=tempdir,
+                        stderr=subprocess.STDOUT,
+                    )
+                except subprocess.CalledProcessError as e:
+                    result = e.output.decode()
             await utils.answer(
                 message,
                 f"""
