@@ -41,6 +41,8 @@ class Loop:
         *args,
         **kwargs
     ):
+        """Args, kwargs using in start"""
+        
         self.func = func
         self.interval = interval
         self.autostart = autostart
@@ -52,6 +54,8 @@ class Loop:
             self.status = True
 
     def start(self, interval: int = None, *args, **kwargs):
+        """Args, kwargs using in start"""
+
         if self.task:
             return False
         if interval:
