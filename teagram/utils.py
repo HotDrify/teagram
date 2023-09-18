@@ -20,6 +20,26 @@ from . import database
 Message = Union[custom.Message, types.Message]
 git_hash = lambda: git.Repo().head.commit.hexsha
 
+
+# from hikka
+def escape_html(text: str, /) -> str:  # sourcery skip
+    """
+    Pass all untrusted/potentially corrupt input here
+    :param text: Text to escape
+    :return: Escaped text
+    """
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+# from hikka
+def escape_quotes(text: str, /) -> str:
+    """
+    Escape quotes to html quotes
+    :param text: Text to escape
+    :return: Escaped text
+    """
+    return escape_html(text).replace('"', "&quot;")
+
+
 def get_full_command(message: Message) -> Union[
     Tuple[Literal[""], Literal[""], Literal[""]], Tuple[str, str, str]
 ]:
