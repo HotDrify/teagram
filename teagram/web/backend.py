@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from telethon import TelegramClient
 from .. import database
 
-import os, sys, atexit, asyncio, configparser
+import os, re, sys, atexit, asyncio, configparser
 from uvicorn import Config, Server
 
 
@@ -18,7 +18,7 @@ login = {
     '2fa': 0
 }
 
-api = FastAPI(on_startup=print('To login in account, open in browser http://127.0.0.1:8000'))
+api = FastAPI()
 api.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,6 +39,35 @@ def shutdown():
     database.db.set('teagram.loader', 'web_success', True)
     database.db.pop('teagram.loader', 'web_auth')
 
+@api.on_event('startup')
+async def proxytunnel():
+    print('Getting url...')
+    stream = await asyncio.create_subprocess_shell(
+        'ssh -o StrictHostKeyChecking=no -R 80:localhost:8000 nokey@localhost.run',
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+
+    ev = asyncio.Event()
+    url = ''
+
+    async def gettext():
+        for line in iter(stream.stdout.readline, ""):
+            if (ur := re.search(r"tunneled.*?(https:\/\/.+)", ((await line).decode()))):
+                nonlocal url
+                url = ur[1]
+                if not ev.is_set():
+                    ev.set()
+
+    asyncio.ensure_future(gettext())
+    await asyncio.wait_for(ev.wait(), 15)
+
+    if url:
+        print('To login in account, open in browser {}'.format(str(url)))
+    else:
+        print('To login in account, open in browser https://127.0.0.1:8000')
+
 @api.get('/')
 async def home(request: Request):
     return templating.Jinja2Templates(
@@ -51,7 +80,7 @@ async def home(request: Request):
 async def check_tokens(data: Request):
     data = data.headers
     
-    client = TelegramClient('../teagram', data['id'], data['hash'])
+    client = TelegramClient('./teagram', data['id'], data['hash'])
     await client.connect()
     config = configparser.ConfigParser()
     try:
@@ -77,6 +106,7 @@ async def check_tokens(data: Request):
     
     try:
         if await client.get_me():
+            print(await client.get_me())
             shutdown()
             await client.disconnect()
             asyncio.get_running_loop().stop()
@@ -91,7 +121,7 @@ async def check_tokens(data: Request):
 async def phone_request(data: Request):
     data = data.headers
 
-    client = TelegramClient('../teagram', login['id'], login['hash'])
+    client = TelegramClient('./teagram', login['id'], login['hash'])
     await client.connect()
 
     login['phone_hash'] = (await client.send_code_request(data['phone'])).phone_code_hash
@@ -103,7 +133,7 @@ async def phone_request(data: Request):
 async def phonecode(data: Request):
     data = data.headers
 
-    client = TelegramClient('../teagram', login['id'], login['hash'])
+    client = TelegramClient('./teagram', login['id'], login['hash'])
     await client.connect()
 
     _2fa = data.get('2fa', None)
