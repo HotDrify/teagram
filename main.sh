@@ -55,9 +55,6 @@ eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
 echo "[INFO] Installing requirements.txt..." >> "$LOG_FILE"
 echo "[INFO] Installing libraries..."
 pip3 install -r requirements.txt
-echo "[INFO] Installing requirements-speedup.txt..." >> "$LOG_FILE"
-echo "[INFO] Installing speed libraries..."
-pip3 install -r requirements-speedup.txt
 echo "[INFO] First start teagram..." >> "$LOG_FILE"
 echo "[INFO] First start..."
 clear
