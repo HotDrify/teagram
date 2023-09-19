@@ -14,7 +14,6 @@ echo -e "
 \033[0;36m  | | | -_| .'\033[0m| . |  _| .'|     |
 \033[0;36m  |_| |___|__,\033[0m|_  |_| |__,|_|_|_|
 \033[0;36m              \033[0m|___|              
-
 "
 
 LOG_FILE="install.log"
@@ -53,10 +52,6 @@ eval "$SUDOCMD $UPD"
 echo "[INFO] Installing 4 packages..." >> "$LOG_FILE"
 echo "[INFO] Installing packages..."
 eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
-echo "[INFO] Cloning https://github.com/itzlayz/teagram-tl..." >> "$LOG_FILE"
-echo "[INFO] Cloning repository..."
-git clone https://github.com/itzlayz/teagram-tl
-cd teagram || exit 1
 echo "[INFO] Installing requirements.txt..." >> "$LOG_FILE"
 echo "[INFO] Installing libraries..."
 pip3 install -r requirements.txt
