@@ -58,5 +58,4 @@ pip3 install -r requirements.txt
 echo "[INFO] First start teagram..." >> "$LOG_FILE"
 echo "[INFO] First start..."
 clear
-python3 -m 
-teagram
+python3 -m teagram
