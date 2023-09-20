@@ -362,6 +362,7 @@ class ModulesManager:
                 value.client = self._client
                 value.bot = self.bot_manager
                 value.prefix = self._db.get('teagram.loader', 'prefixes', ['.'])
+                value.lookup = self.lookup
 
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)
@@ -516,19 +517,6 @@ class ModulesManager:
 
         return module.name
 
-    def get_module(self, name: str, by_commands_too: bool = False) -> Union[Module, None]:
-        """Ищет модуль по названию или по команде"""
-        if (
-            module := list(
-                filter(
-                    lambda module: module.name.lower(
-                    ) == name.lower(), self.modules
-                )
-            )
-        ):
-            return module[0]
-
-        if by_commands_too and name in self.command_handlers:
-            return self.command_handlers[name].__self__
-
-        return None
+    def lookup(self, name: str) -> Union[Module, None]:
+        """Finds module by name"""
+        return next((module for module in self.modules if module.name.lower() in name.lower()), None)

@@ -53,9 +53,6 @@ class ConfigMod(loader.Module):
         self.me = None
         self.bbot = None
 
-    def get_module(self, data: str) -> loader.Module:
-        return next((module for module in self.manager.modules if module.name.lower() in data.lower()), None)
-
     def validate(self, attribute):
         if isinstance(attribute, str):
             try:
@@ -107,7 +104,7 @@ class ConfigMod(loader.Module):
 
         for module in sorted(modules, key=lambda x: len(str(x))):
             name = module.name
-            attrs = self.get_attrs(self.get_module(name))
+            attrs = self.get_attrs(self.lookup(name))
 
             if not attrs or not isinstance(attrs, Config):
                 continue
@@ -142,7 +139,7 @@ class ConfigMod(loader.Module):
         data = call.data
 
         keyboard = InlineKeyboardMarkup()
-        mod = self.get_module(data)
+        mod = self.lookup(data)
         attrs = self.get_attrs(mod)
 
         buttons = []
@@ -191,7 +188,7 @@ class ConfigMod(loader.Module):
         module = data[0]
         attribute = data[1]
 
-        module = self.get_module(module)
+        module = self.lookup(module)
         value = self.get_attrs(module).get(attribute)
 
         docs = self.config.get_doc(attribute)
