@@ -224,6 +224,6 @@ class SettingsMod(loader.Module):
         _users = self.db.get('teagram.loader', 'users', [])
         await utils.answer(
             message,
-            (f'➡ {self.strings["user"]} <code>' + ', '.join(_users) + '</code>')
+            (f'➡ {self.strings["user"]} <code>' + ', '.join(str(user) for user in _users) + '</code>')
               if _users else self.strings['nouser']
         )
