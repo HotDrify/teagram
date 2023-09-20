@@ -1,7 +1,7 @@
 from loguru import logger
 import time
 
-from . import auth, database, loader
+from . import auth, database, loader, __version__
 import os, sys, atexit
 
 async def main():
@@ -38,7 +38,7 @@ async def main():
     await db.cloud.get_chat()
     
     modules = loader.ModulesManager(app, db, me)
-    await modules.load(app)
+    bot = await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
     print(
@@ -52,9 +52,7 @@ async def main():
 
 
 """)
-    print('Юзербот включен (Префикс - "{}")'.format(prefix))
-    
-    
+    print('Юзербот включен (Префикс - "{}")'.format(prefix))    
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted_text = (
@@ -79,7 +77,14 @@ async def main():
         db.pop("teagram.loader", "restart")
     else:
         
-        await db.cloud.send_data('Userbot has started (Prefix - "{}")'.format(prefix))
+        await db.cloud.send_data(
+            '☕ <b>Teagram userbot has started!</b>\n'
+            '🤖 <b>Version: {}</b>\n'
+            '❔ <b>Prefix: {}</b>'.format(
+                __version__,
+                prefix
+            )
+        )
 
     await app.run_until_disconnected()
 

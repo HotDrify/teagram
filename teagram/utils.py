@@ -6,6 +6,8 @@ import yaml
 import os
 import io
 
+from pathlib import Path
+
 import git
 import contextlib
 from types import FunctionType
@@ -19,7 +21,12 @@ from . import database
 
 Message = Union[custom.Message, types.Message]
 git_hash = lambda: git.Repo().head.commit.hexsha
-
+BASE_DIR = (
+    "/data"
+    if "DOCKER" in os.environ
+    else os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+)
+BASE_PATH = Path(BASE_DIR)
 
 # from hikka
 def escape_html(text: str, /) -> str:  # sourcery skip

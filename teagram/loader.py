@@ -336,7 +336,7 @@ class ModulesManager:
                     f"Ошибка при загрузке стороннего модуля {custom_module}: {error}")
 
         logging.info("Менеджер модулей загружен")
-        return True
+        return self.bot_manager
 
     def register_instance(
         self,
