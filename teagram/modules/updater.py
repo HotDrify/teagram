@@ -1,21 +1,22 @@
 import os
-import git
 import sys
 import time
 import atexit
 
-from telethon import TelegramClient, types
+from telethon import types
 from subprocess import check_output
 from .. import loader, utils, validators
 from ..types import Config, ConfigValue
 from loguru import logger
 
 from aiogram import Bot
-from aiogram.utils.exceptions import CantParseEntities, CantInitiateConversation, BotBlocked, Unauthorized
+from aiogram.utils.exceptions import CantParseEntities, BotBlocked, Unauthorized
 
 @loader.module(name="Updater", author='teagram')
 class UpdateMod(loader.Module):
     """🍵 Обновление с гита teagram"""
+    strings = {'name': 'updater'}
+
     def __init__(self):
         value = self.db.get('Updater', 'sendOnUpdate')
         
@@ -59,34 +60,26 @@ class UpdateMod(loader.Module):
             if last != diff:
                 await bot.send_message(
                     me.id,
-                    f"✔ Доступно обновление (<a href='https://github.com/itzlayz/teagram-tl/commit/{last}'>{last[:6]}...</a>)"
+                    f"{self.strings['hupdate']} (<a href='https://github.com/itzlayz/teagram-tl/commit/{last}'>{last[:6]}...</a>)"
                 )
-                
-        except CantInitiateConversation:
-            logger.error(f'Updater | Вы не начали диалог с ботом, пожалуйста напишите боту /start ({_me.username})')
         except BotBlocked:
-            logger.error(f'Updater | Вы заблокировали ботом, пожалуйста разблокируйте бота ({_me.username})')
+            logger.error(f'Updater | {self.strings["nodialog"]} ({_me.username})')
 
         except CantParseEntities:
             await bot.send_message(
                 me.id,
-                f"✔ Доступно обновление (https://github.com/HotDrify/teagram/commit/{last})"
+                f"{self.strings['hupdate']} (https://github.com/HotDrify/teagram/commit/{last})"
             )
         except Exception as error:
             await bot.send_message(
                 me.id,
-                '❌ Произошла ошибка, при проверке доступного обновления.\n'
-                f'❌ Пожалуйста, удостовертесь что у вас работает команда GIT {error}'
+                f'{self.strings["eone"]}\n'
+                f'{self.strings["etwo"]} {error}'
             )
 
     async def update_cmd(self, message: types.Message):
         try:
-            await utils.answer(message, '<b>🛠 Попытка обновления...</b>')
-            
-            update_req = False
-            if 'requirements.txt' in check_output('git diff', shell=True).decode():
-                update_req = True
-
+            await utils.answer(message, self.strings['updating'])
             try:
                 output = check_output('git pull', shell=True).decode()
             except:
@@ -95,7 +88,7 @@ class UpdateMod(loader.Module):
 
             
             if 'Already up to date.' in output:
-                return await utils.answer(message, '<b>✔ У вас установлена последняя версия</b>')
+                return await utils.answer(message, self.strings['lastver'])
             
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
@@ -109,10 +102,7 @@ class UpdateMod(loader.Module):
                 }
             )
 
-            if update_req:
-                check_output('pip install -r requirements.txt')
-
-            await utils.answer(message, "🔁 Обновление...")
-            return sys.exit(0)
+            await utils.answer(message, self.strings['update'])
+            sys.exit(0)
         except Exception as error:
-            await utils.answer(message, f'Произошла ошибка: {error}')
+            await utils.answer(message, self.strings['error'].format(error))

@@ -9,4 +9,4 @@ try:
         path=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     ).active_branch.name
 except Exception:
-    branch = "master"
+    branch = "main"

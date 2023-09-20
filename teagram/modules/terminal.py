@@ -25,14 +25,18 @@ async def bash_exec(command):
 @loader.module(name="Terminal", author='teagram')
 class TerminalMod(loader.Module):
     """Используйте терминал BASH прямо через 🍵teagram!"""
+    strings = {'name': 'terminal'}
+
     async def terminal_cmd(self, message: types.Message, args: str):
+        """Use terminal"""
         await utils.answer(message, "☕")
         output = await bash_exec(args)
 
         await utils.answer(
             message,
-            f"<emoji id=5472111548572900003>⌨️</emoji> <b>Команда:</b> <code>{args.strip()}</code>\n"
-            f"💾 <b>Вывод:</b>\n<code>"
+            "<emoji id=5472111548572900003>⌨️</emoji>"
+            f"<b>{self.strings['cmd']}:</b> <code>{args.strip()}</code>\n"
+            f"💾 <b>{self.strings['output']}:</b>\n<code>"
             f"{output}"
             "</code>"
         )

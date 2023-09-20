@@ -16,6 +16,20 @@ info:
   version: "Version"
   uptime: "Uptime"
 
+updater:
+  updating: "🛠 <b>Updating...</b>"
+  lastver: "✔ <b>You have the latest version installed</b>"
+  update: "🔁 <b>Updating...</b>"
+  hupdate: "🔄 <b>Update available</b>"
+  nodialog: "❌ <b>You have blocked the bot, please unblock the bot</b>"
+  eone: "❌ <b>An error occurred while checking for an available update.</b>"
+  etwo: "❌ <b>Please make sure you have the GIT command working</b>"
+  error: "❌ <b>Error occurred: {}</b>"
+
+terminal:
+  cmd: "Command"
+  output: "Output"
+
 config:
   noowner: "❌ You are not the owner"
   opencfg: "Open config"
