@@ -53,10 +53,8 @@ class EvalMod(loader.Module):
         )
         await utils.answer(
             message,
-            f"""
-<b>💻 Code</b>:
-<code>{args}</code>
-
-<b>💻 Output</b>:
-<code>{result}</code>
-""")
+            "<b>💻 Code</b>:\n"
+            f"<code>{args}</code>\n"
+            "<b>💻 Output</b>:\n"
+            f"<code>{result}</code>"
+        )

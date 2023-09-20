@@ -40,15 +40,11 @@ class TranslatorMod(loader.Module):
         
         await utils.answer(
             message,
-            f"""
-👅 Язык <b>{translated.src} -> {lang}</b>
-🗣 Произношение <b>{translated.pronunciation}</b>
-
-➡ Текст:
-<b>{translated.origin}</b>
-
-➡ Перевод:
-<b>{translated.text}</b>
-"""
+            f"👅 Язык <b>{translated.src} -> {lang}</b>\n"
+            f"🗣 Произношение <b>{translated.pronunciation}</b>\n"
+            "➡ Текст:\n"
+            f"<b>{translated.origin}</b>\n"
+            "➡ Перевод:\n"
+            f"<b>{translated.text}</b>"
         )
 

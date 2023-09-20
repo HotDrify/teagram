@@ -31,9 +31,8 @@ class TerminalMod(loader.Module):
 
         await utils.answer(
             message,
-            f"""
-<emoji id=5472111548572900003>⌨️</emoji> <b>Команда:</b> <code>{args.strip()}</code>
-💾 <b>Вывод:</b><code>
-{output}
-</code>
-""")
+            f"<emoji id=5472111548572900003>⌨️</emoji> <b>Команда:</b> <code>{args.strip()}</code>\n"
+            f"💾 <b>Вывод:</b>\n<code>"
+            f"{output}"
+            "</code>"
+        )
