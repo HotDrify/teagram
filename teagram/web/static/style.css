@@ -1,18 +1,27 @@
 body{
-    background-color: black;
-    color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: black;
+    overflow: hidden;
+    color: white;
+    outline: 0;
 }
-.login{
+.login {
     animation: gradient 3s ease infinite;
     background: linear-gradient(160deg, #0026ff, #2bff01fd);
     background-size: 400% 400%;
+    justify-content: center;
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
 }
 .flexx{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 18px;
+    margin-bottom: 23px;
 }
 h1{
     flex: 1;
@@ -22,6 +31,7 @@ input{
     flex: 2;
     padding: 8px;
     border-radius: 10px;
+    margin-right: 10px;
     max-width: 250px;
 }
 .buttons{
@@ -33,13 +43,9 @@ button{
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background-color: azure;
     border-radius: 15px;    
-    margin: 5px;
     width: 350px;
+    margin-bottom: 5px;
     padding: 5px;
-}
-.output{
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    margin-bottom: 600px;
 }
 @keyframes gradient {
     0%{background-position: 0% 50%}
