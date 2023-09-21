@@ -92,7 +92,7 @@ class UpdateMod(loader.Module):
             
             if 'requirements.txt' in output:
                 await utils.answer(message, self.strings['downloading'])
-                
+
                 run(
                     [
                         sys.executable,
@@ -100,10 +100,8 @@ class UpdateMod(loader.Module):
                         "pip",
                         "install",
                         "--upgrade",
-                        "-q",
                         "--disable-pip-version-check",
                         "--no-warn-script-location",
-                        "-r",
                         "requirements.txt",
                     ],
                     check=True,
