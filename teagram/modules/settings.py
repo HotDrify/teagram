@@ -91,7 +91,26 @@ class SettingsMod(loader.Module):
         self.db.set("teagram.loader", "lang", language)
         
         pack = utils.get_langpack()
-        self.strings = pack.get('settings')
+        for instance in self.manager.modules:
+            if (name := getattr(instance, 'strings', '')):
+                print(name.get('name', ''))
+                if (stringsname := name.get('name', '').lower()) in [
+                    'backup',
+                    'config',
+                    'eval',
+                    'help',
+                    'info',
+                    'loader',
+                    'moduleguard',
+                    'settings',
+                    'terminal',
+                    'translator',
+                    'updater'
+                ]:
+                    pack = pack.get(stringsname)
+                    pack['name'] = stringsname
+                    instance.strings = pack.get(stringsname)
+
         return await utils.answer(
             message, self.strings['lang'].format(language=language))
 

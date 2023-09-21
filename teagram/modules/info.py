@@ -6,7 +6,7 @@ from .. import __version__, loader, utils, validators
 from ..types import Config, ConfigValue
 from ..bot import BotManager
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultPhoto, InputTextMessageContent
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultPhoto
 
 from telethon.tl.custom import Message
 from datetime import timedelta
@@ -38,7 +38,7 @@ class AboutMod(loader.Module):
 
     async def info_inline_handler(self, inline):
         platform = utils.get_platform()
-        uptime = timedelta(seconds=round(time.time() - utils.init_time))
+        uptime = timedelta(seconds=round(time.time() - utils._init_time))
         
         last = utils.git_hash()
         now = str(await bash_exec('git rev-parse HEAD')).strip()

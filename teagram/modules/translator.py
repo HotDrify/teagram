@@ -27,24 +27,24 @@ class TranslatorMod(loader.Module):
             if not (text := (await message.get_reply_message()).raw_text):
                 return await utils.answer(
                     message,
-                    '❌ Текст не найден'
+                    self.strings['notext']
                 )
         
         if (lang := self.config.get('language')) not in LANGUAGES:
             return await utils.answer(
                 message,
-                f'❌ Неправильный язык (`{lang}`)'
+                self.strings['wronglang'].format(lang)
             )
         
         translated: Translated = Translator().translate(text, dest=lang)
         
         await utils.answer(
             message,
-            f"👅 Язык <b>{translated.src} -> {lang}</b>\n"
-            f"🗣 Произношение <b>{translated.pronunciation}</b>\n"
-            "➡ Текст:\n"
+            f"👅 {self.strings['lang']} <b>{translated.src} -> {lang}</b>\n"
+            f"🗣 {self.string['pronun']} <b>{translated.pronunciation}</b>\n"
+            f"➡ {self.strings['text']}:\n"
             f"<b>{translated.origin}</b>\n"
-            "➡ Перевод:\n"
+            f"➡ {self.strings['trans']}:\n"
             f"<b>{translated.text}</b>"
         )
 

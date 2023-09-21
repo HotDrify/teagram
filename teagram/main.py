@@ -1,12 +1,57 @@
-from loguru import logger
-import time
-
 from . import auth, database, loader, __version__
-import os, sys, atexit
+from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequest
+from telethon.types import ChatAdminRights
+
+from aiogram import Bot
+from loguru import logger
+
+import os, sys, atexit, time
+
+async def sendbot(bot, db, prefix, app):
+    try:
+        await bot.send_message(
+            db.cloud.input_chat,
+            '☕ <b>Teagram userbot has started!</b>\n'
+            '🤖 <b>Version: {}</b>\n'
+            '❔ <b>Prefix: {}</b>'.format(
+                __version__,
+                prefix
+            )
+        )
+    except:
+        id = (await bot.get_me()).id
+        admin = ChatAdminRights(
+            post_messages=True,
+            ban_users=True,
+            edit_messages=True,
+            delete_messages=True
+        )
+
+        await app(InviteToChannelRequest(
+            db.cloud.input_chat,
+            [id]
+        ))
+
+        await app(EditAdminRequest(
+            db.cloud.input_chat,
+            id, 
+            admin,
+            'Teagram'
+        ))
+
+        await bot.send_message(
+            db.cloud.input_chat,
+            '☕ <b>Teagram userbot has started!</b>\n'
+            '🤖 <b>Version: {}</b>\n'
+            '❔ <b>Prefix: {}</b>'.format(
+                __version__,
+                prefix
+            )
+        )
 
 async def main():
-    """Основной цикл юзербота"""
     db = database.db
+
     if (app := auth.Auth(manual=False).app):
         await app.connect()
         if not (me := await app.get_me()):
@@ -38,11 +83,10 @@ async def main():
     await db.cloud.get_chat()
     
     modules = loader.ModulesManager(app, db, me)
-    bot = await modules.load(app)
+    bot: Bot = await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
-    print(
-"""
+    print("""
 
   _____ _____    _    ____ ____      _    __  __ 
  |_   _| ____|  / \  / ___|  _ \    / \  |  \/  |
@@ -51,14 +95,33 @@ async def main():
    |_| |_____/_/   \_\____|_| \_\/_/   \_\_|  |_|
 
 
-""")
-    print('Юзербот включен (Префикс - "{}")'.format(prefix))    
+
+    """)
+    print(f'Userbot has started! Prefix "{prefix}"')    
 
     if (restart := db.get("teagram.loader", "restart")):
-        restarted_text = (
-            f"<b>✅ Перезагрузка прошла успешно! ({round(time.time())-int(restart['start'])} сек.)</b>"
+        restarted = round(time.time())-int(restart['start'])
+        ru = (
+            f"<b>✅ Перезагрузка прошла успешно! ({restarted} сек.)</b>"
             if restart["type"] == "restart"
-            else f"<b>✅ Обновление прошло успешно! ({round(time.time())-int(restart['start'])} сек.)</b>"
+            else f"<b>✅ Обновление прошло успешно! ({restarted} сек.)</b>"
+        )
+        en = (
+            f"<b>✅ Reboot was successful! ({restarted} сек.)</b>"
+            if restart["type"] == "restart"
+            else f"<b>✅ The update was successful! ({restarted} сек.)</b>"
+        )
+
+        lang = db.get('teagram.loader', 'lang', '')
+        # if there was no lang in db
+        if not lang:
+            lang = 'en'
+            db.set('teagram.loader', 'lang', 'en')
+
+        restarted_text = (
+            ru 
+            if lang == 'ru'
+            else en
         )
         
         try:
@@ -72,21 +135,13 @@ async def main():
             ):
                 await app.edit_message(_id[0], _id[1], restarted_text, parse_mode='html')
         except:
-            await db.cloud.send_data(restarted_text)
+            await sendbot(bot, db, prefix, app)
 
         db.pop("teagram.loader", "restart")
     else:
-        
-        await db.cloud.send_data(
-            '☕ <b>Teagram userbot has started!</b>\n'
-            '🤖 <b>Version: {}</b>\n'
-            '❔ <b>Prefix: {}</b>'.format(
-                __version__,
-                prefix
-            )
-        )
+        await sendbot(bot, db, prefix, app)
 
     await app.run_until_disconnected()
 
-    logger.info("Завершение работы...")
+    logger.info("Goodbye!")
     return True

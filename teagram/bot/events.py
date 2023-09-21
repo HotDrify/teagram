@@ -76,6 +76,16 @@ class Events(Item):
                                                  reply_markup=InlineKeyboardMarkup().add(
                                                      InlineKeyboardButton('Вернуться', callback_data='send_cfg')
                                                  ))
+        
+        try:
+            if (unit := self._units[call.data]):
+                if unit.callback:
+                    try:
+                        await unit.callback(call)
+                    except Exception as error:
+                        logging.exception(error)
+        except KeyError:
+            pass
 
         for func in self._manager.callback_handlers.values():
             if not await self._check_filters(func, func.__self__, call):

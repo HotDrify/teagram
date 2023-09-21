@@ -161,7 +161,7 @@ class ConfigMod(loader.Module):
         if buttons:
             keyboard.row(*buttons)
 
-        keyboard.add(InlineKeyboardButton('🔄 Назад', callback_data='send_cfg'))
+        keyboard.add(InlineKeyboardButton(self.strings['back'], callback_data='send_cfg'))
         attributes = []
      
         for key, value in attrs.items():
@@ -210,7 +210,7 @@ class ConfigMod(loader.Module):
                 callback_data='change_def'
             ),
             InlineKeyboardButton(
-                '🔄 '+self.strings['back'],
+                self.strings['back'],
                 callback_data='send_cfg'
             ),
         )

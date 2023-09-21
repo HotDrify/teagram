@@ -2,13 +2,11 @@ import logging
 import asyncio
 import sys
 import traceback
-import inspect
+import typing
 
 from aiogram import Bot, Dispatcher, exceptions
 from aiogram.types import (
-    InlineKeyboardMarkup, InlineQuery, InputTextMessageContent,
-    InlineQueryResultArticle, InlineQueryResultDocument, InlineQueryResultPhoto,
-    InlineKeyboardButton
+    InlineKeyboardMarkup
 )
 
 from telethon.types import Message, Photo, Document
@@ -145,6 +143,7 @@ class BotManager(Events, TokenManager):
         text: str,
         message: Message, 
         reply_markup: Union[InlineKeyboardMarkup, None] = None,
+        callback: typing.Any = None,
         photo: Photo = None,
         doc: Document = None
     ):
@@ -155,10 +154,14 @@ class BotManager(Events, TokenManager):
             'description': description,
             'text': text,
             'keyboard': reply_markup,
+            'callback': callback,
             'message': message,
             'photo': photo,
             'doc': doc,
-            'top_msg_id': message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id
+            'top_msg_id': (
+                (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id) 
+                if message.reply_to else None
+            )
         }
 
         try:
@@ -170,6 +173,5 @@ class BotManager(Events, TokenManager):
 
             await utils.answer(
                 message,
-                f'Не удалось отправить форму\n'
-                f"<code>{error}</code>"
+                f"❌ <code>{error}</code>"
             )   

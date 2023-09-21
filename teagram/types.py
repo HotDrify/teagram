@@ -3,11 +3,11 @@ from typing import Any, Dict, List, Union
 
 from telethon import TelegramClient, types
 
-from . import database
+from . import database, bot
 from  dataclasses import dataclass, field
 from .validators import Integer, String, Boolean, ValidationError
 
-from aiogram import Dispatcher, Bot
+from aiogram import Dispatcher
 
 class Module:
     """Module's descripton"""
@@ -24,22 +24,23 @@ class ModulesManager:
 
     def __init__(self) -> None:
         self.modules: List[Module]
+        self.loops: List[FunctionType]
         self.watcher_handlers: List[FunctionType]
-
+        
         self.command_handlers: Dict[str, FunctionType]
         self.message_handlers: Dict[str, FunctionType]
         self.inline_handlers: Dict[str, FunctionType]
         self.callback_handlers: Dict[str, FunctionType]
 
+        self.aliases: dict
         self._local_modules_path: str
 
-        self.me: types.User
+        self._client: TelegramClient
         self._db: database.Database
-
-        self.aliases: Dict[str, str]
+        self.me: types.User
 
         self.dp: Dispatcher
-        self.bot_manager: Bot
+        self.bot_manager: bot.BotManager
 
 class WaitForDefault:
     pass

@@ -27,6 +27,42 @@ updater:
   error: "❌ <b>Error occurred: {}</b>"
   downloading: "📁 <b>Downloading requirements...</b>"
 
+loader:
+  noargs: "❌ <b>No arguments</b>"
+  urlrepo: "✅ <b>Repository link has been reset</b>"
+  wrongurl: "❌ <b>Incorrect URL specified</b>"
+  yesurl: "✅ <b>Repository link has been set</b>"
+  errapi: "❌ <b>Invalid repository link.</b>\n<b>Change it using the command: dlrepo <repository link or reset></b>"
+  noalltxt: "❌ <b>No <a href=\"{modules_repo}\">all.txt</a> file found in the <a href=\"{modules_repo}\">repository</a></b>\n"
+  listmods: "📥 <b>List of available modules from <a href=\"{modules_repo}\">repository</a>:</b>\n\n<code>all</code> - download all modules\n"
+  downdedreq: "✅ <b>Dependencies installed. Restart is required</b>"
+  errmod: "❌ <b>Failed to load module. See logs for details</b>"
+  modurlerr: "❌ <b>Module is unavailable via the link</b>"
+  modnameerr: "❌ <b>Incorrect module name</b>"
+  basicerr: '❌ <b>An error occurred, check the logs</b>'
+  reqerr: "❌ <b>An unexpected error occurred. See logs for details</b>"
+  loadedmod: "✅ <b>Module \"<code>{}</code>\" loaded</b>"
+  unloadedmod: "✅ <b>Module \"<code>{}</code>\" unloaded</b>"
+  reloaded: "✅ <b>Module \"<code>{}</code>\" reloaded</b>"
+  loaded: "✅ <b>Loaded <b>{}</b> out of <b>{}</b> modules</b>"
+  notfound: '❌ <b>Module {} not found</b>'
+  noreply: "❌ <b>No reply to the file</b>"
+  errunicode: "❌ <b>Incorrect file encoding</b>"
+  cantload: "❌ <b>You cannot load built-in modules</b>"
+  cantunload: "❌ <b>You cannot unload built-in modules</b>"
+  restarting: "🔄 <b>Restarting...</b>"
+  wrongmod: '❌ <b>You specified the wrong module</b>'
+  replymod: '⚙ <b>Module <code>{}</code></b>\n'
+  replytoload: '📁 <b>To install the module, send <code>{}loadmod</code> as a reply to this message</b>'
+
+translator:
+  notext: '❌ <b>You did not specify any text</b>'
+  wronglang: '❌ <b>Incorrect language (<code>{}</code>)</b>'
+  lang: "Language"
+  pronun: "Pronunciation"
+  text: "Text"
+  trans: "Translation"
+
 terminal:
   cmd: "Command"
   output: "Output"

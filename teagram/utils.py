@@ -19,11 +19,11 @@ from telethon.tl.functions.channels import CreateChannelRequest
 from telethon import TelegramClient, types, events
 from telethon.tl import custom
 
-from . import database
+from . import database, init_time
 
 Message = Union[custom.Message, types.Message]
 git_hash = lambda: git.Repo().head.commit.hexsha
-init_time = time.time()
+_init_time = init_time
 BASE_DIR = (
     "/data"
     if "DOCKER" in os.environ

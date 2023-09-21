@@ -46,12 +46,12 @@ async def get_git_raw_link(repo_url: str):
 @loader.module(name="Loader", author='teagram')
 class LoaderMod(loader.Module):
     """Загрузчик модулей"""
-
+    strings = {'name': 'loader'}
     async def dlrepo_cmd(self, message: types.Message, args: str):
         """Установить репозиторий с модулями. Использование: dlrepo <ссылка на репозиторий или reset>"""
         if not args:
             return await utils.answer(
-                message, "❌ Нет аргументов")
+                message, self.strings['noargs'])
 
         if args == "reset":
             self.db.set(
@@ -59,15 +59,15 @@ class LoaderMod(loader.Module):
                 "https://github.com/itzlayz/teagram-modules "
             )
             return await utils.answer(
-                message, "✅ Ссылка на репозиторий была сброшена")
+                message, self.strings['urlrepo'])
 
         if not await get_git_raw_link(args):
             return await utils.answer(
-                message, "❌ Ссылка указана неверно")
+                message, self.strings['wrongurl'])
 
         self.db.set("teagram.loader", "repo", args)
         return await utils.answer(
-            message, "✅ Ссылка на репозиторий установлена")
+            message, self.strings['yesurl'])
 
     async def dlmod_cmd(self, message: types.Message, args: str):
         """Загрузить модуль по ссылке. Использование: dlmod <ссылка или all или ничего>"""
@@ -78,16 +78,16 @@ class LoaderMod(loader.Module):
         api_result = await get_git_raw_link(modules_repo)
         if not api_result:
             return await utils.answer(
-                message, "<b>❌ Неверная ссылка на репозиторий.</b>\n"
-                        "<b>Поменяй её с помощью команды: dlrepo <ссылка на репозиторий или reset></b>"
+                message, self.strings['errapi']
             )
 
         raw_link = api_result
         modules = await utils.run_sync(requests.get, raw_link + "all.txt")
         if modules.status_code != 200:
             return await utils.answer(
-                message, (
-                    f"<b>❌ В <a href=\"{modules_repo}\">репозитории</a> не найден файл all.txt</b>\n"
+                message, 
+                self.strings['noalltxt'].format(
+                    modules_repo=modules_repo
                 )
             )
 
@@ -95,8 +95,7 @@ class LoaderMod(loader.Module):
 
         if not args:
             text = (
-                f"<b>📥 Список доступных модулей с <a href=\"{modules_repo}\">репозитория</a>:</b>\n\n"
-                + "<code>all</code> - загрузит все модули\n"
+                self.strings["listmods"].format(modules_repo=modules_repo)
                 + "\n".join(
                     map("<code>{}</code>".format, modules))
             )
@@ -134,16 +133,16 @@ class LoaderMod(loader.Module):
 
                 module_name = await self.manager.load_module(r.text, r.url)
                 if module_name is True:
-                    error_text = "✅ Зависимости установлены. Требуется перезагрузка"
+                    error_text = self.strings['downdedreq']
 
                 if not module_name:
-                    error_text = "❌ Не удалось загрузить модуль. Подробности смотри в логах"
+                    error_text = self.strings['errmod']
             except requests.exceptions.MissingSchema:
-                error_text = "❌ Ссылка указана неверно"
+                error_text = self.strings['wrongurl']
             except requests.exceptions.ConnectionError:
-                error_text = "❌ Модуль недоступен по ссылке"
+                error_text = self.strings['modurlerr']
             except requests.exceptions.RequestException:
-                error_text = "❌ Произошла непредвиденная ошибка. Подробности смотри в логах"
+                error_text = self.strings['reqerr']
 
             if error_text:
                 return await utils.answer(message, error_text)
@@ -153,9 +152,9 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, (
-                f"✅ Модуль \"<code>{module_name}</code>\" загружен"
+                self.strings['loadedmod'].format(module_name=module_name)
                 if args != "all"
-                else f"✅ Загружено <b>{count}</b> из <b>{len(modules)}</b> модулей"
+                else self.strings['loaded'].format(count, len(modules))
             )
         )
 
@@ -173,24 +172,24 @@ class LoaderMod(loader.Module):
 
             if module is True:
                 return await utils.answer(
-                    message, "✅ Зависимости установлены. Требуется перезагрузка")
+                    message, self.strings['downdedreq'])
 
             if not module:
                 return await utils.answer(
-                    message, "❌ Не удалось загрузить модуль. Подробности смотри в логах")
+                    message, self.strings['errmod'])
 
             with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
                 file.write(response.text)
             
             await utils.answer(
                 message, 
-                f"✅ Модуль \"<code>{module}</code>\" загружен"
+                self.strings['loadedmod'].format(module)
             )
 
         except requests.exceptions.MissingSchema:
-            await utils.answer(message, '❌ Вы указали неправильную ссылку')
+            await utils.answer(message, self.strings['wrongurl'])
         except Exception as error:
-            await utils.answer(message, f'❌ Ошибка: <code>{error}</code>')
+            await utils.answer(message, f'❌ <code>{error}</code>')
 
     async def loadmod_cmd(self,  message: Message):
         """Загрузить модуль по файлу. Использование: <реплай на файл>"""
@@ -205,7 +204,7 @@ class LoaderMod(loader.Module):
 
         if not file:
             return await utils.answer(
-                message, "❌ Нет реплая на файл")
+                message, self.strings['noreply'])
 
         _file = await reply.download_media(bytes)
 
@@ -213,7 +212,7 @@ class LoaderMod(loader.Module):
             _file = _file.decode()
         except UnicodeDecodeError:
             return await utils.answer(
-                message, "❌ Неверная кодировка файла")
+                message, self.strings['errunicode'])
 
         modules = [
             '_example'
@@ -231,7 +230,7 @@ class LoaderMod(loader.Module):
             if _file == mod:
                 return await utils.answer(
                     message,
-                    "❌ Нельзя загружать встроенные модули"
+                    self.strings['cantload']
                 )
 
         module_name = await self.manager.load_module(_file)
@@ -242,23 +241,23 @@ class LoaderMod(loader.Module):
                 file.write(_file)
 
             return await utils.answer(
-                message, "✅ <b>Зависимости установлены. Требуется перезагрузка</b>")
+                message, self.strings['downdedreq'])
 
         if not module_name:
             return await utils.answer(
-                message, "❌ <b>Не удалось загрузить модуль. Подробности смотри в логах</b>")
+                message, self.strings['errmod'])
         
         with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
             file.write(_file)
         
         await utils.answer(
-            message, f"✅ Модуль \"<code>{module_name}</code>\" загружен")
+            message, self.strings['loadedmod'].format(module_name))
 
     async def unloadmod_cmd(self,  message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
         if not (module_name := self.manager.unload_module(args)):
             return await utils.answer(
-                message, "❌ Неверное название модуля")
+                message, self.strings['modnamerr'])
         
         modules = [
             'config',
@@ -275,16 +274,16 @@ class LoaderMod(loader.Module):
         if module_name in modules:
             return await utils.answer(
                 message,
-                "❌ Выгружать встроенные модули нельзя"
+                self.strings['cantunload']
             )
 
         return await utils.answer(
-            message, f"✅ Модуль \"<code>{module_name}</code>\" выгружен")
+            message, self.strings['unloadedmod'].format(module_name))
     
     async def reloadmod_cmd(self,  message: types.Message, args: str):
         if not args:
             return await utils.answer(
-                message, "❌ Вы не указали модуль")
+                message, self.strings['noargs'])
         
         try:
             module = args.split(maxsplit=1)[0].replace('.py', '')
@@ -311,7 +310,7 @@ class LoaderMod(loader.Module):
             if module + '.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(
                     message,
-                    f'❌ Модуль {module} не найден'
+                    self.strings['notfound'].format(module)
                 )
             
             unload = self.manager.unload_module(module)
@@ -323,37 +322,36 @@ class LoaderMod(loader.Module):
             if not load and not unload:
                 return await utils.answer(
                     message,
-                    '❌ Произошла ошибка, пожалуйста проверьте логи'
+                    self.strings['reqerr']
                 )
         except Exception as error:
             logging.error(error)
             return await utils.answer(
                 message,
-                '❌ Произошла ошибка, пожалуйста проверьте логи'
+                self.strings['basicerr']
             )
 
 
         return await utils.answer(
-            message, f"✅ Модуль \"<code>{module}</code>\" перезагружен")
+            message, self.strings['reloaded'].format(module))
     
     @loader.command('Скинуть модуль из папки модулей')
     async def showmod(self, message: types.Message, args):
         if not (mod := args.split()) or mod[0] + '.py' not in os.listdir('teagram/modules'):
-            return await utils.answer(message, '❌ Вы указали неправильный модуль')
+            return await utils.answer(message, self.strings['wrongmod'])
 
         await utils.answer(
             message, 
             f'teagram/modules/{mod[0]}.py',
             document=True,
-            caption=f'⚙ Модуль <code>{mod[0]}</code>\n'
-            f'📁 <b>Чтобы установить модуль, напишите <code>{self.prefix[0]}loadmod</code> реплаем на это сообщение</b>'
+            caption=self.strings['replymod'].format(mod[0])
+            +self.strings['replytoload'].format(self.prefix[0])
         )
 
 
     async def restart_cmd(self, message: types.Message):
         """Перезагрузка юзербота"""
         def restart() -> None:
-            """Запускает загрузку юзербота"""
             os.execl(sys.executable, sys.executable, "-m", "teagram")
 
         atexit.register(restart)
@@ -365,8 +363,6 @@ class LoaderMod(loader.Module):
             }
         )
 
-        await utils.answer(message, "<b><emoji id=5328274090262275771>🛠</emoji> Перезагрузка...</b>")
-
-        logging.info("Перезагрузка...")
-        return sys.exit(0)
+        await utils.answer(message, self.strings['restarting'])
+        sys.exit(0)
     

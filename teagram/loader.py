@@ -336,7 +336,7 @@ class ModulesManager:
                     f"Ошибка при загрузке стороннего модуля {custom_module}: {error}")
 
         logging.info("Менеджер модулей загружен")
-        return self.bot_manager
+        return self.bot_manager.bot
 
     def register_instance(
         self,
@@ -401,7 +401,9 @@ class ModulesManager:
                         'updater'
                     ]:
                         a = utils.get_langpack()
-                        instance.strings = a.get(name.get('name'))
+                        pack = a.get(name.get('name'))
+                        pack['name'] = name.get('name')
+                        instance.strings = pack
 
         if not instance:
             logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
@@ -480,7 +482,7 @@ class ModulesManager:
         if is_replace:
             module = module_name
         else:
-            if not (module := self.get_module(module_name)):
+            if not (module := self.lookup(module_name)):
                 return False
 
             if (get_module := inspect.getmodule(module)).__spec__.origin != "<string>":
