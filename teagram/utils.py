@@ -106,6 +106,7 @@ def get_topic(message: Message) -> typing.Optional[int]:
         if (
             isinstance(message, Message)
             or isinstance(message, types.Message)
+            or isinstance(message, events.NewMessage.Event)
             and message.reply_to
             and message.reply_to.forum_topic
         )
