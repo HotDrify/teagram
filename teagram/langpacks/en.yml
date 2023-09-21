@@ -25,7 +25,7 @@ updater:
   eone: "❌ <b>An error occurred while checking for an available update.</b>"
   etwo: "❌ <b>Please make sure you have the GIT command working</b>"
   error: "❌ <b>Error occurred: {}</b>"
-  downloading: "📁 <b>Устанавливаем зависимости...</b>"
+  downloading: "📁 <b>Downloading requirements...</b>"
 
 terminal:
   cmd: "Command"
