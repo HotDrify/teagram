@@ -95,9 +95,7 @@ class UpdateMod(loader.Module):
 
                 run(
                     [
-                        sys.executable,
-                        "-m",
-                        "pip",
+                        "pip3",
                         "install",
                         "--upgrade",
                         "--disable-pip-version-check",
