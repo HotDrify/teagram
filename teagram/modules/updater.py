@@ -92,18 +92,20 @@ class UpdateMod(loader.Module):
             
             if 'requirements.txt' in output:
                 await utils.answer(message, self.strings['downloading'])
-
-                run(
-                    [
-                        "pip3",
-                        "install",
-                        "--upgrade",
-                        "--disable-pip-version-check",
-                        "--no-warn-script-location",
-                        "requirements.txt",
-                    ],
-                    check=True,
-                )
+                try:
+                    run(
+                        [
+                            "pip3",
+                            "install",
+                            "--upgrade",
+                            "--disable-pip-version-check",
+                            "--no-warn-script-location",
+                            "requirements.txt",
+                        ],
+                        check=True,
+                    )
+                except:
+                    pass
             
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
