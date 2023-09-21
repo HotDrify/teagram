@@ -78,3 +78,4 @@ db.json
 teagram.session
 teagram.session-journal
 .idea
+.deepsource.toml
