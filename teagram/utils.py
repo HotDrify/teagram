@@ -4,6 +4,7 @@ import random
 import string
 import typing
 import yaml
+import time
 import os
 import io
 
@@ -22,6 +23,7 @@ from . import database
 
 Message = Union[custom.Message, types.Message]
 git_hash = lambda: git.Repo().head.commit.hexsha
+init_time = time.perf_counter()
 BASE_DIR = (
     "/data"
     if "DOCKER" in os.environ
@@ -157,7 +159,7 @@ async def answer(
     response: Union[str, Any],
     photo: bool = False,
     document: bool = False,
-    topic: bool = True,
+    topic: bool = False,
     caption: str = '',
     parse_mode: str = 'html',
     **kwargs

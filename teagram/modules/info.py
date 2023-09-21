@@ -39,7 +39,7 @@ class AboutMod(loader.Module):
     async def info_inline_handler(self, inline):
         platform = utils.get_platform()
 
-        uptime_raw = round(time.time() - self.boot_time)
+        uptime_raw = round(time.time() - utils.init_time)
         uptime = (timedelta(seconds=uptime_raw))
         
         last = utils.git_hash()
