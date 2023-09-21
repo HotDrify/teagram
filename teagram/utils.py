@@ -2,6 +2,7 @@ import asyncio
 import functools
 import random
 import string
+import typing
 import yaml
 import os
 import io
@@ -86,8 +87,30 @@ def get_full_command(message: Message) -> Union[
 
     return prefixes[0], command.lower(), args[-1] if args else ""
 
-def get_chat(message: Message):
+def get_chat(message: Message) -> typing.Optional[int]:
+    """
+    Get chat id of message
+    :param message: Message to get chat of
+    :return: int or None if not present
+    """
     return (message.chat.id if message.chat else None or message._chat_peer)
+
+def get_topic(message: Message) -> typing.Optional[int]:
+    """
+    Get topic id of message
+    :param message: Message to get topic of
+    :return: int or None if not present
+    """
+    return (
+        (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id)
+        if (
+            isinstance(message, Message)
+            or isinstance(message, types.Message)
+            and message.reply_to
+            and message.reply_to.forum_topic
+        )
+        else None
+    )
 
 def strtobool(val):
     # distutils.util.strtobool
