@@ -38,9 +38,7 @@ class AboutMod(loader.Module):
 
     async def info_inline_handler(self, inline):
         platform = utils.get_platform()
-
-        uptime_raw = round(time.time() - utils.init_time)
-        uptime = (timedelta(seconds=uptime_raw))
+        uptime = timedelta(seconds=round(time.time() - utils.init_time))
         
         last = utils.git_hash()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
