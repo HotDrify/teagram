@@ -12,4 +12,4 @@ requests>=2.31.0
 qrcode>=7.4.2
 fastapi>=0.101.1
 
-# Python>=3.9
+# Python >= 3.9
