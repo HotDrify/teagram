@@ -23,7 +23,7 @@ from . import database
 
 Message = Union[custom.Message, types.Message]
 git_hash = lambda: git.Repo().head.commit.hexsha
-init_time = time.perf_counter()
+init_time = time.time()
 BASE_DIR = (
     "/data"
     if "DOCKER" in os.environ
