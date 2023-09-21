@@ -4,7 +4,7 @@ import time
 import atexit
 
 from telethon import types
-from subprocess import check_output
+from subprocess import check_output, run
 from .. import loader, utils, validators
 from ..types import Config, ConfigValue
 from loguru import logger
@@ -89,6 +89,25 @@ class UpdateMod(loader.Module):
             
             if 'Already up to date.' in output:
                 return await utils.answer(message, self.strings['lastver'])
+            
+            if 'requirements.txt' in output:
+                await utils.answer(message, self.strings['downloading'])
+                
+                run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "--upgrade",
+                        "-q",
+                        "--disable-pip-version-check",
+                        "--no-warn-script-location",
+                        "-r",
+                        "requirements.txt",
+                    ],
+                    check=True,
+                )
             
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
