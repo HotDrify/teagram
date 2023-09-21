@@ -15,7 +15,7 @@ from types import FunctionType
 from typing import Any, List, Literal, Tuple, Union
 
 from telethon.tl.functions.channels import CreateChannelRequest
-from telethon import TelegramClient, types
+from telethon import TelegramClient, types, events
 from telethon.tl import custom
 
 from . import database
