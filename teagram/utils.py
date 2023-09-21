@@ -157,6 +157,7 @@ async def answer(
     response: Union[str, Any],
     photo: bool = False,
     document: bool = False,
+    topic: bool = True,
     caption: str = '',
     parse_mode: str = 'html',
     **kwargs
@@ -200,7 +201,7 @@ async def answer(
                 file,
                 caption=f'📁 <b>Сообщение отправлено файлом</b> (<code>{len(response)}/4096</code>)',
                 parse_mode='HTML',
-                reply_to=message.id,
+                reply_to=(get_topic(message) if topic else message.id),
                 **kwargs
             )
             
@@ -217,7 +218,12 @@ async def answer(
                     **kwargs
                 )
             except: 
-                msg = await message.reply(response, parse_mode=parse_mode, **kwargs)
+                msg = await message.reply(
+                    response, 
+                    parse_mode=parse_mode, 
+                    reply_to=(get_topic(message) if topic else message.id), 
+                    **kwargs
+                )
 
         messages.append(msg)
 
@@ -228,7 +234,7 @@ async def answer(
                 response,
                 caption=caption,
                 parse_mode=parse_mode,
-                reply_to=message.id,
+                reply_to=(get_topic(message) if topic else message.id),
                 **kwargs
             )
         )
