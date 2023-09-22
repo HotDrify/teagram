@@ -47,9 +47,8 @@ class Conversation:
             [exc_type, exc_value, exc_traceback]
         ):
             logging.exception(exc_value)
-        else:
-            if self.purge:
-                await self._purge()
+        elif self.purge:
+            await self._purge()
 
         return self.messagee_to_purge.clear()
 
