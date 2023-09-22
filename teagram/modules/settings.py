@@ -2,26 +2,13 @@ import time
 import io
 import os
 import logging
-from logging import StreamHandler
 
 from telethon import types
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from .. import loader, utils
+from .. import loader, utils, bot
 
-
-class CustomStreamHandler(StreamHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.logs: list = []
-
-    def emit(self, record):
-        self.logs.append(record)
-
-        super().emit(record)
-
-handler = CustomStreamHandler()
 log = logging.getLogger()
-log.addHandler(handler)
 
 @loader.module(name="Settings", author="teagram")
 class SettingsMod(loader.Module):
@@ -41,7 +28,7 @@ class SettingsMod(loader.Module):
             return await utils.answer(
                 message, self.strings['no_logs'])
 
-        handler: CustomStreamHandler = log.handlers[1]
+        handler = log.handlers[1]
         logs = '\n'.join(str(error) for error in handler.logs).encode('utf-8')
         
         if not logs:
@@ -245,4 +232,32 @@ class SettingsMod(loader.Module):
             message,
             (f'➡ {self.strings["user"]} <code>' + ', '.join(str(user) for user in _users) + '</code>')
               if _users else self.strings['nouser']
+        )
+
+    @loader.command('Deleting teagram')
+    async def uninstall_teagram(self, message: types.Message):
+        manager: bot.BotManager = self.bot
+
+        # TODO:
+        # translation
+        
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(
+            InlineKeyboardButton(
+                '⚠ Подтвердить',
+                callback_data='teagram_perm_delete'
+            ),
+            InlineKeyboardButton(
+                '❌ Отменить',
+                callback_data='no_perm_delete'
+            )
+        )
+
+        await manager.form(
+            title='Delete teagram',
+            description='Delete teagram permanently',
+            text='⚠ <b>Вы уверены что хотите удалить teagram?</b>\n',
+            message=message,
+            reply_markup=keyboard,
+            callback='_loader_permdel'
         )

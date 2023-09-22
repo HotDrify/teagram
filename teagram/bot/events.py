@@ -1,11 +1,11 @@
 import logging
 import inspect
 import traceback
-
 from aiogram.types import (
     CallbackQuery, Message, InlineKeyboardButton,
     InlineKeyboardMarkup, InlineQuery, InlineQueryResultArticle, 
     InputTextMessageContent, InlineQueryResultPhoto, InlineQueryResultDocument)
+
 from .types import Item
 from .. import utils
 
@@ -14,6 +14,9 @@ class Events(Item):
     Event handler class.
     Handles various event types such as messages, callback queries, and inline queries.
     """
+    def __init__(self):
+        super().__init__()
+        self._units: dict
 
     async def _message_handler(self, message: Message) -> Message:
         """
@@ -28,7 +31,7 @@ class Events(Item):
             Message: The processed message.
         """
         if message.text == '/start':
-            await message.reply_photo(
+            return await message.reply_photo(
                 photo='https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true',
                 caption='☕ Добро пожаловать! Это инлайн бот <b>Teagram</b>\n'
                 '✒ Предлагаем вам настроить конфиг\n'
@@ -59,6 +62,12 @@ class Events(Item):
         Returns:
             CallbackQuery: The processed callback query.
         """
+        if call.from_user.id != (await self._app.get_me()).id:
+            await call.answer(
+                "❌ Вы не владелец",
+                cache_time=0
+            )
+            
         if call.data.startswith('cfg'):
             if (attr := call.data.replace('cfgyes', '')):
                 attr = attr.split('|')
@@ -71,15 +80,47 @@ class Events(Item):
                     utils.validate(data['toset'])
                 )
 
-                await self.bot.edit_message_text(inline_message_id=call.inline_message_id,
-                                                 text='✔ Вы изменили атрибут!',
-                                                 reply_markup=InlineKeyboardMarkup().add(
-                                                     InlineKeyboardButton('Вернуться', callback_data='send_cfg')
-                                                 ))
+                await self.bot.edit_message_text(
+                    inline_message_id=call.inline_message_id,
+                    text='✔ Вы изменили атрибут!',
+                    reply_markup=InlineKeyboardMarkup().add(
+                        InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                    )
+                )
         
         try:
+            if call.data == 'teagram_perm_delete':
+                call.data = '_loader_permdel'
+
             if (unit := self._units[call.data]):
-                if unit.callback:
+                if unit.get('callback'):
+                    if (
+                        self._units.get('_loader_permdel', '') 
+                        and 'teagram_perm_delete' in str(unit)
+                    ):
+                        self._units.pop(call.data)
+                        from os import rmdir, remove
+
+                        try:
+                            remove(utils.BASE_PATH / 'config.ini')
+                            remove(utils.BASE_PATH / 'db.json')
+
+                            try:
+                                rmdir(utils.BASE_PATH / 'teagram')
+                            except:
+                                pass
+
+                            await call.answer('✔ Успешно...', True)
+                        except PermissionError:
+                            await call.answer('⚠ Недостаточно прав', True)
+                        except FileNotFoundError:
+                            await call.answer('⚠ Не удалось найти папку, удаляем сессию', True)
+                        except:
+                            await call.answer('⚠ Неизвестная ошибка, удаляем сессию', True)
+
+                        await self._app.log_out()
+                        return
+                    
                     try:
                         await unit.callback(call)
                     except Exception as error:
@@ -110,6 +151,19 @@ class Events(Item):
         Returns:
             InlineQuery: The processed inline query.
         """
+        if inline_query.from_user.id != (await self._app.get_me()).id:
+            await inline_query.answer(
+                    [
+                        InlineQueryResultArticle(
+                            id=utils.random_id(),
+                            title="Teagram",
+                            description='Вы не владелец',
+                            input_message_content=InputTextMessageContent(
+                                "❌ Вы не владелец")
+                        )
+                    ], cache_time=0
+                )
+            
         if not (query := inline_query.query):
             commands = ""
             for command, func in self._manager.inline_handlers.items():
@@ -197,20 +251,7 @@ class Events(Item):
         except Exception as error:
             traceback.print_exc()
             
-        try:
-            if inline_query.from_user.id != (await self._app.get_me()).id:
-                await inline_query.answer(
-                        [
-                            InlineQueryResultArticle(
-                                id=utils.random_id(),
-                                title="Teagram",
-                                description='Вы не владелец',
-                                input_message_content=InputTextMessageContent(
-                                    "❌ Вы не владелец")
-                            )
-                        ], cache_time=0
-                    )
-        
+        try:        
             if (data := self.cfg[cmd]):
                 if not args:
                     return await inline_query.answer(

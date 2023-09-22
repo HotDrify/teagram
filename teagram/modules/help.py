@@ -40,7 +40,7 @@ class HelpMod(loader.Module):
                 f"<emoji id=5359370246190801956>☕️</emoji> {self.strings['mods']} <b>{modules_count}</b>\n{bot_inline_info}{text}"
             )
 
-        module = self.manager.get_module(args)
+        module = self.manager.lookup(args)
         if not module:
             return await utils.answer(
                 message, f"<b><emoji id=5465665476971471368>❌</emoji> {self.strings['nomod']}</b>")
