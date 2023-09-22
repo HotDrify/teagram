@@ -130,7 +130,7 @@ class Events(Item):
                     )
                 ], cache_time=0
             )
-        
+
         query_ = query.split()
 
         cmd = query_[0]
@@ -175,7 +175,7 @@ class Events(Item):
                         )
                     ]
                 )
-            elif form['doc']:
+            else:
                 await inline_query.answer(
                     [
                         InlineQueryResultDocument(
@@ -196,7 +196,7 @@ class Events(Item):
             pass
         except Exception as error:
             traceback.print_exc()
-            
+
         try:
             if inline_query.from_user.id != (await self._app.get_me()).id:
                 await inline_query.answer(
@@ -210,7 +210,7 @@ class Events(Item):
                             )
                         ], cache_time=0
                     )
-        
+
             if (data := self.cfg[cmd]):
                 if not args:
                     return await inline_query.answer(
@@ -224,27 +224,26 @@ class Events(Item):
                             )
                         ], cache_time=0
                     )
-                else:
-                    attr = data['attr']
-                    data['toset'] = args
+                attr = data['attr']
+                data['toset'] = args
 
-                    await inline_query.answer(
-                        [
-                            InlineQueryResultArticle(
-                                id=utils.random_id(),
-                                title="☕ Teagram",
-                                input_message_content=InputTextMessageContent(
-                                    "Вы уверены что хотите изменить атрибут?"),
-                                reply_markup=InlineKeyboardMarkup()
-                                .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                                .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
-                            )
-                        ], cache_time=0
-                    )
+                await inline_query.answer(
+                    [
+                        InlineQueryResultArticle(
+                            id=utils.random_id(),
+                            title="☕ Teagram",
+                            input_message_content=InputTextMessageContent(
+                                "Вы уверены что хотите изменить атрибут?"),
+                            reply_markup=InlineKeyboardMarkup()
+                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
+                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
+                        )
+                    ], cache_time=0
+                )
         except KeyError:
             pass
 
-        
+
 
         func = self._manager.inline_handlers.get(cmd)
         if not func:

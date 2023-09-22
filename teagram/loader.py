@@ -65,7 +65,7 @@ class Loop:
 
     def stop(self):
         if self.task:
-            logger.info("{} loop have stopped".format(self.func.__name__))
+            logger.info(f"{self.func.__name__} loop have stopped")
             self.task.cancel()
 
             return True
@@ -118,11 +118,10 @@ class StringLoader(SourceLoader):
         self.origin = origin
 
     def get_code(self, full_name: str) -> Union[Any, None]:
-        source = self.get_source(full_name)
-        if not source:
+        if source := self.get_source(full_name):
+            return compile(source, self.origin, "exec", dont_inherit=True)
+        else:
             return None
-
-        return compile(source, self.origin, "exec", dont_inherit=True)
 
     def get_filename(self, _: str) -> str:
         return self.origin
@@ -143,9 +142,6 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
             elif hasattr(getattr(instance, method_name), "is_command"):
                 method_name = method_name.replace('_cmd', '').replace('cmd', '')
                 command_handlers[method_name] = getattr(instance, method_name)
-            else:
-                pass
-
     return command_handlers
 
 
@@ -421,7 +417,7 @@ class ModulesManager:
             spec = ModuleSpec(module_name, StringLoader(
                 module_source, origin), origin=origin)
             instance = self.register_instance(module_name, spec=spec)
-        except (ImportError, ModuleNotFoundError) as error:
+        except ImportError as error:
             if did_requirements:
                 return True
             try:

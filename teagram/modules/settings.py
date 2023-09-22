@@ -159,17 +159,16 @@ class SettingsMod(loader.Module):
 
     async def aliases_cmd(self, message: types.Message):
         """Показать все алиасы"""
-        aliases = self.manager.aliases
-        if not aliases:
+        if aliases := self.manager.aliases:
+            return await utils.answer(
+                message, self.strings['allalias'] + "\n".join(
+                    f"• <code>{alias}</code> ➜ {command}"
+                    for alias, command in aliases.items()
+                )
+            )
+        else:
             return await utils.answer(
                 message, self.strings['noalias'])
-
-        return await utils.answer(
-            message, self.strings['allalias'] + "\n".join(
-                f"• <code>{alias}</code> ➜ {command}"
-                for alias, command in aliases.items()
-            )
-        )
 
     async def ping_cmd(self, message: types.Message, args: str):
         """🍵 команда для просмотра пинга."""

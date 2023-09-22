@@ -82,7 +82,7 @@ class LoaderMod(loader.Module):
             )
 
         raw_link = api_result
-        modules = await utils.run_sync(requests.get, raw_link + "all.txt")
+        modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
         if modules.status_code != 200:
             return await utils.answer(
                 message, 
@@ -284,7 +284,7 @@ class LoaderMod(loader.Module):
         if not args:
             return await utils.answer(
                 message, self.strings['noargs'])
-        
+
         try:
             module = args.split(maxsplit=1)[0].replace('.py', '')
 
@@ -299,7 +299,7 @@ class LoaderMod(loader.Module):
                 'updater',
                 'loader'
             ]
-            
+
             # for mod in modules:
             #     if module == mod:
             #         return await utils.answer(
@@ -307,12 +307,12 @@ class LoaderMod(loader.Module):
             #             "❌ Нельзя перезагружать встроенные модули"
             #         )
 
-            if module + '.py' not in os.listdir('teagram/modules'):
+            if f'{module}.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(
                     message,
                     self.strings['notfound'].format(module)
                 )
-            
+
             unload = self.manager.unload_module(module)
             with open(f'teagram/modules/{module}.py', encoding='utf-8') as file:
                 module_source = file.read()
@@ -337,7 +337,9 @@ class LoaderMod(loader.Module):
     
     @loader.command('Скинуть модуль из папки модулей')
     async def showmod(self, message: types.Message, args):
-        if not (mod := args.split()) or mod[0] + '.py' not in os.listdir('teagram/modules'):
+        if not (mod := args.split()) or f'{mod[0]}.py' not in os.listdir(
+            'teagram/modules'
+        ):
             return await utils.answer(message, self.strings['wrongmod'])
 
         await utils.answer(
