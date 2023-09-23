@@ -46,10 +46,8 @@ if command -v python3 &>/dev/null; then
     eval "$SUDOCMD $PKGINSTALL python3"
 else
     echo "python3 is installed."
-
-if command -v 
+fi
 echo "[INFO] install packages..."
-eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
 if [[ -d "teagram" ]]; then 
     cd teagram
 else
