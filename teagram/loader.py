@@ -109,7 +109,7 @@ class Module:
     version: Union[int, float]
 
     async def on_load(self) -> Any:
-        print(f'[INFO] - module {self.name} loaded')
+        ...
 
 
 class StringLoader(SourceLoader):
@@ -296,6 +296,7 @@ class ModulesManager:
         self.me = me
 
         self.aliases = self._db.get(__name__, "aliases", {})
+        self.strings = utils.get_langpack().get('manager')
 
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None

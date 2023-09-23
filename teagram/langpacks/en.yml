@@ -10,6 +10,9 @@ help:
   version: "Version"
   desc: "Description"
 
+manager:
+  errorcmd: "❌ <b>Error executing command</b>: {}\n❔ <b>Logs</b>:\n<code>{}</code>"
+
 info:
   update: "<b>Update available</b>"
   owner: "Owner"
@@ -105,6 +108,7 @@ settings:
   noalias: "<b>There are no aliases</b>"
   allalias: "<b>🗄 All aliases:</b>\n"
   ping: "<b>Telegram response time</b>"
+  uptime: "<b>Uptime</b>"
   noreply: "<b>❌ You didn't specify the reply</b>"
   yourself: "<b>❌ You cannot indicate yourself</b>"
   owner: "<b>❌ The command is allowed only to the owner</b>"

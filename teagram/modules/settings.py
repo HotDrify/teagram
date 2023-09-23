@@ -3,6 +3,7 @@ import io
 import os
 import logging
 
+from datetime import timedelta
 from telethon import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -79,9 +80,10 @@ class SettingsMod(loader.Module):
         
         pack = utils.get_langpack()
         for instance in self.manager.modules:
-            if (name := getattr(instance, 'strings', '')):
-                print(name.get('name', ''))
-                if (stringsname := name.get('name', '').lower()) in [
+            name = getattr(instance, 'strings', None)
+            if name:
+                stringsname = name.get('name', '').lower()
+                if stringsname in [
                     'backup',
                     'config',
                     'eval',
@@ -94,9 +96,11 @@ class SettingsMod(loader.Module):
                     'translator',
                     'updater'
                 ]:
-                    pack = pack.get(stringsname)
-                    pack['name'] = stringsname
-                    instance.strings = pack.get(stringsname)
+                    _pack = pack.get(stringsname, None)
+
+                    if _pack:
+                        _pack['name'] = stringsname
+                        setattr(instance, 'strings', pack.get(stringsname))
 
         return await utils.answer(
             message, self.strings['lang'].format(language=language))
@@ -158,17 +162,19 @@ class SettingsMod(loader.Module):
             )
         )
 
-    async def ping_cmd(self, message: types.Message, args: str):
+    async def ping_cmd(self, message: types.Message):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
         
         msg = await message._client.send_message(utils.get_chat(message), "☕")
         
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
+        uptime = timedelta(seconds=round(time.time() - utils._init_time))
 
         await utils.answer(
             message,
-            f"🕒 <b>{self.strings['ping']}</b>: <code>{ping}ms</code>"
+            f"🕒 {self.strings['ping']}: <code>{ping}ms</code>"
+            f"❔ {self.strings['uptime']}: {uptime}"
         )
 
         await msg.delete()

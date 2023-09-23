@@ -407,15 +407,12 @@ def random_id(length: int = 10) -> str:
     )
 
 
-def get_langpack() -> Union[Any, List]:
+def get_langpack() -> Any:
     """
     Get the strings.
-    
-    Paramerts:
-        name (str): Name of langpack (language is getting automatically)
 
     Returns:
-        Union[Any, List]: The language pack.
+        Any: The language pack.
     """
     if not (lang := database.db.get('teagram.loader', 'lang')):
         database.db.set('teagram.loader', 'lang', 'en')

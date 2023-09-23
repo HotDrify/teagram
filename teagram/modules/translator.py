@@ -24,7 +24,7 @@ class TranslatorMod(loader.Module):
     async def translate(self, message: types.Message, args):
         """Перевод"""
         if not (text := args):
-            if not (text := (await message.get_reply_message()).raw_text):
+            if not (reply := (await message.get_reply_message())):
                 return await utils.answer(
                     message,
                     self.strings['notext']
@@ -36,7 +36,7 @@ class TranslatorMod(loader.Module):
                 self.strings['wronglang'].format(lang)
             )
         
-        translated: Translated = Translator().translate(text, dest=lang)
+        translated: Translated = Translator().translate((text or reply.raw_text), dest=lang)
         
         await utils.answer(
             message,

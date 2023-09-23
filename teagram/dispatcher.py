@@ -14,9 +14,9 @@ import traceback
 class DispatcherManager:
     """Менеджер диспетчера"""
 
-    def __init__(self, app: TelegramClient, modules: "loader.ModulesManager") -> None:
+    def __init__(self, app: TelegramClient, manager: "loader.ModulesManager") -> None:
         self.app = app
-        self.modules = modules
+        self.manager = manager
     
     async def check_filters(
         self,
@@ -32,7 +32,7 @@ class DispatcherManager:
             if not coro:
                 return False
         else:
-            _users = self.modules._db.get('teagram.loader', 'users', [])
+            _users = self.manager._db.get('teagram.loader', 'users', [])
             
             if not message.out and message.sender_id not in _users:
                 return False
@@ -63,8 +63,8 @@ class DispatcherManager:
         if not (command or args):
             return
 
-        command = self.modules.aliases.get(command, command)
-        func = self.modules.command_handlers.get(command.lower())
+        command = self.manager.aliases.get(command, command)
+        func = self.manager.command_handlers.get(command.lower())
         if not func:
             return
     
@@ -87,15 +87,15 @@ class DispatcherManager:
             logging.exception(error)
             await utils.answer(
                 message,
-                f"<b>❌ Произошла ошибка при выполнении команды:</b> <code>{message.text}</code>\n"
-                f"<b>❔ Логи:</b>\n<code>{error}</code>"
+                self.manager.strings['errorcmd'].format(
+                    message.text, error)
             )
 
         return message
 
     async def _handle_watchers(self, message: types.Message) -> types.Message:
         """Обработчик вотчеров"""
-        for watcher in self.modules.watcher_handlers:
+        for watcher in self.manager.watcher_handlers:
             try:
                 setattr(message, '_client', self.app)
 
