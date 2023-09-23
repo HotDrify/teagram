@@ -68,9 +68,15 @@ else
     exit 1
 fi
 
-echo "[INFO] Updating and upgrading all packages..." >> "$LOG_FILE"
-echo "[INFO] Updating..."
-eval "$SUDOCMD $UPD"
+read -p "Do you want to update packages? (Y/n): " update_choice
+if [[ "$update_choice" == "y" ]]; then
+    echo "[INFO] Updating and upgrading all packages..." >> "$LOG_FILE"
+    echo "[INFO] Updating..."
+    eval "$SUDOCMD $UPD"
+else
+    echo "[INFO] Skipping package update as per user choice."
+fi
+
 echo "[INFO] Installing 4 packages..." >> "$LOG_FILE"
 echo "[INFO] Installing packages..."
 eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
