@@ -11,6 +11,9 @@ from .. import loader, utils, bot
 
 log = logging.getLogger()
 
+class TestException(Exception):
+    pass
+
 @loader.module(name="Settings", author="teagram")
 class SettingsMod(loader.Module):
     """Настройки юзер бота
@@ -29,8 +32,10 @@ class SettingsMod(loader.Module):
             return await utils.answer(
                 message, self.strings['no_logs'])
 
-        handler = log.handlers[1]
-        logs = '\n'.join(str(error) for error in handler.logs).encode('utf-8')
+        if not getattr(self, '_logger', ''):
+            self._logger = log.handlers[0]
+
+        logs = '\n'.join(str(error) for error in self._logger.logs).encode('utf-8')
         
         if not logs:
             return await utils.answer(
@@ -48,7 +53,21 @@ class SettingsMod(loader.Module):
                 lvl=lvl, 
                 name=logging.getLevelName(lvl))
             )
-    
+
+    @loader.command()
+    async def clearlogs(self, message: types.Message):
+        if not getattr(self, '_logger', ''):
+            self._logger = log.handlers[0]
+
+        self._logger.flush()
+        self._logger.logs = []
+
+        await utils.answer(message, self.strings['flushed'])
+
+    @loader.command()
+    async def error(self, message):
+        raise TestException("Test exception")
+
     async def setprefix_cmd(self, message: types.Message, args: str):
         """Изменить префикс, можно несколько штук разделённые пробелом. Использование: setprefix <префикс> [префикс, ...]"""
         if not (args := args.split()):
@@ -79,6 +98,8 @@ class SettingsMod(loader.Module):
         self.db.set("teagram.loader", "lang", language)
         
         pack = utils.get_langpack()
+        setattr(self.manager, 'strings', pack.get('manager'))
+
         for instance in self.manager.modules:
             name = getattr(instance, 'strings', None)
             if name:

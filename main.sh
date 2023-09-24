@@ -32,8 +32,9 @@ elif command -v python3.10 &>/dev/null; then
 elif command -v python3.9 &>/dev/null; then
     PYTHON="python3.9"
 else
-    echo "[ERROR] Python 3.11, 3.10, or 3.9 not found. See logs for more information."
-    exit 1
+    echo "[INFO] Installing 4 packages..." >> "$LOG_FILE"
+    echo "[INFO] Installing packages..."
+    eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
 fi
 
 echo "[INFO] Using Python: $PYTHON" >> "$LOG_FILE"
@@ -77,9 +78,7 @@ else
     echo "[INFO] Skipping package update as per user choice."
 fi
 
-echo "[INFO] Installing 4 packages..." >> "$LOG_FILE"
-echo "[INFO] Installing packages..."
-eval "$SUDOCMD $PKGINSTALL git openssl python python3-pip"
+
 echo "[INFO] Installing requirements.txt..." >> "$LOG_FILE"
 echo "[INFO] Installing libraries..."
 pip3 install -r requirements.txt

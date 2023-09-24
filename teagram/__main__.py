@@ -26,6 +26,12 @@ if __name__ == "__main__":
             super().emit(record)
 
     handler = CustomStreamHandler()
+    fmt = logging.Formatter(
+        '[%(asctime)s] %(name)s:%(levelname)s > %(message)s',
+        '%Y-%m-%d %H:%M:%S'
+    )
+
+    handler.setFormatter(fmt)
     log = logging.getLogger()
     log.addHandler(handler)
 
