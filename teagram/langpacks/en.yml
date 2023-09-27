@@ -117,3 +117,4 @@ settings:
   deluser: "<b>✔ You have successfully deleted a user</b>"
   nouser: "<b>❔ No users found</b>"
   user: "<b>Users:</b>"
+  chbot: "<b>✔ You succesfully changed inline bot!\nRestart for changes (<code>{}</code>)</b>"

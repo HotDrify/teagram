@@ -4,7 +4,7 @@ import os
 import logging
 
 from datetime import timedelta
-from telethon import types
+from telethon import types, TelegramClient
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from .. import loader, utils, bot
@@ -83,12 +83,14 @@ class SettingsMod(loader.Module):
         """Изменить язык. Использование: setlang <язык>"""
         args = args.split()
         
-        language = args[0]
-        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
-        
         if not args:
             return await utils.answer(
                 message, self.strings['wlang'])
+        
+        language = args[0]
+        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
+        
+        
         
         if language not in languages:
             langs = ' '.join(languages)
@@ -287,4 +289,12 @@ class SettingsMod(loader.Module):
             message=message,
             reply_markup=keyboard,
             callback='_loader_permdel'
+        )
+
+    @loader.command()
+    async def ch_token(self, message: types.Message):
+        self.db.set('teagram.bot', 'token', None)
+        await utils.answer(
+            message,
+            self.strings['chbot'].format(self.prefix + "restart")
         )

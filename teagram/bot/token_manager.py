@@ -1,5 +1,6 @@
 import logging
 import time
+import sys
 import re
 from typing import Union
 
@@ -38,14 +39,22 @@ class TokenManager(Item):
 
             if not all(
                 phrase not in response.text
-                for phrase in ["That I cannot do.", "Sorry"]
+                for phrase in [
+                    "That I cannot do.", 
+                    "Sorry"
+                ]
             ):
-                logging.error("An error occurred while creating the bot. @BotFather's response:")
-                logging.error(response.text)
-
                 if 'too many attempts' in response.text:
                     seconds = response.text.split()[-2]
                     logger.error(f'Please try again after {seconds} seconds')
+                elif '20 bots' in response.text:
+                    logger.error("You have 20 bots, please delete one of your bots to continue")
+                else:
+                    logging.error("An error occurred while creating the bot. @BotFather's response:")
+                    logging.error(response.text)
+                
+                return sys.exit(0)
+
 
             await conv.ask(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
             await conv.get_response()
@@ -112,6 +121,10 @@ class TokenManager(Item):
                 logger.warning('reply_markup not found')
                 time.sleep(1.5)
                 response = await conv.get_response()
+
+            if not getattr(response.reply_markup, 'rows', None):
+                logger.warning('Retrying (CTRL + Z/C to stop)')
+                self._revoke_token()
 
             found = False
             for row in response.reply_markup.rows:
