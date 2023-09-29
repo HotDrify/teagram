@@ -123,7 +123,7 @@ class Conversation:
                     raise RuntimeError("Истекло время ожидания ответа")
 
                 await asyncio.sleep(1)
-                responses = self.app.get_chat_history(self.chat_id, limit=1)
+                responses = self.app.get_chat_history(self.chat_id, limit=limit)
 
         self.messagee_to_purge.append(response)
         return response
