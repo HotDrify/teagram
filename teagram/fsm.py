@@ -108,14 +108,14 @@ class Conversation:
         self.messagee_to_purge.append(message)
         return message
 
-    async def get_response(self, timeout: int = 30) -> types.Message:
+    async def get_response(self, timeout: int = 30, limit: int = 1) -> types.Message:
         """Возвращает ответ
 
         Параметр:
             timeout (``int``, optional):
                 Время ожидания ответа
         """
-        responses = self.app.get_chat_history(self.chat_id, limit=1)
+        responses = self.app.get_chat_history(self.chat_id, limit=limit)
         async for response in responses:
             if response.from_user.is_self:
                 timeout -= 1
