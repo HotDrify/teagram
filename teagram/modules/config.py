@@ -144,9 +144,11 @@ class ConfigMod(loader.Module):
 
         buttons = []
         count = 1
-        _data = f'ch_attr_{mod.name.split(".")[-1]}_{name}'
+        
         
         for name in attrs:
+            _data = f'ch_attr_{mod.name.split(".")[-1]}_{name}'
+            
             buttons.append(
                 InlineKeyboardButton(
                     name, 
