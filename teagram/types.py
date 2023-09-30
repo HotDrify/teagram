@@ -44,8 +44,7 @@ class WaitForDefault:
 
 @dataclass
 class ConfigValue:
-    option: str 
-    description: str = None
+    option: str
     default: Any = None
     value: Any = field(default_factory=WaitForDefault)
     validator: Union[Integer, String, Boolean] = None
