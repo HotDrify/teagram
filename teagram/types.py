@@ -54,7 +54,7 @@ class ConfigValue:
     validator: Union[Integer, String, Boolean] = None
     
     def __post_init__(self):
-        if isinstance(self.value, WaitForDefault):
+        if isinstance(self.value, WaitForDefault) or not self.value:
             self.value = self.default
 
     def __setattr__(self, key: str, value: Any):
