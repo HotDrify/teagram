@@ -144,11 +144,13 @@ class ConfigMod(loader.Module):
 
         buttons = []
         count = 1
+        _data = f'ch_attr_{mod.name.split(".")[-1]}_{name}'
         
         for name in attrs:
             buttons.append(
                 InlineKeyboardButton(
-                    name, callback_data=f'ch_attr_{mod.name.split(".")[-1]}_{name}'
+                    name, 
+                    callback_data=_data
                 )
             )
 
@@ -217,9 +219,9 @@ class ConfigMod(loader.Module):
 
         await self.inline_bot.edit_message_text(
             f'⚙ <b>{self.pending_module.name}</b>\n'
-            f'➡ <b>{self.strings["attr"]}</b>: <code>{attribute}</code>\n'
+            f'➡ <b>{self.strings["attr"]}</b>: <code>{str(attribute)}</code>\n'
             f'➡ <b>{self.strings["value"]}</b>: <code>{str(value) or self.strings["nospec"]}</code>\n'
-            f'↪ <b>{self.strings["def"]}</b>: <code>{default or self.strings["nospec"]}</code>\n\n'+
+            f'↪ <b>{self.strings["def"]}</b>: <code>{str(default) or self.strings["nospec"]}</code>\n\n'+
             (f'❔ <code>{docs}</code>' if docs else ""),
             reply_markup=keyboard,
             inline_message_id=call.inline_message_id
