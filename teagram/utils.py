@@ -259,7 +259,6 @@ def get_platform() -> str:
     IS_DOCKER = "DOCKER" in os.environ
     IS_GOORM = "GOORM" in os.environ
     IS_WIN = "WINDIR" in os.environ
-    IS_TRIGGER = 'TRIGGEREARTH' in os.environ
     IS_WSL = False
     
     with contextlib.suppress(Exception):
@@ -279,8 +278,6 @@ def get_platform() -> str:
         platform = "<emoji id=5309880373126113150>💻</emoji> Windows"
     elif IS_CODESPACES:
         platform = "<emoji id=5467643451145199431>👨‍💻</emoji> Github Codespaces"
-    elif IS_TRIGGER:
-        platform = "🌍 Trigger Earth"
     else:
         platform = "🖥️ VDS"
     
