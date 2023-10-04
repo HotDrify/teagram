@@ -24,7 +24,7 @@ class HelpMod(loader.Module):
 
                 if module.inline_handlers:
                     if commands:
-                        inline += " <b>|| [inline]</b>: "
+                        inline += " <b>	• [inline]</b>: "
                     else:
                         inline += "<b>[inline]</b>: "
 
