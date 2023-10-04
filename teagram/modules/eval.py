@@ -56,5 +56,5 @@ class EvalMod(loader.Module):
             "<b>💻 Code</b>:\n"
             f"<code>{args}</code>\n"
             "<b>💻 Output</b>:\n"
-            f"<code>{result}</code>"
+            f"<code>{utils.escape_html(result)}</code>"
         )

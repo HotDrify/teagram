@@ -2,13 +2,12 @@ import asyncio
 import logging
 from types import TracebackType
 from typing import List, Union
-
 from telethon import TelegramClient, types
-from telethon.tl.functions.messages import DeleteMessagesRequest
-
 
 class Conversation:
-    """Диалог с пользователем. Отправка сообщений и ожидание ответа"""
+    """
+    Conversation with user/bot (`telethon.TelegramClient.conversation`)
+    """
 
     def __init__(
         self,
@@ -16,23 +15,17 @@ class Conversation:
         chat_id: Union[str, int],
         purge: bool = False
     ) -> None:
-        """Инициализация класса
-
-        Параметры:
-            app (``TelegramClient``):
-                Клиент
-
-            chat_id (``str`` | ``int``):
-                Чат, в который нужно отправить сообщение
-
-            purge (``bool``, optional):
-                Удалять сообщения после завершения диалога
+        """
+        :param app: Telegram client
+        :param chat_id: Chat id
+        :param purge: Delete messages after conversation 
         """
         self.app: TelegramClient = app
         self.chat_id = chat_id
         self.purge = purge
+        self._id = app._self_id
 
-        self.messagee_to_purge: List[types.Message] = []
+        self.message_to_purge: List[types.Message] = []
 
     async def __aenter__(self) -> "Conversation":
         return self
@@ -51,25 +44,19 @@ class Conversation:
             if self.purge:
                 await self._purge()
 
-        return self.messagee_to_purge.clear()
+        return self.message_to_purge.clear()
 
     async def ask(self, text: str, *args, **kwargs) -> types.Message:
-        """Отправить сообщение
-
-        Параметры:
-            text (``str``):
-                Текст сообщения
-
-            args (``list``, optional):
-                Аргументы отправки сообщения
-
-            kwargs (``dict``, optional):
-                Параметры отправки сообщения
+        """
+        :param text: Message text
+        :param args: args
+        :param kwargs: kwargs
+        :return: `types.Message`
         """
         message = await self.app.send_message(
             self.chat_id, text, *args, **kwargs)
 
-        self.messagee_to_purge.append(message)
+        self.message_to_purge.append(message)
         return message
 
     async def ask_media(
@@ -78,42 +65,47 @@ class Conversation:
         *args,
         **kwargs
     ) -> types.Message:
-        """Отправить файл
-
-        Параметры:
-            file_path (``str``):
-                Ссылка или путь до файла
+        """
+        :param file_path: Path to file
+        :param args: args
+        :param kwargs: kwargs
+        :return: `types.Message` 
         """
 
         message = await self.app.send_file(self.chat_id, file_path, *args, **kwargs)
 
-        self.messagee_to_purge.append(message)
+        self.message_to_purge.append(message)
         return message
 
-    async def get_response(self, timeout: int = 30) -> types.Message:
-        """Возвращает ответ
-
-        Параметр:
-            timeout (``int``, optional):
-                Время ожидания ответа
+    async def get_response(
+            self, 
+            timeout: int = 30, 
+            limit: int = 1
+        ) -> list[types.Message]:
         """
-        responses = self.app.iter_messages(self.chat_id, limit=1)
+        :param timeout: Time to wait response
+        :param limit: Number of messages to be retrieved
+        :return: List with `types.Message`
+        """
+        _responses = []
+        responses = self.app.iter_messages(self.chat_id, limit=limit)
         async for response in responses:
-            if int(response._sender_id) != int((await self.app.get_me()).id):
+            if int(response._sender_id) != self._id:
                 timeout -= 1
                 if timeout == 0:
-                    raise RuntimeError("Истекло время ожидания ответа")
+                    raise RuntimeError("Timed out")
 
                 await asyncio.sleep(1)
-                responses = self.app.iter_messages(self.chat_id, limit=1)
+                responses = self.app.iter_messages(self.chat_id, limit=limit)
 
-        self.messagee_to_purge.append(response)
-        return response
+            _responses.append(response)
+            self.message_to_purge.append(response)
 
+        return list(set(responses))
 
     async def _purge(self) -> bool:
-        """Удалить все отправленные и полученные сообщения"""
-        for message in self.messagee_to_purge:
-            await self.app(DeleteMessagesRequest(message.id))
+        """Deletes all conversation's messages"""
+        for message in self.message_to_purge:
+            await message.delete()
 
         return True
