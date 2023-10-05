@@ -37,12 +37,9 @@ class TokenManager(Item):
             await conv.ask("/newbot")
             response = await conv.get_response()
 
-            if not all(
-                phrase not in response.text
-                for phrase in [
-                    "That I cannot do.", 
-                    "Sorry"
-                ]
+            if any(
+                phrase in response.text
+                for phrase in ["That I cannot do.", "Sorry"]
             ):
                 if 'too many attempts' in response.text:
                     seconds = response.text.split()[-2]
@@ -52,7 +49,7 @@ class TokenManager(Item):
                 else:
                     logging.error("An error occurred while creating the bot. @BotFather's response:")
                     logging.error(response.text)
-                
+
                 return sys.exit(0)
 
 
@@ -62,8 +59,8 @@ class TokenManager(Item):
             bot_username = f"teagram_{utils.random_id(6)}_bot"
 
             await conv.ask(bot_username)
-            
-            time.sleep(0.5) 
+
+            time.sleep(0.5)
             response = await conv.get_response()
 
             search = re.search(r"(?<=<code>)(.*?)(?=</code>)", response.text)
@@ -78,7 +75,7 @@ class TokenManager(Item):
             await conv.ask("/setuserpic")
             await conv.get_response()
 
-            await conv.ask("@" + bot_username)
+            await conv.ask(f"@{bot_username}")
             await conv.get_response()
 
             await conv.ask_media("assets/bot_avatar.png", media_type="photo")
@@ -87,7 +84,7 @@ class TokenManager(Item):
             await conv.ask("/setinline")
             await conv.get_response()
 
-            await conv.ask("@" + bot_username)
+            await conv.ask(f"@{bot_username}")
             await conv.get_response()
 
             await conv.ask("teagram-command")
@@ -129,8 +126,9 @@ class TokenManager(Item):
             found = False
             for row in response.reply_markup.rows:
                 for button in row.buttons:
-                    search = re.search(r"@teagram_[0-9a-zA-Z]{6}_bot", button.text)
-                    if search:
+                    if search := re.search(
+                        r"@teagram_[0-9a-zA-Z]{6}_bot", button.text
+                    ):
                         self.bot_username = button.text
 
                         await conv.ask(button.text)
@@ -144,10 +142,7 @@ class TokenManager(Item):
 
             time.sleep(1)
             response = await conv.get_response()
-            search = re.search(r"\d{1,}:[0-9a-zA-Z_-]{35}", response.text)
-
-            if search:
+            if search := re.search(r"\d{1,}:[0-9a-zA-Z_-]{35}", response.text):
                 return str(search.group(0))
-            else:
-                token = response.text.split()[-1]
-                return str(token)
+            token = response.text.split()[-1]
+            return str(token)

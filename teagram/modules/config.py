@@ -88,7 +88,7 @@ class ConfigMod(loader.Module):
             return await call.answer(self.strings['noowner'])
 
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
-        modules = [mod for mod in self.manager.modules]
+        modules = list(self.manager.modules)
 
         await self.inline_bot.edit_message_text(
             inline_message_id=call.inline_message_id,
@@ -136,7 +136,7 @@ class ConfigMod(loader.Module):
     async def answer_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
             return await call.answer(self.strings['noowner'])
-        
+
         data = call.data
 
         keyboard = InlineKeyboardMarkup()
@@ -144,10 +144,7 @@ class ConfigMod(loader.Module):
         attrs = self.get_attrs(mod)
 
         buttons = []
-        count = 1
-        
-        
-        for name in attrs:
+        for count, name in enumerate(attrs, start=1):
             _data = f'ch_attr_{mod.name.split(".")[-1]}_{name}'
 
             buttons.append(
@@ -161,14 +158,12 @@ class ConfigMod(loader.Module):
                 keyboard.row(*buttons)
                 buttons.clear()
 
-            count += 1
-
         if buttons:
             keyboard.row(*buttons)
 
         keyboard.add(InlineKeyboardButton(self.strings['back'], callback_data='send_cfg'))
         attributes = []
-     
+
         for key, value in attrs.items():
             formated = str(value)
             if isinstance(value, tuple):

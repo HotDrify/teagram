@@ -82,29 +82,28 @@ class SettingsMod(loader.Module):
     async def setlang_cmd(self, message: types.Message, args: str):
         """Изменить язык. Использование: setlang <язык>"""
         args = args.split()
-        
+
         if not args:
             return await utils.answer(
                 message, self.strings['wlang'])
-        
+
         language = args[0]
         languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
-        
-        
-        
+
+
+
         if language not in languages:
             langs = ' '.join(languages)
             return await utils.answer(
                 message, self.strings['elang'].format(langs=langs))
 
         self.db.set("teagram.loader", "lang", language)
-        
+
         pack = utils.get_langpack()
         setattr(self.manager, 'strings', pack.get('manager'))
 
         for instance in self.manager.modules:
-            name = getattr(instance, 'strings', None)
-            if name:
+            if name := getattr(instance, 'strings', None):
                 stringsname = name.get('name', '').lower()
                 if stringsname in [
                     'backup',
@@ -119,9 +118,7 @@ class SettingsMod(loader.Module):
                     'translator',
                     'updater'
                 ]:
-                    _pack = pack.get(stringsname, None)
-
-                    if _pack:
+                    if _pack := pack.get(stringsname, None):
                         _pack['name'] = stringsname
                         setattr(instance, 'strings', pack.get(stringsname))
 
@@ -173,17 +170,16 @@ class SettingsMod(loader.Module):
 
     async def aliases_cmd(self, message: types.Message):
         """Показать все алиасы"""
-        aliases = self.manager.aliases
-        if not aliases:
+        if aliases := self.manager.aliases:
+            return await utils.answer(
+                message, self.strings['allalias'] + "\n".join(
+                    f"• <code>{alias}</code> ➜ {command}"
+                    for alias, command in aliases.items()
+                )
+            )
+        else:
             return await utils.answer(
                 message, self.strings['noalias'])
-
-        return await utils.answer(
-            message, self.strings['allalias'] + "\n".join(
-                f"• <code>{alias}</code> ➜ {command}"
-                for alias, command in aliases.items()
-            )
-        )
 
     async def ping_cmd(self, message: types.Message):
         """🍵 команда для просмотра пинга."""
@@ -295,6 +291,5 @@ class SettingsMod(loader.Module):
     async def ch_token(self, message: types.Message):
         self.db.set('teagram.bot', 'token', None)
         await utils.answer(
-            message,
-            self.strings['chbot'].format(self.prefix + "restart")
+            message, self.strings['chbot'].format(f"{self.prefix}restart")
         )

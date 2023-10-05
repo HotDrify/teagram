@@ -21,7 +21,7 @@ class HelpMod(loader.Module):
     async def help_cmd(self, message: types.Message, args: str):
         """Список всех модулей"""
         try:
-            self.bot_username = '@' + (await self.bot.bot.get_me()).username
+            self.bot_username = f'@{(await self.bot.bot.get_me()).username}'
         except:
             self.bot_username = self.strings['ebot']
 
@@ -35,11 +35,12 @@ class HelpMod(loader.Module):
                     f"<code>{command}</code>" for command in module.command_handlers
                 )
 
-                inline = " <b>| 🤖</b>: " if module.inline_handlers else ""
-                inline += " <b>|</b> ".join(
-                    f"<code>{inline_command}</code>" for inline_command in module.inline_handlers
+                inline = (
+                    " <b>| 🤖</b>: " if module.inline_handlers else ""
+                ) + " <b>|</b> ".join(
+                    f"<code>{inline_command}</code>"
+                    for inline_command in module.inline_handlers
                 )
-
                 if commands or inline:
                     text += f"\n{self.config['smile']} <b>{module.name}</b> - " + (commands if commands else self.strings['nocmd']) + inline
 
@@ -65,8 +66,7 @@ class HelpMod(loader.Module):
         )
 
         inline_descriptions = "\n".join(
-            f"👉 <code>@{self.bot_username + ' ' + command}</code>\n"
-            f"    ╰ {(module.inline_handlers[command].__doc__ or self.strings['nomd']).strip()}"
+            f"👉 <code>@{f'{self.bot_username} {command}'}</code>\n    ╰ {(module.inline_handlers[command].__doc__ or self.strings['nomd']).strip()}"
             for command in module.inline_handlers
         )
 

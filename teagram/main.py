@@ -11,12 +11,7 @@ async def sendbot(bot, db, prefix, app):
     try:
         await bot.send_message(
             db.cloud.input_chat,
-            '☕ <b>Teagram userbot has started!</b>\n'
-            '🤖 <b>Version: {}</b>\n'
-            '❔ <b>Prefix: {}</b>'.format(
-                __version__,
-                prefix
-            )
+            f'☕ <b>Teagram userbot has started!</b>\n🤖 <b>Version: {__version__}</b>\n❔ <b>Prefix: {prefix}</b>',
         )
     except:
         id = (await bot.get_me()).id
@@ -41,12 +36,7 @@ async def sendbot(bot, db, prefix, app):
 
         await bot.send_message(
             db.cloud.input_chat,
-            '☕ <b>Teagram userbot has started!</b>\n'
-            '🤖 <b>Version: {}</b>\n'
-            '❔ <b>Prefix: {}</b>'.format(
-                __version__,
-                prefix
-            )
+            f'☕ <b>Teagram userbot has started!</b>\n🤖 <b>Version: {__version__}</b>\n❔ <b>Prefix: {prefix}</b>',
         )
 
 async def main():

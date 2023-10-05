@@ -63,8 +63,8 @@ class ConfigValue:
                 value = self.validator._valid(value)
             except ValidationError:
                 value = self.default
-        
-        if isinstance(value, tuple) or isinstance(value, list) or isinstance(value, dict):
+
+        if isinstance(value, (tuple, list, dict)):
             raise ValidationError('Неправильный тип (Проверьте типы валидаторов) / Invalid type (Check validator types)')
 
         object.__setattr__(self, key, value)
