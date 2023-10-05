@@ -76,8 +76,8 @@ config:
   cfg: "Config"
   chdef: '✔ You have successfully changed the default value'
   ch: 'Change'
-  attr: '<b>Attribute</b>'
-  value: '<b>Value</b>'
+  attr: 'Attribute'
+  value: 'Value'
   def: 'Default'
   nospec: '<b>Not specified</b>'
   back: 'Back'

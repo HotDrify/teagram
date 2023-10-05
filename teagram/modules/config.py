@@ -51,7 +51,7 @@ class ConfigMod(loader.Module):
         self.message = None
         self.chat = None
         self._def = False
-        self.me = None
+        self.me = self.client._self_id
         self.bbot = None
 
     def validate(self, attribute):
@@ -238,6 +238,20 @@ class ConfigMod(loader.Module):
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)
 
+            attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
+            attrs = [
+                (key, value) for key, value in attrs if not (
+                    key.startswith('__') and key.endswith('__')
+                ) and key not in self.DEFAULT_ATTRS
+            ]
+
+            for _attr in attrs:
+                a = getattr(self.pending_module, _attr[0])
+                if isinstance(a, Config):
+                    a.config[self.pending]
+                    a.set(self.pending, attr)
+                    break
+
             self.config[self.pending] = attr
             self.config_db.set(
                 self.pending_module.name,
@@ -272,13 +286,6 @@ class ConfigMod(loader.Module):
         """Настройка через inline"""
         if not self.bbot:
             self.bbot = await self.inline_bot.get_me()
-
-        if not self.me:
-            if not (_id := self.db.get('teagram.loader', 'ownerid', '')):
-                _id = self.manager.me.id
-                self.db.set('teagram.loader', 'ownerid', _id)
-
-            self.me = _id
 
         bot = self.bbot
         await utils.invoke_inline(message, bot.username, 'cfg')
