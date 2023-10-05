@@ -378,6 +378,8 @@ class ModulesManager:
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)
                 instance.watcher_handlers = get_watcher_handlers(instance)
+                instance.loops = get_loops(instance)
+                
 
                 instance.message_handlers = get_message_handlers(instance)
                 instance.callback_handlers = get_callback_handlers(instance)
@@ -386,23 +388,20 @@ class ModulesManager:
                 self.modules.append(instance)
                 self.command_handlers.update(instance.command_handlers)
                 self.watcher_handlers.extend(instance.watcher_handlers)
+                self.loops.append(*instance.loops) if instance.loops else None
 
                 self.message_handlers.update(instance.message_handlers)
                 self.callback_handlers.update(instance.callback_handlers)
                 self.inline_handlers.update(instance.inline_handlers)
 
+                if instance.loops:
+                    for loop in self.loops:
+                        setattr(loop, 'method', instance)
+                        
                 if (name := getattr(instance, 'strings', '')):
                     if name.get('name', '').lower() in [
-                        'backup',
-                        'config',
-                        'eval',
-                        'help',
-                        'info',
-                        'loader',
-                        'moduleguard',
-                        'settings',
-                        'terminal',
-                        'translator',
+                        'backup', 'config', 'eval', 'help', 'info', 
+                        'loader', 'settings', 'terminal', 'translator',
                         'updater'
                     ]:
                         a = utils.get_langpack()
