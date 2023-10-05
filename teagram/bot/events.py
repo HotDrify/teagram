@@ -284,8 +284,6 @@ class Events(Item):
         except KeyError:
             pass
 
-
-
         func = self._manager.inline_handlers.get(cmd)
         if not func:
             return await inline_query.answer(
