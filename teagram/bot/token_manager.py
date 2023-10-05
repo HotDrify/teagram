@@ -39,6 +39,8 @@ class TokenManager(Item):
 
             if any(
                 phrase in response.text
+            if any(
+                phrase in response.text
                 for phrase in ["That I cannot do.", "Sorry"]
             ):
                 if 'too many attempts' in response.text:

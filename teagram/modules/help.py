@@ -22,6 +22,7 @@ class HelpMod(loader.Module):
         """Список всех модулей"""
         try:
             self.bot_username = f'@{(await self.bot.bot.get_me()).username}'
+            self.bot_username = f'@{(await self.bot.bot.get_me()).username}'
         except:
             self.bot_username = self.strings['ebot']
 

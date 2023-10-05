@@ -194,6 +194,7 @@ async def answer(
         message: Message = message[0]
 
     if isinstance(response, str) and not photo and not document:
+    if isinstance(response, str) and not photo and not document:
         if len(response) > 4096:
             file = io.BytesIO(response.encode())
             file.name = 'response.txt'

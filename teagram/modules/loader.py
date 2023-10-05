@@ -83,6 +83,7 @@ class LoaderMod(loader.Module):
 
         raw_link = api_result
         modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
+        modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
         if modules.status_code != 200:
             return await utils.answer(
                 message, 

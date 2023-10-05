@@ -185,6 +185,7 @@ class Events(Item):
                 ], cache_time=0
             )
 
+
         query_ = query.split()
 
         cmd = query_[0]
@@ -230,6 +231,7 @@ class Events(Item):
                     ]
                 )
             else:
+            else:
                 await inline_query.answer(
                     [
                         InlineQueryResultDocument(
@@ -267,7 +269,22 @@ class Events(Item):
                     )
                 attr = data['attr']
                 data['toset'] = args
+                attr = data['attr']
+                data['toset'] = args
 
+                await inline_query.answer(
+                    [
+                        InlineQueryResultArticle(
+                            id=utils.random_id(),
+                            title="☕ Teagram",
+                            input_message_content=InputTextMessageContent(
+                                "Вы уверены что хотите изменить атрибут?"),
+                            reply_markup=InlineKeyboardMarkup()
+                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
+                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
+                        )
+                    ], cache_time=0
+                )
                 await inline_query.answer(
                     [
                         InlineQueryResultArticle(

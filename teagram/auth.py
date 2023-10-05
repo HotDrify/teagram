@@ -99,13 +99,9 @@ class Auth:
         code = input("Enter confirmation code: ")
 
         try:
-            user = await self.app.sign_in(
-                phone,
-                code,
-                phone_code_hash=phone_code_hash
+            return await self.app.sign_in(
+                phone, code, phone_code_hash=phone_code_hash
             )
-
-            return user
         except errors.SessionPasswordNeededError:
             twofa = await self._2fa()
 
