@@ -1,11 +1,22 @@
 from telethon import types
-from .. import __version__, loader, utils
+from .. import __version__, loader, utils, validators
+from ..types import Config, ConfigValue
 
 @loader.module(name="Help", author='teagram')
 class HelpMod(loader.Module):
     """Помощь по командам 🍵 teagram"""
 
     strings = {'name': 'help'}
+    def __init__(self):
+        self.config = Config(
+            ConfigValue(
+                'smile',
+                'smile module_name - commands',
+                '⚙',
+                self.db.get('Help', 'smile', None),
+                validators.String()
+            )
+        )
 
     async def help_cmd(self, message: types.Message, args: str):
         """Список всех модулей"""
@@ -30,7 +41,7 @@ class HelpMod(loader.Module):
                 )
 
                 if commands or inline:
-                    text += f"\n<b>{module.name}</b> - " + (commands if commands else self.strings['nocmd']) + inline
+                    text += f"\n{self.config['smile']} <b>{module.name}</b> - " + (commands if commands else self.strings['nocmd']) + inline
 
             modules_count = len(self.manager.modules) - 1
             bot_inline_info = f"<emoji id=5228968570863496802>🤖</emoji> {self.strings['ibot']}: <b>{self.bot_username}</b>\n"

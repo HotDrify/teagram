@@ -188,16 +188,16 @@ class SettingsMod(loader.Module):
     async def ping_cmd(self, message: types.Message):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
-        
-        msg = await message._client.send_message(utils.get_chat(message), "☕")
+        client: TelegramClient = message._client
+        msg = await client.send_message(utils.get_chat(message), "☕", reply_to=utils.get_topic(message))
         
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
         uptime = timedelta(seconds=round(time.time() - utils._init_time))
 
         await utils.answer(
             message,
-            f"🕒 {self.strings['ping']}: <code>{ping}ms</code>"
-            f"❔ {self.strings['uptime']}: {uptime}"
+            f"🕒 {self.strings['ping']}: <code>{ping}ms</code>\n"
+            f"❔ {self.strings['uptime']}: <code>{uptime}</code>"
         )
 
         await msg.delete()

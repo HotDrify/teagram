@@ -100,7 +100,7 @@ class LoaderMod(loader.Module):
                     map("<code>{}</code>".format, modules))
             )
             return await utils.answer(
-                message, text)
+                message, text, link_preview=False)
 
         error_text = None
         module_name = None
