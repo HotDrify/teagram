@@ -207,7 +207,33 @@ def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
         )
     }
 
+def get_loops(instance: Module):
+    loops = []
 
+    for method in dir(instance):
+        func = getattr(instance, method)
+        if (
+            callable(getattr(instance, method)) and
+            hasattr(func, 'loop') and
+            method.startswith('loop') or
+            method.endswith('loop')
+        ):
+            loops.append(func)
+
+    return loops
+
+def loop(interval: Union[int, float], autostart: bool = True):
+    def decorator(func: FunctionType):
+        _loop = Loop(func, interval, autostart)
+        setattr(func, 'loop', True)
+        setattr(func, '_loop', _loop)
+        setattr(func, 'interval', interval)
+        setattr(func, 'autostart', autostart)
+
+        return _loop
+
+    return decorator
+    
 def on(custom_filters: Union[filters.Filter, LambdaType]) -> FunctionType:
     """Создает фильтр для команды
 
