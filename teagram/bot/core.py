@@ -66,11 +66,11 @@ class BotManager(Events, TokenManager):
 
         if not self._token:
             new = True
-            
+
             self._token = await self._create_bot()
-            if not self._token:
-                logging.error(error_text)
-                sys.exit(1)
+        if not self._token:
+            logging.error(error_text)
+            sys.exit(1)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
@@ -80,7 +80,7 @@ class BotManager(Events, TokenManager):
             result = await self._revoke_token()
             new = True
             revoke = True
-            
+
             if not result:
                 self._token = await self._create_bot() or logging.error(error_text) or sys.exit(1)
             else:
@@ -98,7 +98,7 @@ class BotManager(Events, TokenManager):
                         await conv.ask("/cancel")
                     except errors.UserIsBlockedError:
                         await self._app(UnblockRequest('@BotFather'))
-                    
+
                     await conv.ask("/setinline")
                     await conv.get_response()
 

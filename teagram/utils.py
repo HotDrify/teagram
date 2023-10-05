@@ -193,7 +193,7 @@ async def answer(
     if isinstance(message, list):
         message: Message = message[0]
 
-    if isinstance(response, str) and not (photo or document):
+    if isinstance(response, str) and not photo and not document:
         if len(response) > 4096:
             file = io.BytesIO(response.encode())
             file.name = 'response.txt'
@@ -206,10 +206,10 @@ async def answer(
                 reply_to=(get_topic(message) if topic else message.id),
                 **kwargs
             )
-            
+
             if message.out:
                 await message.delete()
-        
+
         else:
             try:
                 msg = await client.edit_message(
@@ -343,11 +343,10 @@ def get_display_name(entity: Union[types.User, types.Chat]) -> str:
     Returns:
         entity: Union[types.User, types.Chat].
     """
-    return getattr(entity, "title", None) or (
-        entity.first_name or "" + (
-            " " + entity.last_name
-            if entity.last_name else ""
-        )
+    return (
+        getattr(entity, "title", None)
+        or entity.first_name
+        or ("" + (f" {entity.last_name}" if entity.last_name else ""))
     )
 
 def get_platform() -> str:
