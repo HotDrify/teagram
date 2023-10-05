@@ -28,6 +28,59 @@ VALID_PIP_PACKAGES = re.compile(
     re.MULTILINE,
 )
 
+class Loop:
+    def __init__(
+        self,
+        func,
+        interval: Union[int, float],
+        autostart: bool,
+        *args,
+        **kwargs
+    ):
+        """аргументы при запуске."""
+        self.func = func
+        self.interval = interval
+        self.autostart = autostart
+        self.status = False
+        self.task = None
+
+        if self.autostart:
+            self.start(*args, **kwargs)
+            self.status = True
+        def start(self, interval: int = None, *args, **kwargs):
+        """Args, kwargs using in start"""
+
+        if self.task:
+            return False
+        if interval:
+            self.interval = interval
+
+        self.task = asyncio.ensure_future(self.loop(*args, **kwargs))
+
+    def stop(self):
+        if self.task:
+            logger.info(f"{self.func.__name__} loop have stopped")
+            logger.info(f"{self.func.__name__} loop have stopped")
+            self.task.cancel()
+
+            return True
+
+        return False
+
+    async def loop(self, *args, **kwargs):
+        while self.status:
+            if self.interval <= 0:
+                logger.exception('Interval must be higher than zero')
+                break
+
+            try:
+                await self.func(self.method, *args, **kwargs)
+            except Exception as error:
+                logger.error(error)
+
+            await asyncio.sleep(self.interval)
+
+        self.status = False
 
 def module(
     name: str,
