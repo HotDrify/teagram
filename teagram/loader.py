@@ -66,7 +66,6 @@ class Loop:
     def stop(self):
         if self.task:
             logger.info(f"{self.func.__name__} loop have stopped")
-            logger.info(f"{self.func.__name__} loop have stopped")
             self.task.cancel()
 
             return True
