@@ -152,7 +152,7 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, (
-                self.strings['loadedmod'].format(module_name=module_name)
+                self.strings['loadedmod'].format(module_name)
                 if args != "all"
                 else self.strings['loaded'].format(count, len(modules))
             )
