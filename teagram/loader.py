@@ -387,24 +387,18 @@ class ModulesManager:
                     for loop in self.loops:
                         setattr(loop, 'method', instance)
                 
-                if (name := getattr(instance, 'strings', '')):
-                    if name.get('name', '').lower() in [
-                        'backup',
-                        'config',
-                        'eval',
-                        'help',
-                        'info',
-                        'loader',
-                        'moduleguard',
-                        'settings',
-                        'terminal',
-                        'translator',
-                        'updater'
-                    ]:
-                        a = utils.get_langpack()
-                        pack = a.get(name.get('name'))
-                        pack['name'] = name.get('name')
-                        instance.strings = pack
+                name = getattr(instance, 'strings', {}).get('name', '').lower()
+                mods = [
+                    'backup', 'config', 'eval', 'help', 'info', 
+                    'loader', 'moduleguard', 'settings', 
+                    'terminal', 'translator', 'updater'
+                ]
+
+                if name in mods:
+                    langpack = utils.get_langpack()
+                    instance.strings = langpack.get(name, {})
+                    instance.strings['name'] = name
+
 
         if not instance:
             logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
@@ -423,7 +417,7 @@ class ModulesManager:
             if did_requirements:
                 return True
             try:
-                requirements = " ".join(re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source))
+                requirements = re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source)
             except TypeError as error:
                 logger.error(traceback.format_exc())
                 return logger.warning("Не указаны пакеты для установки")
