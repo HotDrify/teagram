@@ -386,7 +386,7 @@ class ModulesManager:
                 name = getattr(instance, 'strings', {}).get('name', '').lower()
                 mods = [
                     'backup', 'config', 'eval', 'help', 'info', 
-                    'loader', 'moduleguard', 'settings', 
+                    'loader', 'settings', 
                     'terminal', 'translator', 'updater'
                 ]
 
