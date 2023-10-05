@@ -2,26 +2,17 @@ import time
 import io
 import os
 import logging
-from logging import StreamHandler
 
-from telethon import types
+from datetime import timedelta
+from telethon import types, TelegramClient
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from .. import loader, utils
+from .. import loader, utils, bot
 
-
-class CustomStreamHandler(StreamHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.logs: list = []
-
-    def emit(self, record):
-        self.logs.append(record)
-
-        super().emit(record)
-
-handler = CustomStreamHandler()
 log = logging.getLogger()
-log.addHandler(handler)
+
+class TestException(Exception):
+    pass
 
 @loader.module(name="Settings", author="teagram")
 class SettingsMod(loader.Module):
@@ -41,8 +32,10 @@ class SettingsMod(loader.Module):
             return await utils.answer(
                 message, self.strings['no_logs'])
 
-        handler: CustomStreamHandler = log.handlers[1]
-        logs = '\n'.join(str(error) for error in handler.logs).encode('utf-8')
+        if not getattr(self, '_logger', ''):
+            self._logger = log.handlers[0]
+
+        logs = '\n'.join(str(error) for error in self._logger.logs).encode('utf-8')
         
         if not logs:
             return await utils.answer(
@@ -60,7 +53,21 @@ class SettingsMod(loader.Module):
                 lvl=lvl, 
                 name=logging.getLevelName(lvl))
             )
-    
+
+    @loader.command()
+    async def clearlogs(self, message: types.Message):
+        if not getattr(self, '_logger', ''):
+            self._logger = log.handlers[0]
+
+        self._logger.flush()
+        self._logger.logs = []
+
+        await utils.answer(message, self.strings['flushed'])
+
+    @loader.command()
+    async def error(self, message):
+        raise TestException("Test exception")
+
     async def setprefix_cmd(self, message: types.Message, args: str):
         """Изменить префикс, можно несколько штук разделённые пробелом. Использование: setprefix <префикс> [префикс, ...]"""
         if not (args := args.split()):
@@ -75,26 +82,30 @@ class SettingsMod(loader.Module):
     async def setlang_cmd(self, message: types.Message, args: str):
         """Изменить язык. Использование: setlang <язык>"""
         args = args.split()
-        
-        language = args[0]
-        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
-        
+
         if not args:
             return await utils.answer(
                 message, self.strings['wlang'])
-        
+
+        language = args[0]
+        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
+
+
+
         if language not in languages:
             langs = ' '.join(languages)
             return await utils.answer(
                 message, self.strings['elang'].format(langs=langs))
 
         self.db.set("teagram.loader", "lang", language)
-        
+
         pack = utils.get_langpack()
+        setattr(self.manager, 'strings', pack.get('manager'))
+
         for instance in self.manager.modules:
-            if (name := getattr(instance, 'strings', '')):
-                print(name.get('name', ''))
-                if (stringsname := name.get('name', '').lower()) in [
+            if name := getattr(instance, 'strings', None):
+                stringsname = name.get('name', '').lower()
+                if stringsname in [
                     'backup',
                     'config',
                     'eval',
@@ -107,9 +118,9 @@ class SettingsMod(loader.Module):
                     'translator',
                     'updater'
                 ]:
-                    pack = pack.get(stringsname)
-                    pack['name'] = stringsname
-                    instance.strings = pack.get(stringsname)
+                    if _pack := pack.get(stringsname, None):
+                        _pack['name'] = stringsname
+                        setattr(instance, 'strings', pack.get(stringsname))
 
         return await utils.answer(
             message, self.strings['lang'].format(language=language))
@@ -170,17 +181,19 @@ class SettingsMod(loader.Module):
             return await utils.answer(
                 message, self.strings['noalias'])
 
-    async def ping_cmd(self, message: types.Message, args: str):
+    async def ping_cmd(self, message: types.Message):
         """🍵 команда для просмотра пинга."""
         start = time.perf_counter_ns()
-        
-        msg = await message._client.send_message(utils.get_chat(message), "☕")
+        client: TelegramClient = message._client
+        msg = await client.send_message(utils.get_chat(message), "☕", reply_to=utils.get_topic(message))
         
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
+        uptime = timedelta(seconds=round(time.time() - utils._init_time))
 
         await utils.answer(
             message,
-            f"🕒 <b>{self.strings['ping']}</b>: <code>{ping}ms</code>"
+            f"🕒 {self.strings['ping']}: <code>{ping}ms</code>\n"
+            f"❔ {self.strings['uptime']}: <code>{uptime}</code>"
         )
 
         await msg.delete()
@@ -244,4 +257,39 @@ class SettingsMod(loader.Module):
             message,
             (f'➡ {self.strings["user"]} <code>' + ', '.join(str(user) for user in _users) + '</code>')
               if _users else self.strings['nouser']
+        )
+
+    @loader.command('Deleting teagram')
+    async def uninstall_teagram(self, message: types.Message):
+        manager: bot.BotManager = self.bot
+
+        # TODO:
+        # translation
+        
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(
+            InlineKeyboardButton(
+                '⚠ Подтвердить',
+                callback_data='teagram_perm_delete'
+            ),
+            InlineKeyboardButton(
+                '❌ Отменить',
+                callback_data='no_perm_delete'
+            )
+        )
+
+        await manager.form(
+            title='Delete teagram',
+            description='Delete teagram permanently',
+            text='⚠ <b>Вы уверены что хотите удалить teagram?</b>\n',
+            message=message,
+            reply_markup=keyboard,
+            callback='_loader_permdel'
+        )
+
+    @loader.command()
+    async def ch_token(self, message: types.Message):
+        self.db.set('teagram.bot', 'token', None)
+        await utils.answer(
+            message, self.strings['chbot'].format(f"{self.prefix}restart")
         )

@@ -66,6 +66,7 @@ class Loop:
     def stop(self):
         if self.task:
             logger.info(f"{self.func.__name__} loop have stopped")
+            logger.info(f"{self.func.__name__} loop have stopped")
             self.task.cancel()
 
             return True
@@ -109,7 +110,7 @@ class Module:
     version: Union[int, float]
 
     async def on_load(self) -> Any:
-        print(f'[INFO] - module {self.name} loaded')
+        ...
 
 
 class StringLoader(SourceLoader):
@@ -292,6 +293,7 @@ class ModulesManager:
         self.me = me
 
         self.aliases = self._db.get(__name__, "aliases", {})
+        self.strings = utils.get_langpack().get('manager')
 
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None
@@ -382,24 +384,18 @@ class ModulesManager:
                     for loop in self.loops:
                         setattr(loop, 'method', instance)
                 
-                if (name := getattr(instance, 'strings', '')):
-                    if name.get('name', '').lower() in [
-                        'backup',
-                        'config',
-                        'eval',
-                        'help',
-                        'info',
-                        'loader',
-                        'moduleguard',
-                        'settings',
-                        'terminal',
-                        'translator',
-                        'updater'
-                    ]:
-                        a = utils.get_langpack()
-                        pack = a.get(name.get('name'))
-                        pack['name'] = name.get('name')
-                        instance.strings = pack
+                name = getattr(instance, 'strings', {}).get('name', '').lower()
+                mods = [
+                    'backup', 'config', 'eval', 'help', 'info', 
+                    'loader', 'moduleguard', 'settings', 
+                    'terminal', 'translator', 'updater'
+                ]
+
+                if name in mods:
+                    langpack = utils.get_langpack()
+                    instance.strings = langpack.get(name, {})
+                    instance.strings['name'] = name
+
 
         if not instance:
             logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
@@ -408,10 +404,7 @@ class ModulesManager:
 
     async def load_module(self, module_source: str, origin: str = "<string>", did_requirements: bool = False) -> str:
         """Загружает сторонний модуль"""
-        module_name = "teagram.modules." + (
-            "".join(random.choice(string.ascii_letters + string.digits)
-                    for _ in range(10))
-        )
+        module_name = f"teagram.modules.{utils.random_id()}"
 
         try:
             spec = ModuleSpec(module_name, StringLoader(
@@ -421,7 +414,7 @@ class ModulesManager:
             if did_requirements:
                 return True
             try:
-                requirements = " ".join(re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source))
+                requirements = re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source)
             except TypeError as error:
                 logger.error(traceback.format_exc())
                 return logger.warning("Не указаны пакеты для установки")

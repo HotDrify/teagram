@@ -9,6 +9,7 @@ from telethon import types
 
 from .. import loader, utils, database
 from ..types import ConfigValue, Config
+from ..utils import escape_html
 
 # distutils will be deleted in python 3.12
 # distutils будет удалена в python 3.12
@@ -50,7 +51,7 @@ class ConfigMod(loader.Module):
         self.message = None
         self.chat = None
         self._def = False
-        self.me = None
+        self.me = self.client._self_id
         self.bbot = None
 
     def validate(self, attribute):
@@ -87,6 +88,7 @@ class ConfigMod(loader.Module):
             return await call.answer(self.strings['noowner'])
 
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
+        modules = list(self.manager.modules)
         modules = list(self.manager.modules)
 
         await self.inline_bot.edit_message_text(
@@ -144,9 +146,12 @@ class ConfigMod(loader.Module):
 
         buttons = []
         for count, name in enumerate(attrs, start=1):
+            _data = f'ch_attr_{mod.name.split(".")[-1]}_{name}'
+
             buttons.append(
                 InlineKeyboardButton(
-                    name, callback_data=f'ch_attr_{mod.name.split(".")[-1]}_{name}'
+                    name, 
+                    callback_data=_data
                 )
             )
 
@@ -213,10 +218,10 @@ class ConfigMod(loader.Module):
 
         await self.inline_bot.edit_message_text(
             f'⚙ <b>{self.pending_module.name}</b>\n'
-            f'➡ <b>{self.strings["attr"]}</b>: <code>{attribute}</code>\n'
-            f'➡ <b>{self.strings["value"]}</b>: <code>{str(value) or self.strings["nospec"]}</code>\n'
-            f'↪ <b>{self.strings["def"]}</b>: <code>{default or self.strings["nospec"]}</code>\n\n'+
-            (f'❔ <code>{docs}</code>' if docs else ""),
+            f'➡ <b>{escape_html(self.strings["attr"])}</b>: <code>{escape_html(attribute)}</code>\n'
+            f'➡ <b>{escape_html(self.strings["value"])}</b>: <code>{escape_html(value) or self.strings["nospec"]}</code>\n'
+            f'↪ <b>{escape_html(self.strings["def"])}</b>: <code>{escape_html(default) or self.strings["nospec"]}</code>\n\n'+
+            (f'❔ <code>{escape_html(docs)}</code>' if docs else ""),
             reply_markup=keyboard,
             inline_message_id=call.inline_message_id
         )
@@ -228,6 +233,20 @@ class ConfigMod(loader.Module):
         
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)
+
+            attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
+            attrs = [
+                (key, value) for key, value in attrs if not (
+                    key.startswith('__') and key.endswith('__')
+                ) and key not in self.DEFAULT_ATTRS
+            ]
+
+            for _attr in attrs:
+                a = getattr(self.pending_module, _attr[0])
+                if isinstance(a, Config):
+                    a.config[self.pending]
+                    a.set(self.pending, attr)
+                    break
 
             self.config[self.pending] = attr
             self.config_db.set(
@@ -263,13 +282,6 @@ class ConfigMod(loader.Module):
         """Настройка через inline"""
         if not self.bbot:
             self.bbot = await self.inline_bot.get_me()
-
-        if not self.me:
-            if not (_id := self.db.get('teagram.loader', 'ownerid', '')):
-                _id = self.manager.me.id
-                self.db.set('teagram.loader', 'ownerid', _id)
-
-            self.me = _id
 
         bot = self.bbot
         await utils.invoke_inline(message, bot.username, 'cfg')

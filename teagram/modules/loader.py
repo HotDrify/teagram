@@ -83,6 +83,7 @@ class LoaderMod(loader.Module):
 
         raw_link = api_result
         modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
+        modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
         if modules.status_code != 200:
             return await utils.answer(
                 message, 
@@ -100,7 +101,7 @@ class LoaderMod(loader.Module):
                     map("<code>{}</code>".format, modules))
             )
             return await utils.answer(
-                message, text)
+                message, text, link_preview=False)
 
         error_text = None
         module_name = None
@@ -152,7 +153,7 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, (
-                self.strings['loadedmod'].format(module_name=module_name)
+                self.strings['loadedmod'].format(module_name)
                 if args != "all"
                 else self.strings['loaded'].format(count, len(modules))
             )

@@ -8,6 +8,7 @@ from googletrans.models import Translated
 @loader.module('Translator', 'teagram')
 class TranslatorMod(loader.Module):
     """Переводчик"""
+    strings = {'name': 'translator'}
     
     def __init__(self):
         self.config = Config(
@@ -24,7 +25,7 @@ class TranslatorMod(loader.Module):
     async def translate(self, message: types.Message, args):
         """Перевод"""
         if not (text := args):
-            if not (text := (await message.get_reply_message()).raw_text):
+            if not (reply := (await message.get_reply_message())):
                 return await utils.answer(
                     message,
                     self.strings['notext']
@@ -36,12 +37,12 @@ class TranslatorMod(loader.Module):
                 self.strings['wronglang'].format(lang)
             )
         
-        translated: Translated = Translator().translate(text, dest=lang)
+        translated: Translated = Translator().translate((text or reply.raw_text), dest=lang)
         
         await utils.answer(
             message,
-            f"👅 {self.strings['lang']} <b>{translated.src} -> {lang}</b>\n"
-            f"🗣 {self.string['pronun']} <b>{translated.pronunciation}</b>\n"
+            f"👅 <b>{self.strings['lang']} {translated.src} -> {lang}</b>\n"
+            f"🗣 <b>{self.strings['pronun']} {translated.pronunciation or '-'}</b>\n"
             f"➡ {self.strings['text']}:\n"
             f"<b>{translated.origin}</b>\n"
             f"➡ {self.strings['trans']}:\n"

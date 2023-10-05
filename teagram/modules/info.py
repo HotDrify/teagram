@@ -82,9 +82,8 @@ class AboutMod(loader.Module):
                     thumb_url=avatar or davatar,
                     photo_url=avatar or davatar,
                     caption=default or custom,
-                    reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton('❓ Teagram', url='https://t.me/UBteagram')
-                    ).add(
+                    reply_markup=InlineKeyboardMarkup().row(
+                        InlineKeyboardButton('❓ Teagram', url='https://t.me/UBteagram'),
                         InlineKeyboardButton('🤖 Github', url='https://github.com/itzlayz/teagram-tl')
                     )
                 )

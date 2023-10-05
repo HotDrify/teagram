@@ -1,15 +1,27 @@
 from telethon import types
-from .. import __version__, loader, utils
+from .. import __version__, loader, utils, validators
+from ..types import Config, ConfigValue
 
 @loader.module(name="Help", author='teagram')
 class HelpMod(loader.Module):
     """Помощь по командам 🍵 teagram"""
 
     strings = {'name': 'help'}
+    def __init__(self):
+        self.config = Config(
+            ConfigValue(
+                'smile',
+                'smile module_name - commands',
+                '⚙',
+                self.db.get('Help', 'smile', None),
+                validators.String()
+            )
+        )
 
     async def help_cmd(self, message: types.Message, args: str):
         """Список всех модулей"""
         try:
+            self.bot_username = f'@{(await self.bot.bot.get_me()).username}'
             self.bot_username = f'@{(await self.bot.bot.get_me()).username}'
         except:
             self.bot_username = self.strings['ebot']
@@ -31,7 +43,7 @@ class HelpMod(loader.Module):
                     for inline_command in module.inline_handlers
                 )
                 if commands or inline:
-                    text += f"\n<b>{module.name}</b> - " + (commands if commands else self.strings['nocmd']) + inline
+                    text += f"\n{self.config['smile']} <b>{module.name}</b> - " + (commands if commands else self.strings['nocmd']) + inline
 
             modules_count = len(self.manager.modules) - 1
             bot_inline_info = f"<emoji id=5228968570863496802>🤖</emoji> {self.strings['ibot']}: <b>{self.bot_username}</b>\n"
@@ -41,7 +53,7 @@ class HelpMod(loader.Module):
                 f"<emoji id=5359370246190801956>☕️</emoji> {self.strings['mods']} <b>{modules_count}</b>\n{bot_inline_info}{text}"
             )
 
-        module = self.manager.get_module(args)
+        module = self.manager.lookup(args)
         if not module:
             return await utils.answer(
                 message, f"<b><emoji id=5465665476971471368>❌</emoji> {self.strings['nomod']}</b>")

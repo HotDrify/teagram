@@ -67,10 +67,11 @@ class BotManager(Events, TokenManager):
         if not self._token:
             new = True
 
+
             self._token = await self._create_bot()
-        if not self._token:
-            logging.error(error_text)
-            sys.exit(1)
+            if not self._token:
+                logging.error(error_text)
+                sys.exit(1)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
@@ -147,7 +148,7 @@ class BotManager(Events, TokenManager):
         photo: Photo = None,
         doc: Document = None
     ):
-        unit_id = utils.random_id()
+        unit_id = callback or utils.random_id()
         self._units[unit_id] = {
             'type': 'form',
             'title': title,
@@ -165,7 +166,7 @@ class BotManager(Events, TokenManager):
         }
 
         try:
-            await self.invoke_inline(unit_id, message)
+            await self.invoke_unit(unit_id, message)
         except Exception as error:
             del self._units[unit_id]
 
@@ -175,3 +176,5 @@ class BotManager(Events, TokenManager):
                 message,
                 f"❌ <code>{error}</code>"
             )   
+
+        return unit_id

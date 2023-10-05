@@ -54,7 +54,7 @@ class ConfigValue:
     validator: Union[Integer, String, Boolean] = None
     
     def __post_init__(self):
-        if isinstance(self.value, WaitForDefault):
+        if isinstance(self.value, WaitForDefault) or not self.value:
             self.value = self.default
 
     def __setattr__(self, key: str, value: Any):
@@ -63,6 +63,8 @@ class ConfigValue:
                 value = self.validator._valid(value)
             except ValidationError:
                 value = self.default
+
+        if isinstance(value, (tuple, list, dict)):
 
         if isinstance(value, (tuple, list, dict)):
             raise ValidationError('Неправильный тип (Проверьте типы валидаторов) / Invalid type (Check validator types)')
