@@ -65,8 +65,6 @@ class ConfigValue:
                 value = self.default
 
         if isinstance(value, (tuple, list, dict)):
-
-        if isinstance(value, (tuple, list, dict)):
             raise ValidationError('Неправильный тип (Проверьте типы валидаторов) / Invalid type (Check validator types)')
 
         object.__setattr__(self, key, value)

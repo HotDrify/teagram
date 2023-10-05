@@ -8,7 +8,7 @@ from loguru import logger
 from telethon import errors
 from telethon.tl.functions.contacts import UnblockRequest
 
-from .. import fsm, utils
+from .. import utils
 from .types import Item
 
 class TokenManager(Item):
@@ -26,15 +26,15 @@ class TokenManager(Item):
         """
         logging.info("Starting the process of creating a new bot...")
 
-        async with fsm.Conversation(self._app, "@BotFather") as conv:
+        async with self._app.conversation('@BotFather') as conv:
             try:
-                await conv.ask("/cancel")
+                await conv.send_message("/cancel")
             except errors.UserIsBlockedError:
                 await self._app(UnblockRequest('@BotFather'))
 
             await conv.get_response()
 
-            await conv.ask("/newbot")
+            await conv.send_message("/newbot")
             response = await conv.get_response()
 
             if any(
@@ -53,12 +53,12 @@ class TokenManager(Item):
                 return sys.exit(0)
 
 
-            await conv.ask(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
+            await conv.send_message(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
             await conv.get_response()
 
             bot_username = f"teagram_{utils.random_id(6)}_bot"
 
-            await conv.ask(bot_username)
+            await conv.send_message(bot_username)
 
             time.sleep(0.5)
             response = await conv.get_response()
@@ -72,22 +72,22 @@ class TokenManager(Item):
                 return logging.error(response.text)
 
             token = search.group(0)
-            await conv.ask("/setuserpic")
+            await conv.send_message("/setuserpic")
             await conv.get_response()
 
-            await conv.ask(f"@{bot_username}")
+            await conv.send_message(f"@{bot_username}")
             await conv.get_response()
 
-            await conv.ask_media("assets/bot_avatar.png", media_type="photo")
+            await conv.send_message_media("assets/bot_avatar.png", media_type="photo")
             await conv.get_response()
 
-            await conv.ask("/setinline")
+            await conv.send_message("/setinline")
             await conv.get_response()
 
-            await conv.ask(f"@{bot_username}")
+            await conv.send_message(f"@{bot_username}")
             await conv.get_response()
 
-            await conv.ask("teagram-command")
+            await conv.send_message("teagram-command")
             await conv.get_response()
 
             logger.success("Bot created successfully")
@@ -100,15 +100,15 @@ class TokenManager(Item):
         Returns:
             str: The revoked bot token.
         """
-        async with fsm.Conversation(self._app, "@BotFather") as conv:
+        async with self._app.conversation("@BotFather") as conv:
             try:
-                await conv.ask("/cancel")
+                await conv.send_message("/cancel")
             except errors.UserIsBlockedError:
                 await self._app(UnblockRequest('@BotFather'))
 
             await conv.get_response()
 
-            await conv.ask("/revoke")
+            await conv.send_message("/revoke")
             response = await conv.get_response()
 
             if "/newbot" in response.text:
@@ -131,7 +131,7 @@ class TokenManager(Item):
                     ):
                         self.bot_username = button.text
 
-                        await conv.ask(button.text)
+                        await conv.send_message(button.text)
                         found = True
                         break
 

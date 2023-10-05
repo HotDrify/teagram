@@ -92,21 +92,19 @@ class BotManager(Events, TokenManager):
             await self._app(StartBotRequest(name, name, 'start'))
 
             if revoke:
-                from ..fsm import Conversation
-
-                async with Conversation(self._app, "@BotFather") as conv:
+                async with self._app.converstaion("@BotFather") as conv:
                     try:
-                        await conv.ask("/cancel")
+                        await conv.send_message("/cancel")
                     except errors.UserIsBlockedError:
                         await self._app(UnblockRequest('@BotFather'))
 
-                    await conv.ask("/setinline")
+                    await conv.send_message("/setinline")
                     await conv.get_response()
 
-                    await conv.ask(self.bot_username)
+                    await conv.send_message(self.bot_username)
                     await conv.get_response()
 
-                    await conv.ask("~teagram~ $")
+                    await conv.send_message("~teagram~ $")
                     await conv.get_response()
 
                     logger.success("Bot revoked successfully")

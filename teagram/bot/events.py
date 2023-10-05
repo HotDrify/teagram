@@ -231,7 +231,6 @@ class Events(Item):
                     ]
                 )
             else:
-            else:
                 await inline_query.answer(
                     [
                         InlineQueryResultDocument(
