@@ -71,8 +71,6 @@ class DispatcherManager:
         if not await self.check_filters(func, message):
             return
         
-        setattr(message, '_client', self.app)
-        
         try:
             if (
                 len(vars_ := getfullargspec(func).args) > 2
@@ -97,8 +95,6 @@ class DispatcherManager:
         """Обработчик вотчеров"""
         for watcher in self.manager.watcher_handlers:
             try:
-                setattr(message, '_client', self.app)
-
                 if not await self.check_filters(watcher, message):
                     continue
 
