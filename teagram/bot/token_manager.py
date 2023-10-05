@@ -5,7 +5,7 @@ import re
 from typing import Union
 
 from loguru import logger
-from telethon import errors, types
+from telethon import errors
 from telethon.tl.functions.contacts import UnblockRequest
 
 from .. import fsm, utils
@@ -37,8 +37,6 @@ class TokenManager(Item):
             await conv.ask("/newbot")
             response = await conv.get_response()
 
-            if any(
-                phrase in response.text
             if any(
                 phrase in response.text
                 for phrase in ["That I cannot do.", "Sorry"]
