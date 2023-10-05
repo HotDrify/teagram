@@ -413,10 +413,7 @@ class ModulesManager:
 
     async def load_module(self, module_source: str, origin: str = "<string>", did_requirements: bool = False) -> str:
         """Загружает сторонний модуль"""
-        module_name = "teagram.modules." + (
-            "".join(random.choice(string.ascii_letters + string.digits)
-                    for _ in range(10))
-        )
+        module_name = "teagram.modules." + utils.random_id()
 
         try:
             spec = ModuleSpec(module_name, StringLoader(
