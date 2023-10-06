@@ -63,13 +63,7 @@ class BackupMod(loader.Module):
         if self.config['backupInterval']:
             self.toloop.start()
 
-    @loader.loop(1, autostart=True)
-    async def toloop(self):
-        if not (interval := self.config['backupInterval']):
-            await asyncio.sleep(10)
-        
-        await asyncio.sleep(interval)
-
+    async def backup(self):
         self.client: TelegramClient
         backup = await create_backup('./teagram/modules/', '')
 
@@ -87,6 +81,17 @@ class BackupMod(loader.Module):
                 self.strings['error'],
                 parse_mode='html'
             )
+    
+    async def on_unload(self):
+        await self.backup()
+
+    @loader.loop(1, autostart=True)
+    async def toloop(self):
+        if not (interval := self.config['backupInterval']):
+            await asyncio.sleep(10)
+        
+        await asyncio.sleep(interval)
+        await self.backup()
 
     @loader.command('Backup mods')
     async def backupmods(self, message: types.Message):
@@ -96,22 +101,7 @@ class BackupMod(loader.Module):
             self.strings['attempt']
         )
 
-        backup = await create_backup('./teagram/modules/', '')
-
-        if backup[1]:
-            await utils.answer(
-                message,
-                backup[0],
-                document=True,
-                caption=self.strings['done']
-            )
-        else:
-            logger.error(backup[0])
-
-            await utils.answer(
-                message,
-                self.strings['error']
-            )
+        await self.backup()
 
     @loader.command('Backup db')
     async def backupdb(self, message: types.Message):

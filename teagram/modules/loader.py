@@ -256,9 +256,9 @@ class LoaderMod(loader.Module):
 
     async def unloadmod_cmd(self,  message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
-        if not (module_name := self.manager.unload_module(args)):
+        if not (module_name := self.manager.unload_module(args.strip())):
             return await utils.answer(
-                message, self.strings['modnamerr'])
+                message, self.strings['notfound'].format(args.strip()))
         
         modules = [
             'config',

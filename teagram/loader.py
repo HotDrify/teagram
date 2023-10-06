@@ -110,6 +110,9 @@ class Module:
 
     async def on_load(self) -> Any:
         ...
+    
+    async def on_unload(self) -> Any:
+        ...
 
 
 class StringLoader(SourceLoader):
@@ -472,6 +475,11 @@ class ModulesManager:
         else:
             if not (module := self.lookup(module_name)):
                 return False
+            
+            try:
+                asyncio.get_running_loop().create_task(module.on_unload())
+            except Exception as error:
+                logging.exception(error)
 
             if (get_module := inspect.getmodule(module)).__spec__.origin != "<string>":
                 set_modules = set(self._db.get(__name__, "modules", []))
