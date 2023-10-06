@@ -80,10 +80,13 @@ class ExampleMod(loader.Module):  # Example - название класса мо
                         f" Аргументы: {args}" if args
                         else ""
                     ),
-                    input_message_content=InputTextMessageContent(
-                        "Текст после нажатия на кнопку"),
+                    input_message_content=InputTextMessageContent("Текст после нажатия на кнопку"),
                     reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton("Текст кнопки", callback_data="example_button_callback"))
+                        InlineKeyboardButton(
+                            "Текст кнопки", 
+                            callback_data="example_button_callback"
+                        )
+                    )
                 )
             ]
         )

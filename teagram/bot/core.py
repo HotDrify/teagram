@@ -92,7 +92,7 @@ class BotManager(Events, TokenManager):
             await self._app(StartBotRequest(name, name, 'start'))
 
             if revoke:
-                async with self._app.converstaion("@BotFather") as conv:
+                async with self._app.conversation("@BotFather") as conv:
                     try:
                         await conv.send_message("/cancel")
                     except errors.UserIsBlockedError:

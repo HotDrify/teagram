@@ -55,7 +55,7 @@ class TokenManager(Item):
 
             await conv.send_message(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
             await conv.get_response()
-
+            
             bot_username = f"teagram_{utils.random_id(6)}_bot"
 
             await conv.send_message(bot_username)
@@ -72,13 +72,14 @@ class TokenManager(Item):
                 return logging.error(response.text)
 
             token = search.group(0)
+
             await conv.send_message("/setuserpic")
             await conv.get_response()
 
             await conv.send_message(f"@{bot_username}")
             await conv.get_response()
 
-            await conv.send_message_media("assets/bot_avatar.png", media_type="photo")
+            await conv.send_file("assets/bot_avatar.png")
             await conv.get_response()
 
             await conv.send_message("/setinline")
@@ -121,7 +122,7 @@ class TokenManager(Item):
 
             if not getattr(response.reply_markup, 'rows', None):
                 logger.warning('Retrying (CTRL + Z/C to stop)')
-                self._revoke_token()
+                await self._revoke_token()
 
             found = False
             for row in response.reply_markup.rows:
