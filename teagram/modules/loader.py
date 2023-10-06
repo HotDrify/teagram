@@ -221,7 +221,6 @@ class LoaderMod(loader.Module):
             'eval',
             'help',
             'info',
-            'moduleGuard',
             'terminal',
             'tester',
             'updater'
@@ -269,7 +268,6 @@ class LoaderMod(loader.Module):
             'eval',
             'help',
             'info',
-            'moduleGuard',
             'terminal',
             'tester',
             'updater',
@@ -298,7 +296,6 @@ class LoaderMod(loader.Module):
                 'eval',
                 'help',
                 'info',
-                'moduleGuard',
                 'terminal',
                 'tester',
                 'updater',
