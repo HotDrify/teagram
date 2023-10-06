@@ -21,7 +21,8 @@ class DispatcherManager:
     async def check_filters(
         self,
         func: FunctionType,
-        message: Union[types.Message, Message]
+        message: Union[types.Message, Message],
+        watcher: bool = False
     ) -> bool:
         """Проверка фильтров"""
         if (custom_filters := getattr(func, "_filters", None)):
@@ -34,7 +35,7 @@ class DispatcherManager:
         else:
             _users = self.manager._db.get('teagram.loader', 'users', [])
             
-            if not message.out and message.sender_id not in _users:
+            if not message.out and message.sender_id not in _users and not watcher:
                 return False
 
         return True
@@ -95,7 +96,7 @@ class DispatcherManager:
         """Обработчик вотчеров"""
         for watcher in self.manager.watcher_handlers:
             try:
-                if not await self.check_filters(watcher, message):
+                if not await self.check_filters(watcher, message, True):
                     continue
 
                 await watcher(message)
