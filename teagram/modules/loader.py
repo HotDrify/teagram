@@ -235,6 +235,10 @@ class LoaderMod(loader.Module):
                 )
 
         module_name = await self.manager.load_module(_file)
+        if not module_name:
+            return await utils.answer(
+                message, self.strings['noreq'])
+        
         module = '_'.join(module_name.lower().split())
 
         if module_name is True:

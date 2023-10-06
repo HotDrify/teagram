@@ -32,6 +32,7 @@ updater:
 
 loader:
   noargs: "❌ <b>No arguments</b>"
+  noreq: "❌ <b>Import error but requirements not found</b>"
   urlrepo: "✅ <b>Repository link has been reset</b>"
   wrongurl: "❌ <b>Incorrect URL specified</b>"
   yesurl: "✅ <b>Repository link has been set</b>"
