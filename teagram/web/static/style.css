@@ -1,0 +1,59 @@
+body{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: black;
+    overflow: hidden;
+    color: white;
+    outline: 0;
+}
+.login {
+    animation: gradient 3s ease infinite;
+    background: linear-gradient(160deg, #0026ff, #2bff01fd);
+    background-size: 400% 400%;
+    justify-content: center;
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+.flexx{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 23px;
+}
+h1{
+    flex: 1;
+    margin-left: 15px;
+}
+input{
+    flex: 2;
+    padding: 8px;
+    border-radius: 10px;
+    margin-right: 10px;
+    max-width: 250px;
+}
+.buttons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+button{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: azure;
+    border-radius: 15px;    
+    width: 350px;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+@keyframes gradient {
+    0%{background-position: 0% 50%}
+    50%{background-position: 100% 50%}
+    100%{background-position: 0% 50%}
+}
+.teagram{
+    position:absolute;
+    left: 50%;
+    transform: translateX(-50%); 
+}
