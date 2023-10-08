@@ -15,13 +15,13 @@ from telethon.tl.functions.messages import StartBotRequest
 from telethon.tl.functions.contacts import UnblockRequest
 
 from typing import Union, NoReturn
-from loguru import logger
 
 from .events import Events
 from .token_manager import TokenManager
 
 from .. import database, __version__, types, utils
 
+logger = logging.getLogger()
 
 class BotManager(Events, TokenManager):
     """
@@ -53,7 +53,6 @@ class BotManager(Events, TokenManager):
         Returns:
             Union[bool, NoReturn]: True if loaded successfully, else exits with an error.
         """
-        logging.info("Loading bot manager...")
         error_text = "The userbot requires a bot. Resolve the bot creation issue and restart the userbot."
 
         new = False
@@ -70,20 +69,20 @@ class BotManager(Events, TokenManager):
 
             self._token = await self._create_bot()
             if not self._token:
-                logging.error(error_text)
+                logger.error(error_text)
                 sys.exit(1)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
         except (exceptions.ValidationError, exceptions.Unauthorized):
-            logging.error("Invalid token. Attempting to recreate the token.")
+            logger.error("Invalid token. Attempting to recreate the token.")
 
             result = await self._revoke_token()
             new = True
             revoke = True
 
             if not result:
-                self._token = await self._create_bot() or logging.error(error_text) or sys.exit(1)
+                self._token = await self._create_bot() or logger.error(error_text) or sys.exit(1)
             else:
                 self._token = result
 
@@ -107,7 +106,7 @@ class BotManager(Events, TokenManager):
                     await conv.send_message("~teagram~ $")
                     await conv.get_response()
 
-                    logger.success("Bot revoked successfully")
+                    logger.info("Bot revoked successfully")
 
         self._db.set('teagram.bot', 'token', self._token)
         self._dp = Dispatcher(self.bot)

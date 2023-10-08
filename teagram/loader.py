@@ -1,14 +1,11 @@
 import asyncio
 import os
 import sys
-import json
 
 import re
 import subprocess
 
 import logging
-import string
-import random
 import traceback
 
 import requests
@@ -18,9 +15,8 @@ from importlib.abc import SourceLoader
 from importlib.machinery import ModuleSpec
 from importlib.util import spec_from_file_location, module_from_spec
 
-from typing import Union, List, Dict, Any, Callable
+from typing import Union, List, Dict, Any
 from types import FunctionType, LambdaType
-from loguru import logger
 
 from telethon import TelegramClient, types
 from . import dispatcher, utils, database, bot
@@ -31,6 +27,7 @@ VALID_PIP_PACKAGES = re.compile(
     re.MULTILINE,
 )
 
+logger = logging.getLogger()
 
 class Loop:
     def __init__(
@@ -154,7 +151,10 @@ def get_watcher_handlers(instance: Module) -> List[FunctionType]:
         for method_name in dir(instance)
         if (
             callable(getattr(instance, method_name))
-            and method_name.startswith("watcher")
+            and (
+                method_name.startswith("watcher") or
+                hasattr(getattr(instance, method_name), 'watcher')
+            )
         )
     ]
 
@@ -244,26 +244,28 @@ def command(docs: str = None, *args, **kwargs) -> FunctionType:
 
     return decorator
 
+def watcher(*args, **kwargs) -> FunctionType:
+    def decorator(func: FunctionType):
+        setattr(func, 'watcher', True)
+
+        for arg in args:
+            setattr(func, arg, True)
+
+        for kwarg, value in kwargs.items():
+            setattr(func, kwarg, value)
+
+        return func
+
+    return decorator
 
 def on_bot(custom_filters: LambdaType) -> FunctionType:
-    """Создает фильтр для команды бота
-
-    Параметры:
-        custom_filters (``types.FunctionType`` | ``types.LambdaType``):
-            Фильтры.
-            Функция должна принимать параметры self, message/call/inline_query
-
-    Пример:
-        >>> @on_bot(lambda self, call: call.from_user.id == self.manager.me.id)
-        >>> async def func_callback_handler(
-                self,
-                call: aiogram.types.CallbackQuery
-            ):
-        >>>     ...
+    """
+    Makes custom filter for bot
+    :param custom_filters: Lambda filter
+    :returns: 
     """
 
     def decorator(func: FunctionType):
-        """Декоратор для обработки команды бота"""
         func._filters = custom_filters
         return func
 
@@ -301,14 +303,11 @@ class ModulesManager:
         self.bot_manager: bot.BotManager = None
 
     async def load(self, app: TelegramClient) -> bool:
-        """Загружает менеджер модулей"""
         self.dp = dispatcher.DispatcherManager(app, self)
         await self.dp.load()
 
         self.bot_manager = bot.BotManager(app, self._db, self)
         await self.bot_manager.load()
-
-        logging.info("Загрузка модулей...")
 
         for local_module in filter(
             lambda file_name: file_name.endswith(".py")
@@ -322,8 +321,8 @@ class ModulesManager:
             try:
                 self.register_instance(module_name, file_path)
             except Exception as error:
-                logging.exception(
-                    f"Ошибка при загрузке локального модуля {module_name}: {error}")
+                logger.exception(
+                    f"Error loading local module {module_name}: {error}")
 
         await self.send_on_loads()
 
@@ -332,10 +331,9 @@ class ModulesManager:
                 r = await utils.run_sync(requests.get, custom_module)
                 await self.load_module(r.text, r.url)
             except requests.exceptions.RequestException as error:
-                logging.exception(
-                    f"Ошибка при загрузке стороннего модуля {custom_module}: {error}")
+                logger.exception(
+                    f"Error loading third party module {custom_module}: {error}")
 
-        logging.info("Менеджер модулей загружен")
         return self.bot_manager.bot
 
     def register_instance(
@@ -344,7 +342,6 @@ class ModulesManager:
         file_path: str = "",
         spec: ModuleSpec = None
     ) -> Module:
-        """Регистрирует модуль"""
         spec = spec or spec_from_file_location(module_name, file_path)
         module = module_from_spec(spec)
         sys.modules[module.__name__] = module
@@ -400,12 +397,11 @@ class ModulesManager:
 
 
         if not instance:
-            logging.warn("Не удалось найти класс модуля заканчивающийся на `Mod`")
+            logger.warn("Could not find module class ending with `Mod`")
 
         return instance
 
     async def load_module(self, module_source: str, origin: str = "<string>", did_requirements: bool = False) -> str:
-        """Загружает сторонний модуль"""
         module_name = f"teagram.modules.{utils.random_id()}"
 
         try:
@@ -419,9 +415,9 @@ class ModulesManager:
                 requirements = re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source)
             except TypeError as error:
                 logger.error(traceback.format_exc())
-                return logger.warning("Не указаны пакеты для установки")
+                return logger.warning("Installation packages not specified")
 
-            logging.info(f"Установка пакетов: {', '.join(requirements)}...")
+            logger.info(f"Installing packages: {', '.join(requirements)}...")
 
             try:
                 subprocess.run(
@@ -435,12 +431,12 @@ class ModulesManager:
                     ]
                 )
             except subprocess.CalledProcessError as error:
-                logging.exception(f"Ошибка при установке пакетов: {error}")
+                logger.exception(f"Error installing packages: {error}")
 
             return await self.load_module(module_source, origin, True)
         except Exception as error:
-            return logging.exception(
-                f"Ошибка при загрузке модуля {origin}: {error}")
+            return logger.exception(
+                f"Error loading module {origin}: {error}")
 
         if not instance:
             return False
@@ -448,28 +444,25 @@ class ModulesManager:
         try:
             await self.send_on_load(instance)
         except Exception as error:
-            return logging.exception(error)
+            return logger.exception(error)
 
         return instance.name
 
     async def send_on_loads(self) -> bool:
-        """Отсылает команды выполнения функции"""
         for module in self.modules:
             await self.send_on_load(module)
 
         return True
 
     async def send_on_load(self, module: Module) -> bool:
-        """Используется для выполнении функции после загрузки модуля"""
         try:
             await module.on_load()
         except Exception as error:
-            return logging.exception(error)
+            return logger.exception(error)
 
         return True
 
     def unload_module(self, module_name: str = None, is_replace: bool = False) -> str:
-        """Выгружает загруженный (если он загружен) модуль"""
         if is_replace:
             module = module_name
         else:
@@ -479,7 +472,7 @@ class ModulesManager:
             try:
                 asyncio.get_running_loop().create_task(module.on_unload())
             except Exception as error:
-                logging.exception(error)
+                logger.exception(error)
 
             if (get_module := inspect.getmodule(module)).__spec__.origin != "<string>":
                 set_modules = set(self._db.get(__name__, "modules", []))

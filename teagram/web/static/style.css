@@ -6,8 +6,8 @@ body{
     outline: 0;
 }
 .login {
-    animation: gradient 3s ease infinite;
-    background: linear-gradient(170deg, #0e7539, #005e61);
+    animation: gradient 5s cubic-bezier(0.92, -0.04, 0.25, 1) infinite;
+    background: linear-gradient(10deg, #01b04a, #077477);
     background-size: 400% 400%;
     justify-content: center;
     overflow: hidden;
@@ -44,6 +44,7 @@ button{
     background-color: azure;
     border-radius: 15px;    
     width: 350px;
+    margin-top: 5px;
     margin-bottom: 5px;
     padding: 5px;
 }

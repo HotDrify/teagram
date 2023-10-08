@@ -56,6 +56,10 @@ document.querySelector('#enterTokens').onclick = () => {
                                 img.remove()
                             }                           
                             new QRCode(_qr, data.replace(/["']/g, ''));
+                            _qr.insertBefore(
+                                _qr.getElementsByTagName("img")[0],
+                                document.getElementById("enterTokens")
+                            )
                             _qr.title = ""                             
                         }
                     )

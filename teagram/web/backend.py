@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from telethon import TelegramClient, types, errors
 from .. import database, utils
 
-import os, re, sys, atexit, asyncio, configparser
+import os, re, sys, atexit, asyncio, configparser, logging
 from uvicorn import Config, Server
 
 GREP = 'kill $(pgrep -f "ssh -o StrictHostKeyChecking=no -R 80:localhost:8000 nokey@localhost.run")'
@@ -19,6 +19,7 @@ login = {
     '2fa': 0
 }
 
+logger = logging.getLogger()
 api = FastAPI()
 api.add_middleware(
     CORSMiddleware,
@@ -43,7 +44,7 @@ def shutdown():
 
 @api.on_event('startup')
 async def proxytunnel():
-    print('Getting url...')
+    logging.info("Web configuration")
 
     url = None
     if 'windows' not in utils.get_platform().lower():
@@ -71,9 +72,9 @@ async def proxytunnel():
 
     if url:
         atexit.register(lambda: os.system(GREP))
-        print(f'To login in account, open in browser {url}')
+        logger.info(f'To login in account, open in browser {url}')
     else:
-        print('To login in account, open in browser https://127.0.0.1:8000')
+        logger.info('To login in account, open in browser https://127.0.0.1:8000')
 
 @api.get('/')
 async def home(request: Request):
