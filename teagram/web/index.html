@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class='login'>
+        
         <h2 class="teagram">TEAGRAM</h2>
 
         <div class="flexx">
@@ -19,27 +20,20 @@
             <h1>Api hash</h1>
         <input id='api_hash' type="text"> 
         </div>
-        <div class="flexx">
-            <h1>Phone number</h1>
-            <input id='phone' type="number"> 
-        </div>
-        
-        <div class="flexx">
-            <h1>Code from telegram</h1>
-            <input id='phonecode' type="text"> 
-        </div>
         
         <div class="flexx">
             <h1>2FA password</h1>
             <input id='_2fa' type="password"> 
         </div>
         
-        <div class="buttons">
+        <div id="_buttons" class="buttons">
+            <div class="_qrcode" id="_qrcode"></div>
             <button id="enterTokens">Enter api tokens</button>
-            <button id="enterPhone">Enter phone</button>
-            <button id="enterCode">Enter phone code (2FA passed automatically)</button>
+            <button id="entertwofa">Enter 2FA</button>
         </div>
+        
     </div>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script src="{{ url_for('static', path='/index.js') }}"></script>    
 </body>
 </html>

@@ -145,6 +145,10 @@ def validate(attribute):
 
     return attribute
 
+# https://github.com/hikariatama/Hikka/blob/master/hikka/_internal.py#L16-L17
+async def fw_protect():
+    await asyncio.sleep(random.randint(1000, 3000) / 1000)
+
 async def create_group(
     app: TelegramClient,
     title: str,
@@ -152,6 +156,7 @@ async def create_group(
     megagroup: bool = False,
     broadcast: bool = False
 ):
+    await fw_protect()
     return await app(CreateChannelRequest(title, description, megagroup=megagroup, broadcast=broadcast))
 
 async def answer(
@@ -270,6 +275,22 @@ async def invoke_inline(
         reply_to=message.reply_to_msg_id or None
     )
 
+# https://github.com/hikariatama/Hikka/blob/master/hikka/utils.py#L862-L876
+def get_link(user: typing.Union[types.User, types.Channel], /) -> str:
+    """
+    Get telegram permalink to entity
+    :param user: User or channel
+    :return: Link to entity
+    """
+    return (
+        f"tg://user?id={user.id}"
+        if isinstance(user, types.User)
+        else (
+            f"tg://resolve?domain={user.username}"
+            if getattr(user, "username", None)
+            else ""
+        )
+    )
 
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """
