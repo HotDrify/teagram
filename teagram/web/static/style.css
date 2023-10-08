@@ -7,7 +7,7 @@ body{
 }
 .login {
     animation: gradient 3s ease infinite;
-    background: linear-gradient(170deg, #07ff6e, #29abaf);
+    background: linear-gradient(170deg, #0e7539, #005e61);
     background-size: 400% 400%;
     justify-content: center;
     overflow: hidden;
