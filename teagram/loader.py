@@ -365,6 +365,7 @@ class ModulesManager:
                 instance.command_handlers = get_command_handlers(instance)
                 instance.watcher_handlers = get_watcher_handlers(instance)
                 instance.loops = get_loops(instance)
+                instance.logger = logging.getLogger(instance.__module__)
 
                 instance.message_handlers = get_message_handlers(instance)
                 instance.callback_handlers = get_callback_handlers(instance)

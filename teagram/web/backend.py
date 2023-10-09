@@ -44,7 +44,7 @@ def shutdown():
 
 @api.on_event('startup')
 async def proxytunnel():
-    logging.info("Web configuration")
+    logging.info("Web configuration...")
 
     url = None
     if 'windows' not in utils.get_platform().lower():

@@ -91,7 +91,7 @@ backup:
 
 settings:
   flushed: "<b>✅ Logs are cleared</b>"
-  no_logs: "<b>❌ <b>You did not specify the level or indicated the wrong log level</b>"
+  no_logs: "<b>❌ <b>You did not specify the level or indicated the wrong log level:</b>\n"
   no_lvl: "<b>❌ <b>Invalid log level {lvl} ({name})</b>"
   logs: "<b>📤 Logs with {lvl} ({name}) level</b>"
   wprefix: "<b>❔ What prefix should I change to?</b>"

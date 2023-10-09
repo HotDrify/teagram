@@ -3,15 +3,17 @@ from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequ
 from telethon.types import ChatAdminRights
 
 from aiogram import Bot
-from loguru import logger
+import os, sys, atexit, time, logging
 
-import os, sys, atexit, time
+logger = logging.getLogger()
 
 async def sendbot(bot, db, prefix, app):
     try:
         await bot.send_message(
             db.cloud.input_chat,
-            f'☕ <b>Teagram userbot has started!</b>\n🤖 <b>Version: {__version__}</b>\n❔ <b>Prefix: {prefix}</b>',
+            '☕ <b>Teagram userbot has started!</b>\n'
+            f'🤖 <b>Version: {__version__}</b>\n'
+            f'❔ <b>Prefix: {prefix}</b>',
         )
     except:
         id = (await bot.get_me()).id
@@ -81,7 +83,7 @@ async def main():
   █    █▀▀▀  █▄▄█  █ ▄▄  █▄▄▀  █▄▄█  █ █ █ 
   █    █▄▄▄  █  █  █▄▄█  █  █  █  █  █   █
     """)
-    print(f'Userbot has started! Prefix "{prefix}"')    
+    logger.info(f'Userbot has started! Prefix "{prefix}"')    
 
     if (restart := db.get("teagram.loader", "restart")):
         restarted = round(time.time())-int(restart['start'])
@@ -126,6 +128,4 @@ async def main():
         await sendbot(bot, db, prefix, app)
 
     await app.run_until_disconnected()
-
     logger.info("Goodbye!")
-    return True

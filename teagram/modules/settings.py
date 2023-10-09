@@ -3,6 +3,7 @@ import io
 import os
 import logging
 
+from logging import _nameToLevel, _levelToName
 from datetime import timedelta
 from telethon import types, TelegramClient
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -20,27 +21,40 @@ class SettingsMod(loader.Module):
        Userbot's settings"""
 
     strings = {'name': 'settings'}
+    levels = "\n".join(f"<code>{k}</code>: <code>{v}</code>" for k, v in _nameToLevel.items())
 
     async def logs_cmd(self, message: types.Message, args: str):
         """Отправляет логи. Использование: logs <уровень>"""
-        if not args:
-            args = "40"
+        try:
+            args = int(args)
+        except:
+            args = args.strip().upper()
 
-        lvl = int(args)
-
-        if not args or lvl < 0 or lvl > 60:
+        if not args or (
+            (args < 0 or args > 50) if isinstance(args, int)
+            else (_nameToLevel.get(args, '') and _levelToName.get(args, ''))
+        ):
             return await utils.answer(
-                message, self.strings['no_logs'])
+                message, self.strings['no_logs'] + self.levels)
 
         if not getattr(self, '_logger', ''):
             self._logger = log.handlers[0]
 
-        logs = '\n'.join(str(error) for error in self._logger.logs).encode('utf-8')
+        lvl = logging.getLevelName(args)
+        if isinstance(lvl, int):
+            lvl = _levelToName.get(lvl)
+
+        logs = '\n'.join(
+            self._logger.format(log) for log in self._logger.logs[lvl]
+        ).encode('utf-8')
         
         if not logs:
             return await utils.answer(
-                message, self.strings['no_lvl'].format(lvl=lvl,
-                                                 name=logging.getLevelName(lvl)))
+                message, self.strings['no_lvl'].format(
+                    lvl=lvl,
+                    name=logging.getLevelName(lvl)
+                ) + self.levels
+            )
 
         logs = io.BytesIO(logs)
         logs.name = "teagram.log"
@@ -60,7 +74,14 @@ class SettingsMod(loader.Module):
             self._logger = log.handlers[0]
 
         self._logger.flush()
-        self._logger.logs = []
+        self._logger.logs = {
+            'INFO': [],
+            'WARNING': [],
+            'ERROR': [],
+            'CRITICAL': [],
+            'DEBUG': [],
+            'NOTSET': []
+        }
 
         await utils.answer(message, self.strings['flushed'])
 
