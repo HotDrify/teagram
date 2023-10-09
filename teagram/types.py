@@ -15,8 +15,11 @@ class Module:
     author: str
     version: Union[int, float]
 
-    async def on_load(self, app: TelegramClient) -> Any:
+    async def on_load(self) -> Any:
         """Invokes on module load"""
+    
+    async def on_unload(self) -> Any:
+        """Invokes on module unload"""
 
 
 class ModulesManager:
