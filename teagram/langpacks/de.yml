@@ -1,0 +1,120 @@
+help:
+  no: "<b>Keine Hilfe verfügbar</b>"
+  nomd: "<b>Keine Beschreibung für Befehl vorhanden</b>"
+  nocmd: "<b>Befehl nicht gefunden</b>"
+  nomod: "Modul nicht gefunden"
+  ebot: "<b>Fehler aufgetreten, bitte den Bot neu starten</b>"
+  ibot: "Inline-Bot"
+  mods: "Verfügbare Module"
+  author: "Autor"
+  version: "Version"
+  desc: "Beschreibung"
+
+manager:
+  errorcmd: "❌ <b>Fehler beim Ausführen des Befehls</b>: {}\n❔ <b>Logs</b>:\n<code>{}</code>"
+
+loader:
+  noargs: "❌ <b>Keine Argumente vorhanden</b>"
+  noreq: "❌ <b>Import-Fehler, Abhängigkeiten nicht gefunden</b>"
+  urlrepo: "✅ <b>Repository-Link zurückgesetzt</b>"
+  wrongurl: "❌ <b>Falscher Link angegeben</b>"
+  yesurl: "✅ <b>Repository-Link erfolgreich gesetzt</b>"
+  errapi: "❌ <b>Falscher Repository-Link.</b>\n<b>Ändern Sie ihn mit dem Befehl: dlrepo <Link zum Repository oder reset></b>"
+  noalltxt: "❌ <b>Keine all.txt-Datei im <a href=\"{modules_repo}\">Repository</a> gefunden</b>\n"
+  listmods: "📥 <b>Liste der verfügbaren Module im <a href=\"{modules_repo}\">Repository</a>:</b>\n\n<code>all</code> - lädt alle Module\n"
+  downdedreq: "✅ <b>Abhängigkeiten installiert. Neustart erforderlich</b>"
+  errmod: "❌ <b>Modul konnte nicht geladen werden. Details finden Sie in den Logs</b>"
+  modurlerr: "❌ <b>Modul nicht über den Link verfügbar</b>"
+  modnameerr: "❌ <b>Falscher Modulname</b>"
+  basicerr: '❌ <b>Fehler aufgetreten, überprüfen Sie die Logs</b>'
+  reqerr: "❌ <b>Unerwarteter Fehler aufgetreten. Details finden Sie in den Logs</b>"
+  loadedmod: "✅ <b>Modul \"<code>{}</code>\" geladen</b>"
+  unloadedmod: "✅ <b>Modul \"<code>{}</code>\" entladen</b>"
+  reloaded: "✅ <b>Modul \"<code>{}</code>\" neu geladen</b>"
+  loaded: "✅ <b>Geladen <b>{}</b> von <b>{}</b> Modulen</b>"
+  notfound: '❌ <b>Modul {} nicht gefunden</b>'
+  noreply: "❌ <b>Kein Reply für die Datei vorhanden</b>"
+  errunicode: "❌ <b>Falsche Codierung der Datei</b>"
+  cantload: "❌ <b>Eingebaute Module können nicht geladen werden</b>"
+  cantunload: "❌ <b>Eingebaute Module können nicht entladen werden</b>"
+  restarting: "🔄 <b>Neustart...</b>"
+  wrongmod: '❌ <b>Sie haben das falsche Modul angegeben</b>'
+  replymod: '⚙ <b>Modul <code>{}</code></b>\n'
+  replytoload: '📁 <b>Um ein Modul zu installieren, schreiben Sie <code>{}loadmod</code> als Reply auf diese Nachricht</b>'
+
+translator:
+  notext: '❌ <b>Kein Text angegeben</b>'
+  wronglang: '❌ <b>Falsche Sprache (<code>{}</code>)</b>'
+  lang: "Sprache"
+  pronun: "Aussprache"
+  text: "Text"
+  trans: "Übersetzung"
+
+info:
+  update: "<b>Update verfügbar</b>"
+  owner: "Besitzer"
+  version: "Version"
+  uptime: "Betriebszeit"
+
+config:
+  noowner: "❌ Du bist nicht der Besitzer"
+  opencfg: "Konfiguration öffnen"
+  cfg: "Konfiguration"
+  chdef: '✔ Du hast den Standardwert erfolgreich geändert'
+  ch: 'Ändern'
+  attr: 'Attribut'
+  value: 'Wert'
+  def: 'Standard'
+  nospec: '<b>Nicht angegeben</b>'
+  back: '🔄 Zurück'
+
+updater:
+  updating: "🛠 <b>Versuch des Updates...</b>"
+  lastver: "✔ <b>Du hast bereits die neueste Version installiert</b>"
+  update: "🔁 <b>Update...</b>"
+  hupdate: "🔄 <b>Update verfügbar</b>"
+  nodialog: "❌ <b>Du hast den Bot blockiert, bitte entsperre den Bot</b>"
+  eone: "❌ <b>Fehler beim Überprüfen des verfügbaren Updates aufgetreten</b>"
+  etwo: "❌ <b>Bitte stellen Sie sicher, dass der GIT Befehl bei Ihnen funktioniert</b>"
+  error: "❌ <b>Fehler aufgetreten: {}</b>"
+  downloading: "📁 <b>Abhängigkeiten werden installiert...</b>"
+
+terminal:
+  cmd: "Befehl"
+  output: "Output"
+
+backup:
+  attemp: '<b>👀 Versuch eines Backups...</b>'
+  done: "<b>✅ Erfolgreiches Backup</b>"
+  error: "<b>🚫 Fehler, überprüfen Sie die Logs</b>"
+
+settings:
+  flushed: "<b>✅ Logs geleert</b>"
+  no_logs: "<b>❌ Sie haben das Level nicht angegeben oder ein falsches Level angegeben:</b>\n"
+  no_lvl: "<b>❌ Falsches Level {lvl} ({name})</b>"
+  logs: "<b>📤 Logs mit Level {lvl} ({name})</b>"
+  wprefix: "<b>❔ Welchen Präfix soll ich setzen?</b>"
+  prefix: "<b>✅ Präfix wurde auf {prefixes} gesetzt</b>"
+  wlang: "<b>❔ Welche Sprache soll ich einstellen?</b>"
+  elang: "<b>❌ Sprache nicht gefunden. Verfügbare Sprachen: {langs}</b>"
+  lang: "<b>✅ Sprache wurde auf </b><code>{language}</code> <b>geändert</b>"
+  walias: "<b>❔ Welchen Alias soll ich hinzufügen?</b>"
+  ealias: "<b>❌ Falsche Argumente angegeben. Richtiges Format: addalias <neuer Alias> <Befehl></b>"
+  nalias: "<b>❌ Dieser Alias existiert bereits</b>"
+  calias: "<b>❌ Dieser Befehl existiert nicht</b>"
+  alias: "<b>✅ Alias <code>{alias}</code> für Befehl <code>{cmd}</code> wurde hinzugefügt</b>"
+  dwalias: "<b>❔ Welchen Alias soll ich löschen?</b>"
+  dealias: "<b>❌ Dieser Alias existiert nicht</b>"
+  dalias: "<b>✅ Alias <code>{}</code> wurde gelöscht</b>"
+  noalias: "<b>Keine Aliase vorhanden</b>"
+  allalias: "<b>🗄 Alle Aliase:</b>\n"
+  ping: "<b>Antwortzeit von Telegram</b>"
+  uptime: "<b>Betriebszeit</b>"
+  noreply: "<b>❌ Sie haben keine Antwort angegeben</b>"
+  yourself: "<b>❌ Sie können sich nicht selbst angeben</b>"
+  owner: "<b>❌ Befehl nur für den Besitzer erlaubt</b>"
+  adduser: "<b>✔ Benutzer erfolgreich hinzugefügt</b>"
+  deluser: "<b>✔ Benutzer erfolgreich gelöscht</b>"
+  nouser: "<b>❔ Benutzer nicht gefunden</b>"
+  user: "<b>Benutzer:</b>"
+  chbot: "<b>✔ Du hast den Inline-Bot erfolgreich geändert!\nBitte starte den Bot neu, um die Änderungen zu übernehmen (<code>{}</code>)</b>"
