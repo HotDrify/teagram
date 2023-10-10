@@ -104,14 +104,14 @@ class SettingsMod(loader.Module):
         """Изменить язык. Использование: setlang <язык>"""
         args = args.split()
 
+        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
+        langs = f" (<code>{', '.join(languages)}</code>)"
+
         if not args:
             return await utils.answer(
-                message, self.strings['wlang'])
+                message, self.strings['wlang'] + langs)
 
         language = args[0]
-        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
-
-
 
         if language not in languages:
             langs = ' '.join(languages)
@@ -123,25 +123,18 @@ class SettingsMod(loader.Module):
         pack = utils.get_langpack()
         setattr(self.manager, 'strings', pack.get('manager'))
 
-        for instance in self.manager.modules:
-            if name := getattr(instance, 'strings', None):
-                stringsname = name.get('name', '').lower()
-                if stringsname in [
-                    'backup',
-                    'config',
-                    'eval',
-                    'help',
-                    'info',
-                    'loader',
-                    'moduleguard',
-                    'settings',
-                    'terminal',
-                    'translator',
-                    'updater'
-                ]:
-                    if _pack := pack.get(stringsname, None):
-                        _pack['name'] = stringsname
-                        setattr(instance, 'strings', pack.get(stringsname))
+        for instance in self.manager.modules:            
+            name = getattr(instance, 'strings', {}).get('name', '').lower()
+            mods = [
+                'backup', 'config', 'eval', 'help', 
+                'info', 'loader', 'settings', 
+                'terminal', 'translator', 'updater'
+            ]
+
+            if name in mods:
+                langpack = utils.get_langpack()
+                instance.strings = langpack.get(name, {})
+                instance.strings['name'] = name
 
         return await utils.answer(
             message, self.strings['lang'].format(language=language))

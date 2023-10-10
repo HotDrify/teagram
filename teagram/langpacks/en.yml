@@ -97,7 +97,7 @@ settings:
   wprefix: "<b>❔ What prefix should I change to?</b>"
   prefix: "<b>✅ The prefix has been changed to {prefixes}</b>"
   wlang: "<b>❔ What language should I change to?</b>"
-  elang: "<b>❌ Language not found. Available languages: <code>{langs}</code></b>"
+  elang: "<b>❌ Language not found. Available languages: {langs}</b>"
   lang: "<b>✅ The language has been changed to </b><code>{language}</code>"
   walias: "<b>❔ What alias should I add?</b>"
   ealias: "<b>❌ The arguments specified are incorrect. Correct: addalias <new alias> <command></b>"
