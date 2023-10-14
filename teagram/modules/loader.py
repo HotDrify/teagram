@@ -56,7 +56,7 @@ class LoaderMod(loader.Module):
         if args == "reset":
             self.db.set(
                 "teagram.loader", "repo",
-                "https://github.com/itzlayz/teagram-modules "
+                "https://github.com/itzlayz/teagram-modules"
             )
             return await utils.answer(
                 message, self.strings['urlrepo'])
@@ -82,7 +82,6 @@ class LoaderMod(loader.Module):
             )
 
         raw_link = api_result
-        modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
         modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
         if modules.status_code != 200:
             return await utils.answer(
