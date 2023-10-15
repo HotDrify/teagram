@@ -24,7 +24,6 @@ async def execute_python_code(code, env={}):
         env = {'__import__': __import__, **env}
         exec(compile(parsed, filename="<ast>", mode="exec"), env)
         return (await eval(f"{fn_name}()", env))
-        return (await eval(f"{fn_name}()", env))
     except Exception as error:
         return error
 
