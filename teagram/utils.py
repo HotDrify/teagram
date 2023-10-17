@@ -34,7 +34,7 @@ from telethon.types import (
     InputPeerNotifySettings,
     UpdateNewChannelMessage
 )
-from hikkatl.tl.functions.account import UpdateNotifySettingsRequest
+from telethon.tl.functions.account import UpdateNotifySettingsRequest
 from telethon.tl import custom
 
 from . import database, init_time
@@ -200,7 +200,7 @@ async def invite_inline_bot(
                 channel=peer,
                 user_id=client.loader.inline.me.username,
                 admin_rights=ChatAdminRights(ban_users=True),
-                rank="Hikka",
+                rank="Teagram",
             )
         )
 
