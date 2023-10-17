@@ -89,7 +89,6 @@ class ConfigMod(loader.Module):
 
         inline_keyboard = InlineKeyboardMarkup(row_width=3, resize_keyboard=True)
         modules = list(self.manager.modules)
-        modules = list(self.manager.modules)
 
         await self.inline_bot.edit_message_text(
             inline_message_id=call.inline_message_id,

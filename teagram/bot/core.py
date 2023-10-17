@@ -108,6 +108,9 @@ class BotManager(Events, TokenManager):
 
                     logger.info("Bot revoked successfully")
 
+        self.me = await self.bot.get_me()
+        self.bot_id = self.me.id
+        
         self._db.set('teagram.bot', 'token', self._token)
         self._dp = Dispatcher(self.bot)
         self._register_handlers()

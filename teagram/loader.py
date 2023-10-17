@@ -301,13 +301,18 @@ class ModulesManager:
 
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None
+        self.inline = None
 
     async def load(self, app: TelegramClient) -> bool:
+        setattr(app, 'loader', self)
+
         self.dp = dispatcher.DispatcherManager(app, self)
         await self.dp.load()
 
         self.bot_manager = bot.BotManager(app, self._db, self)
         await self.bot_manager.load()
+
+        self.inline = self.bot_manager
 
         for local_module in filter(
             lambda file_name: file_name.endswith(".py")
@@ -358,6 +363,7 @@ class ModulesManager:
                 value.manager = self
                 value.client = self._client
                 value.bot = self.bot_manager
+                value.inline = value.bot
                 value.prefix = self._db.get('teagram.loader', 'prefixes', ['.'])
                 value.lookup = self.lookup
 
@@ -386,8 +392,8 @@ class ModulesManager:
                 
                 name = getattr(instance, 'strings', {}).get('name', '').lower()
                 mods = [
-                    'backup', 'config', 'eval', 'help', 'info', 
-                    'loader', 'settings', 
+                    'backup', 'config', 'eval', 'help', 
+                    'loader', 'settings', 'info', 
                     'terminal', 'translator', 'updater'
                 ]
 

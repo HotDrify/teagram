@@ -1,6 +1,7 @@
 import asyncio
 import functools
 import random
+import requests
 import string
 import typing
 import yaml
@@ -13,10 +14,27 @@ from pathlib import Path
 import git
 import contextlib
 from types import FunctionType
+from urllib.parse import urlparse
 from typing import Any, List, Literal, Tuple, Union
-
-from telethon.tl.functions.channels import CreateChannelRequest
-from telethon import TelegramClient, types, events
+from telethon import (
+    TelegramClient, 
+    types, 
+    events, 
+    hints
+)
+from telethon.tl.functions.channels import (
+    CreateChannelRequest,
+    InviteToChannelRequest,
+    EditAdminRequest,
+    EditPhotoRequest
+)
+from telethon.types import (
+    Channel,
+    ChatAdminRights,
+    InputPeerNotifySettings,
+    UpdateNewChannelMessage
+)
+from hikkatl.tl.functions.account import UpdateNotifySettingsRequest
 from telethon.tl import custom
 
 from . import database, init_time
@@ -158,6 +176,202 @@ async def create_group(
 ):
     await fw_protect()
     return await app(CreateChannelRequest(title, description, megagroup=megagroup, broadcast=broadcast))
+
+async def invite_inline_bot(
+    client: TelegramClient,
+    peer: hints.EntityLike,
+) -> None:
+    """
+    Invites inline bot to a chat
+    :param client: Client to use
+    :param peer: Peer to invite bot to
+    :return: None
+    :raise RuntimeError: If error occurred while inviting bot
+    """
+
+    try:
+        await client(InviteToChannelRequest(peer, [client.loader.inline.me.username]))
+    except Exception as e:
+        raise e
+
+    with contextlib.suppress(Exception):
+        await client(
+            EditAdminRequest(
+                channel=peer,
+                user_id=client.loader.inline.me.username,
+                admin_rights=ChatAdminRights(ban_users=True),
+                rank="Hikka",
+            )
+        )
+
+async def asset_channel(
+    client: TelegramClient,
+    title: str,
+    description: str,
+    *,
+    channel: bool = False,
+    silent: bool = False,
+    archive: bool = False,
+    invite_bot: bool = False,
+    avatar: typing.Optional[str] = None
+) -> typing.Tuple[Channel, bool]:
+    """
+    Create new channel (if needed) and return its entity
+    :param client: Telegram client to create channel by
+    :param title: Channel title
+    :param description: Description
+    :param channel: Whether to create a channel or supergroup
+    :param silent: Automatically mute channel
+    :param archive: Automatically archive channel
+    :param invite_bot: Add inline bot and assure it's in chat
+    :param avatar: Url to an avatar to set as pfp of created peer
+    :return: Peer and bool: is channel new or pre-existent
+    """
+    if not hasattr(client, "_channels_cache"):
+        client._channels_cache = {}
+
+    if (
+        title in client._channels_cache
+        and client._channels_cache[title]["exp"] > time.time()
+    ):
+        return client._channels_cache[title]["peer"], False
+
+    async for d in client.iter_dialogs():
+        if d.title == title:
+            client._channels_cache[title] = {"peer": d.entity, "exp": int(time.time())}
+            if invite_bot:
+                if all(
+                    participant.id != client.loader.inline.bot_id
+                    for participant in (
+                        await client.get_participants(d.entity, limit=100)
+                    )
+                ):
+                    await fw_protect()
+                    await invite_inline_bot(client, d.entity)
+
+            return d.entity, False
+
+    await fw_protect()
+
+    peer = (
+        await client(
+            CreateChannelRequest(
+                title,
+                description,
+                megagroup=not channel,
+            )
+        )
+    ).chats[0]
+
+    if invite_bot:
+        await fw_protect()
+        await invite_inline_bot(client, peer)
+
+    if silent:
+        await fw_protect()
+        await dnd(client, peer, archive)
+    elif archive:
+        await fw_protect()
+        await client.edit_folder(peer, 1)
+
+    if avatar:
+        await fw_protect()
+        await set_avatar(client, peer, avatar)
+
+    client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
+    return peer, True
+
+async def dnd(
+    client: TelegramClient,
+    peer: hints.Entity,
+    archive: bool = True,
+) -> bool:
+    """
+    Mutes and optionally archives peer
+    :param peer: Anything entity-link
+    :param archive: Archive peer, or just mute?
+    :return: `True` on success, otherwise `False`
+    """
+    try:
+        await client(
+            UpdateNotifySettingsRequest(
+                peer=peer,
+                settings=InputPeerNotifySettings(
+                    show_previews=False,
+                    silent=True,
+                    mute_until=2**31 - 1,
+                ),
+            )
+        )
+
+        if archive:
+            await fw_protect()
+            await client.edit_folder(peer, 1)
+    except Exception:
+        return False
+
+    return True
+
+def check_url(url: str) -> bool:
+    """
+    Statically checks url for validity
+    :param url: URL to check
+    :return: True if valid, False otherwise
+    """
+    try:
+        return bool(urlparse(url).netloc)
+    except Exception:
+        return False
+
+async def set_avatar(
+    client: TelegramClient,
+    peer: hints.Entity,
+    avatar: str,
+) -> bool:
+    """
+    Sets an entity avatar
+    :param client: Client to use
+    :param peer: Peer to set avatar to
+    :param avatar: Avatar to set
+    :return: True if avatar was set, False otherwise
+    """
+    if isinstance(avatar, str) and check_url(avatar):
+        f = (
+            await run_sync(
+                requests.get,
+                avatar,
+            )
+        ).content
+    elif isinstance(avatar, bytes):
+        f = avatar
+    else:
+        return False
+
+    await fw_protect()
+    res = await client(
+        EditPhotoRequest(
+            channel=peer,
+            photo=await client.upload_file(f, file_name="photo.png"),
+        )
+    )
+
+    await fw_protect()
+
+    try:
+        await client.delete_messages(
+            peer,
+            message_ids=[
+                next(
+                    update
+                    for update in res.updates
+                    if isinstance(update, UpdateNewChannelMessage)
+                ).message.id
+            ],
+        )
+    except Exception:
+        pass
+
+    return True
 
 async def answer(
     message: Union[Message, List[Message]],
