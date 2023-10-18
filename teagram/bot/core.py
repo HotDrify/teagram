@@ -138,31 +138,36 @@ class BotManager(Events, TokenManager):
     
     async def form(
         self,
-        *,
         title: str,
+        *,
         description: Union[str, None] = None,
-        text: str,
+        text: str = '',
         message: Message, 
         reply_markup: Union[InlineKeyboardMarkup, None] = None,
         callback: typing.Any = None,
+        gif: typing.Any = None,
         photo: Photo = None,
-        doc: Document = None
+        doc: Document = None,
+        **kwargs
     ):
         unit_id = callback or utils.random_id()
         self._units[unit_id] = {
             'type': 'form',
             'title': title,
             'description': description,
-            'text': text,
+            'text': text or reply_markup.get('text', '...'),
             'keyboard': reply_markup,
+            'reply_markup': reply_markup,
             'callback': callback,
             'message': message,
             'photo': photo,
             'doc': doc,
+            'gif': gif,
             'top_msg_id': (
                 (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id) 
                 if message.reply_to else None
-            )
+            ),
+            **kwargs
         }
 
         try:

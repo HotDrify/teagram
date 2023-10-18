@@ -3,9 +3,9 @@ import inspect
 import traceback
 from aiogram.types import (
     CallbackQuery, Message, InlineKeyboardButton,
-    InlineKeyboardMarkup, InlineQuery, InlineQueryResultArticle, 
+    InlineKeyboardMarkup, InlineQuery, InlineQueryResultArticle, InlineQueryResultGif,
     InputTextMessageContent, InlineQueryResultPhoto, InlineQueryResultDocument)
-
+from .markup import _generate_markup
 from .types import Item
 from .. import utils
 
@@ -181,15 +181,19 @@ class Events(Item):
         inline_query.args = args
 
         func = self._manager.inline_handlers.get(cmd)
-        if not await self._check_filters(func, func.__self__, inline_query):
-            return
+        if func:
+            if not await self._check_filters(func, func.__self__, inline_query):
+                return
 
         try:
             form = self._units[query]
             text = form.get('text')
-            keyboard = form.get('keyboard')
+            keyboard = form.get('keyboard') or form.get('reply_markup')
 
-            if not form['photo'] and not form['doc']:
+            if isinstance(form.get("reply_markup"), dict) or isinstance(form.get("keyboard"), dict):
+                keyboard = _generate_markup(self, keyboard)
+
+            if not form['photo'] and not form['doc'] and not form['gif']:
                 await inline_query.answer(
                     [
                         InlineQueryResultArticle(
@@ -221,6 +225,20 @@ class Events(Item):
                             photo_url=form['photo'],
                             thumb_url=form['photo']
                         )
+                    ]
+                )
+            elif form['gif']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultGif(
+                            id=utils.random_id(20),
+                            title=form.get("title"),
+                            caption=form.get("caption"),
+                            parse_mode="HTML",
+                            thumb_url=form.get("thumb", form["gif"]),
+                            gif_url=form["gif"],
+                            reply_markup=keyboard
+                        ),
                     ]
                 )
             else:

@@ -68,6 +68,13 @@ def escape_quotes(text: str, /) -> str:
     return escape_html(text).replace('"', "&quot;")
 
 
+def get_args(message: Message) -> str:
+    return get_full_command(message)
+
+def get_args_raw(message: Message) -> str:
+    return get_full_command(message)[2]
+
+
 def get_full_command(message: Message) -> Union[
     Tuple[Literal[""], Literal[""], Literal[""]], Tuple[str, str, str]
 ]:
