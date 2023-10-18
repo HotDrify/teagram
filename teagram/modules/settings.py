@@ -119,22 +119,7 @@ class SettingsMod(loader.Module):
                 message, self.strings['elang'].format(langs=langs))
 
         self.db.set("teagram.loader", "lang", language)
-
-        pack = utils.get_langpack()
-        setattr(self.manager, 'strings', pack.get('manager'))
-
-        for instance in self.manager.modules:            
-            name = getattr(instance, 'strings', {}).get('name', '').lower()
-            mods = [
-                'backup', 'config', 'eval', 'help', 
-                'info', 'loader', 'settings', 
-                'terminal', 'translator', 'updater'
-            ]
-
-            if name in mods:
-                langpack = utils.get_langpack()
-                instance.strings = langpack.get(name, {})
-                instance.strings['name'] = name
+        self.manager.translator.load_translation()
 
         return await utils.answer(
             message, self.strings['lang'].format(language=language))

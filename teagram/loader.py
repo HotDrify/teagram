@@ -19,7 +19,7 @@ from typing import Union, List, Dict, Any, Callable
 from types import FunctionType, LambdaType
 
 from telethon import TelegramClient, types
-from . import dispatcher, utils, database, bot
+from . import dispatcher, utils, database, bot, translation
 
 VALID_URL = r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
 VALID_PIP_PACKAGES = re.compile(
@@ -306,6 +306,7 @@ class ModulesManager:
 
         self.aliases = self._db.get(__name__, "aliases", {})
         self.strings = utils.get_langpack().get('manager')
+        self.translator = translation.Translator(self._db)
 
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None
@@ -398,17 +399,9 @@ class ModulesManager:
                     for loop in self.loops:
                         setattr(loop, 'method', instance)
                 
-                name = getattr(instance, 'strings', {}).get('name', '').lower()
-                mods = [
-                    'backup', 'config', 'eval', 'help', 
-                    'loader', 'settings', 'info', 
-                    'terminal', 'translator', 'updater'
-                ]
-
-                if name in mods:
-                    langpack = utils.get_langpack()
-                    instance.strings = langpack.get(name, {})
-                    instance.strings['name'] = name
+                instance.strings = translation.Strings(
+                    instance, self.translator)
+                instance.translator = self.translator
 
 
         if not instance:

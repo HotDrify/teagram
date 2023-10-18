@@ -249,7 +249,7 @@ class ConfigMod(loader.Module):
 
             self.config[self.pending] = attr
             self.config_db.set(
-                self.pending_module.name,
+                self.pending_module.__name__.replace('Mod', ''),
                 self.pending,
                 attr
             )

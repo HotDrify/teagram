@@ -648,7 +648,7 @@ def get_langpack() -> Any:
     Returns:
         Any: The language pack.
     """
-    if not (lang := database.db.get('teagram.loader', 'lang')):
+    if not (lang := database.db.get('teagram.loader', 'lang', '')):
         database.db.set('teagram.loader', 'lang', 'en')
 
         get_langpack()
