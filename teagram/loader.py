@@ -15,7 +15,7 @@ from importlib.abc import SourceLoader
 from importlib.machinery import ModuleSpec
 from importlib.util import spec_from_file_location, module_from_spec
 
-from typing import Union, List, Dict, Any
+from typing import Union, List, Dict, Any, Callable
 from types import FunctionType, LambdaType
 
 from telethon import TelegramClient, types
@@ -131,7 +131,6 @@ class StringLoader(SourceLoader):
 
 
 def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
-    """Возвращает словарь из названий с функциями команд"""
     command_handlers = {}
     for method_name in dir(instance):
         if callable(getattr(instance, method_name)) and len(method_name) > 4:
@@ -142,6 +141,7 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
             elif hasattr(getattr(instance, method_name), "is_command"):
                 method_name = method_name.replace('_cmd', '').replace('cmd', '')
                 command_handlers[method_name] = getattr(instance, method_name)
+                
     return command_handlers
 
 
@@ -257,6 +257,11 @@ def watcher(*args, **kwargs) -> FunctionType:
         return func
 
     return decorator
+
+def inline_everyone(func: Callable) -> FunctionType:
+    setattr(func, 'inline_everyone', True)
+
+    return func
 
 def on_bot(custom_filters: LambdaType) -> FunctionType:
     """

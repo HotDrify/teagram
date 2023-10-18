@@ -46,6 +46,7 @@ class Item:
             if not coro:
                 return False
         elif update_type.from_user.id != self._manager.me.id:
-            return False
+            if not getattr(func, 'inline_everyone', None):
+                return False
 
         return True
