@@ -51,8 +51,11 @@ if __name__ == "__main__":
     logging.getLogger('aiohttp').setLevel(logging.WARNING)
     logging.getLogger('aiogram').setLevel(logging.WARNING)
     
-    if os.geteuid() == 0:
-        log.warning("Please do not use root for userbot!!!")
+    try:
+        if os.geteuid() == 0:
+            log.warning("Please do not use root for userbot!!!")
+    except:
+        pass
 
     if database.db.get('teagram.loader', 'web_auth', ''):
         async def serve():
