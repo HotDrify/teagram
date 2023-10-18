@@ -1,3 +1,4 @@
+import os
 import sys
 import asyncio
 import logging
@@ -49,6 +50,9 @@ if __name__ == "__main__":
     logging.getLogger('telethon').setLevel(logging.WARNING)
     logging.getLogger('aiohttp').setLevel(logging.WARNING)
     logging.getLogger('aiogram').setLevel(logging.WARNING)
+    
+    if os.geteuid() == 0:
+        log.warning("Please do not use root for userbot!!!")
 
     if database.db.get('teagram.loader', 'web_auth', ''):
         async def serve():

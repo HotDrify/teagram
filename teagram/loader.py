@@ -276,6 +276,9 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
 
     return decorator
 
+# non functional, for hikka
+def tds(cls):
+    return cls
 
 class ModulesManager:
     """Manager of modules"""
