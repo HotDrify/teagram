@@ -67,26 +67,6 @@ class Events(Item):
                 "❌ Вы не владелец",
                 cache_time=0
             )
-            
-        if call.data.startswith('cfg'):
-            if (attr := call.data.replace('cfgyes', '')):
-                attr = attr.split('|')
-                data = self.cfg[attr[0]]
-                data['cfg'][attr[1]] = utils.validate(data['toset'])
-
-                self._db.set(
-                    data['mod'].name,
-                    attr[1],
-                    utils.validate(data['toset'])
-                )
-
-                await self.bot.edit_message_text(
-                    inline_message_id=call.inline_message_id,
-                    text='✔ Вы изменили атрибут!',
-                    reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton('Вернуться', callback_data='send_cfg')
-                    )
-                )
         
         try:
             if call.data == 'teagram_perm_delete':

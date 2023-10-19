@@ -197,7 +197,25 @@ class ConfigMod(loader.Module):
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3).lower()
-        self.bot.cfg[self.pending_id] = {'cfg': self.config, 'attr': attribute, 'mod': module}
+        attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
+        attrs = [
+            (key, value) for key, value in attrs if not (
+                key.startswith('__') and key.endswith('__')
+            ) and key not in self.DEFAULT_ATTRS
+        ]
+
+        for _attr in attrs:
+            a = getattr(self.pending_module, _attr[0])
+            if isinstance(a, Config) or isinstance(a, loader.ModuleConfig):
+                self.modconfig = a
+                break
+
+        self.bot.cfg[self.pending_id] = {
+            'cfg': self.config, 
+            'attr': attribute, 
+            'mod': module, 
+            'modcfg': getattr(self.pending_module, _attr[0])
+        }
 
         keyboard = InlineKeyboardMarkup()
         keyboard.row(
@@ -232,24 +250,10 @@ class ConfigMod(loader.Module):
         
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)
-
-            attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
-            attrs = [
-                (key, value) for key, value in attrs if not (
-                    key.startswith('__') and key.endswith('__')
-                ) and key not in self.DEFAULT_ATTRS
-            ]
-
-            for _attr in attrs:
-                a = getattr(self.pending_module, _attr[0])
-                if isinstance(a, Config):
-                    a.config[self.pending]
-                    a.set(self.pending, attr)
-                    break
-
+            
             self.config[self.pending] = attr
             self.config_db.set(
-                self.pending_module.__name__.replace('Mod', ''),
+                self.pending_module.__class__.__name__.replace('Mod', ''),
                 self.pending,
                 attr
             )
@@ -258,6 +262,45 @@ class ConfigMod(loader.Module):
             self._def = False
 
             await call.answer(self.strings['chdef'])
+
+    @loader.on_bot(lambda _, call: call.data.startswith('cfg'))
+    async def cfg_callback_handler(self, call):
+        if call.data.startswith('cfg'):
+            if (attr := call.data.replace('cfgyes', '')):
+                attr = attr.split('|')
+                data = self.inline.cfg[attr[0]]
+                validator = data['modcfg'].config.get(attr[1]).validator
+                try:
+                    validator._valid(data['toset'], **validator.type.keywords)
+                except Exception as error:
+                    keywords = ""
+                    for k, v in validator.type.keywords.items():
+                        keywords += f"\n{k}: {v}"
+
+                    return await self.bot.bot.edit_message_text(
+                        inline_message_id=call.inline_message_id,
+                        text=f'❌ <b>{error}\nAttribute keywords:</b> {keywords}',
+                        reply_markup=InlineKeyboardMarkup().add(
+                            InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                        )
+                    )
+                
+                data['cfg'][attr[1]] = utils.validate(data['toset'])
+                data['modcfg'][attr[1]] = utils.validate(data['toset'])
+
+                self.db.set(
+                    data['mod'].name,
+                    attr[1],
+                    utils.validate(data['toset'])
+                )
+
+                await self.bot.bot.edit_message_text(
+                    inline_message_id=call.inline_message_id,
+                    text='✔ Вы изменили атрибут!',
+                    reply_markup=InlineKeyboardMarkup().add(
+                        InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                    )
+                )
 
     async def cfg_inline_handler(self, inline_query: InlineQuery):
         if inline_query.from_user.id == self.me:

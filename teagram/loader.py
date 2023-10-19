@@ -20,6 +20,8 @@ from types import FunctionType, LambdaType
 
 from telethon import TelegramClient, types
 from . import dispatcher, utils, database, bot, translation
+from . import validators as _validators
+from . import types as ttypes
 
 VALID_URL = r"[-[\]_.~:/?#@!$&'()*+,;%<=>a-zA-Z0-9]+"
 VALID_PIP_PACKAGES = re.compile(
@@ -279,6 +281,10 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
 # non functional, for hikka
 def tds(cls):
     return cls
+
+ModuleConfig = ttypes.Config
+ConfigValue = ttypes.ConfigValue
+validators = _validators
 
 class ModulesManager:
     """Manager of modules"""

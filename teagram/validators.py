@@ -42,13 +42,13 @@ class Integer(Validator):
         try:
             value = int(str(value).strip())
         except ValueError:
-            raise ValidationError('Значение должно быть цифрой / Value must be a number')
+            raise ValidationError('Value must be a number')
 
         if minimum and value < minimum:
-            raise ValidationError('Значение должно быть больше минимума / Value must be greater than minimum')
+            raise ValidationError('Value must be greater than minimum')
         
         if maximum and value > maximum:
-            raise ValidationError('Значение должно быть меньше максимума / Value must be lower than maximum')
+            raise ValidationError('Value must be lower than maximum') 
         
         return value
 
@@ -81,13 +81,13 @@ class String(Validator):
         try:
             value = str(value)
         except ValueError:
-            raise ValidationError('Значение должно быть строкой / Value must be a string')
+            raise ValidationError('Value must be a string')
 
         if min_len and len(value) < min_len:
-            raise ValidationError('Длина должно быть больше минимума / Length must be greater than minimum')
+            raise ValidationError('Length must be greater than minimum')
         
         if max_len and len(value) > max_len:
-            raise ValidationError('Длина должна быть меньше максимума / Length must be lower than maximum')
+            raise ValidationError('Length must be lower than maximum')
         
         return value
             
@@ -108,8 +108,36 @@ class Boolean(Validator):
             value = str(value).lower()
 
             if value not in true + false:
-                raise ValidationError('Передаваемое значение должно быть логическим / Passed value must be a boolean')
+                raise ValidationError('Passed value must be a boolean')
         except TypeError:
-            raise ValidationError('Передаваемое значение должно быть логическим / Passed value must be a boolean')
+            raise ValidationError('Passed value must be a boolean')
 
         return value in true
+    
+class Choice(Validator):
+    def __init__(
+        self,
+        possible_values,
+        /,
+    ):
+        super().__init__(
+            partial(
+                self._valid, 
+                possible_values
+            )
+        )
+        
+    @staticmethod
+    def _valid(
+        value: ALLOWED_TYPES,
+        /,
+        *,
+        possible_values: list[ALLOWED_TYPES],
+    ) -> ALLOWED_TYPES:
+        if value not in possible_values:
+            raise ValidationError(
+                f"Can't validate value ({value}), possible values:"
+                f" {' | '.join(list(map(str, possible_values)))}"
+            )
+
+        return value
