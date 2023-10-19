@@ -80,3 +80,5 @@ teagram.session-journal
 .idea
 .deepsource.toml
 *.zip
+*.sqlite-journal
+*.sqlite
