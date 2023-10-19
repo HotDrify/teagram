@@ -35,15 +35,18 @@ class Strings:
         try:
             return self.translator.translations[self.name][key]
         except KeyError:
-            for lang in LANGUAGES:
-                if lang == self.translator.lang:
-                    if (
-                        hasattr(self.module, f'strings_{lang}')
-                        and key in getattr(self.module, f'strings_{lang}')
-                    ):
-                        return getattr(self.module, f'strings_{lang}').get(key)
-                    else:
-                        return self._strings.get(key, "")
+            try:
+                return self.translator.translations[self.module.name.lower()][key]
+            except KeyError:
+                for lang in LANGUAGES:
+                    if lang == self.translator.lang:
+                        if (
+                            hasattr(self.module, f'strings_{lang}')
+                            and key in getattr(self.module, f'strings_{lang}')
+                        ):
+                            return getattr(self.module, f'strings_{lang}').get(key)
+                        else:
+                            return self._strings.get(key, None)
 
     def __getitem__(self, key: str) -> str:
         return self.get(key)

@@ -79,3 +79,4 @@ teagram.session
 teagram.session-journal
 .idea
 .deepsource.toml
+*.zip
