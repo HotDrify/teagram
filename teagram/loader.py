@@ -376,7 +376,7 @@ class ModulesManager:
 
                 value.db = self._db
                 value.manager = self
-                value.client = self._client
+                value.client, value._client = self._client, self._client
                 value.bot = self.bot_manager
                 value.inline = value.bot
                 value.prefix = self._db.get('teagram.loader', 'prefixes', ['.'])
@@ -400,6 +400,16 @@ class ModulesManager:
                 self.message_handlers.update(instance.message_handlers)
                 self.callback_handlers.update(instance.callback_handlers)
                 self.inline_handlers.update(instance.inline_handlers)
+
+                if (
+                    not instance.name or 
+                    instance.name.lower() == 'unknown' and 
+                    (
+                        name := 
+                        getattr(instance, 'strings', {}).get('name', '')
+                    )
+                ):
+                    instance.name = name
 
                 if instance.loops:
                     for loop in self.loops:
