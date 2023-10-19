@@ -242,57 +242,12 @@ class Events(Item):
             pass
         except Exception as error:
             traceback.print_exc()
-
-        try:    
-            if (data := self.cfg[cmd]):
-                if not args:
-                    return await inline_query.answer(
-                        [
-                            InlineQueryResultArticle(
-                                id=utils.random_id(),
-                                title="Teagram",
-                                description='Укажите значение',
-                                input_message_content=InputTextMessageContent(
-                                    "❌ Вы не указали значение")
-                            )
-                        ], cache_time=0
-                    )
-                attr = data['attr']
-                data['toset'] = args
-                attr = data['attr']
-                data['toset'] = args
-
-                await inline_query.answer(
-                    [
-                        InlineQueryResultArticle(
-                            id=utils.random_id(),
-                            title="☕ Teagram",
-                            input_message_content=InputTextMessageContent(
-                                "Вы уверены что хотите изменить атрибут?"),
-                            reply_markup=InlineKeyboardMarkup()
-                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
-                        )
-                    ], cache_time=0
-                )
-                await inline_query.answer(
-                    [
-                        InlineQueryResultArticle(
-                            id=utils.random_id(),
-                            title="☕ Teagram",
-                            input_message_content=InputTextMessageContent(
-                                "Вы уверены что хотите изменить атрибут?"),
-                            reply_markup=InlineKeyboardMarkup()
-                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
-                        )
-                    ], cache_time=0
-                )
-        except KeyError:
-            pass
-
         
         if not func:
+            if self.cfg[cmd]:
+                func = self._manager.inline_handlers.get('changing')
+                return await func(inline_query, args)
+
             return await inline_query.answer(
                 [
                     InlineQueryResultArticle(

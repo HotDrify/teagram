@@ -302,6 +302,57 @@ class ConfigMod(loader.Module):
                     )
                 )
 
+    async def changing_inline_handler(self, inline_query, args):
+        try:    
+            cmd = inline_query.query.split()[0]
+
+            if (data := self.inline.cfg[cmd]):
+                if not args:
+                    return await inline_query.answer(
+                        [
+                            InlineQueryResultArticle(
+                                id=utils.random_id(),
+                                title="Teagram",
+                                description='Укажите значение',
+                                input_message_content=InputTextMessageContent(
+                                    "❌ Вы не указали значение")
+                            )
+                        ], cache_time=0
+                    )
+                attr = data['attr']
+                data['toset'] = args
+                attr = data['attr']
+                data['toset'] = args
+
+                await inline_query.answer(
+                    [
+                        InlineQueryResultArticle(
+                            id=utils.random_id(),
+                            title="☕ Teagram",
+                            input_message_content=InputTextMessageContent(
+                                "Вы уверены что хотите изменить атрибут?"),
+                            reply_markup=InlineKeyboardMarkup()
+                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
+                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
+                        )
+                    ], cache_time=0
+                )
+                await inline_query.answer(
+                    [
+                        InlineQueryResultArticle(
+                            id=utils.random_id(),
+                            title="☕ Teagram",
+                            input_message_content=InputTextMessageContent(
+                                "Вы уверены что хотите изменить атрибут?"),
+                            reply_markup=InlineKeyboardMarkup()
+                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
+                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
+                        )
+                    ], cache_time=0
+                )
+        except KeyError:
+            pass
+
     async def cfg_inline_handler(self, inline_query: InlineQuery):
         if inline_query.from_user.id == self.me:
             await self.set_cfg(inline_query)
