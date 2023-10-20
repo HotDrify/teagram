@@ -113,7 +113,7 @@ class Module:
     
     async def on_unload(self) -> Any:
         ...
-    
+
     # same as on_load but with some args
     async def client_ready(self, client, db):
         ...
@@ -172,7 +172,7 @@ def get_watcher_handlers(instance: 'Module') -> List[FunctionType]:
     return [
         method for method_name, method in vars(instance).items()
         if isinstance(method, FunctionType) and (
-            method_name.startswith("watcher") 
+            method_name.startswith("watcher")
             or hasattr(method, 'watcher')
         )
     ]
@@ -224,7 +224,9 @@ def get_loops(instance: Module):
         func = getattr(instance, method)
         if (
             callable(getattr(instance, method)) and
-            hasattr(func, 'loop')
+            hasattr(func, 'loop') and
+            method.startswith('loop') or
+            method.endswith('loop')
         ):
             loops.append(func)
 
