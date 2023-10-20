@@ -3,6 +3,7 @@ import os
 import sys
 
 import re
+import typing
 import subprocess
 
 import logging
@@ -113,6 +114,22 @@ class Module:
     async def on_unload(self) -> Any:
         ...
 
+    def get(self, key: str, _: Any = None) -> Any:
+        db = getattr(self, 'db', {}) # we can't get db now
+        
+        db.get(
+            module.__class__.__name__,
+            key, _
+        )
+
+    def set(self, key: str, value: Any) -> None:
+        db = getattr(self, 'db', {})
+        
+        db.set(
+            module.__class__.__name__,
+            key, value
+        )
+
 
 class StringLoader(SourceLoader):
     def __init__(self, data: str, origin: str) -> None:
@@ -147,16 +164,11 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
     return command_handlers
 
 
-def get_watcher_handlers(instance: Module) -> List[FunctionType]:
+def get_watcher_handlers(instance: 'Module') -> List[FunctionType]:
     return [
-        getattr(instance, method_name)
-        for method_name in dir(instance)
-        if (
-            callable(getattr(instance, method_name))
-            and (
-                method_name.startswith("watcher") or
-                hasattr(getattr(instance, method_name), 'watcher')
-            )
+        method for method_name, method in vars(instance).items()
+        if isinstance(method, FunctionType) and (
+            method_name.startswith("watcher") or hasattr(method, 'watcher')
         )
     ]
 
@@ -385,6 +397,7 @@ class ModulesManager:
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)
                 instance.watcher_handlers = get_watcher_handlers(instance)
+
                 instance.loops = get_loops(instance)
                 instance.logger = logging.getLogger(instance.__module__)
 
