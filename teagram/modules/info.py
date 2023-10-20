@@ -24,11 +24,11 @@ class InfoMod(loader.Module):
                 default='',
                 value=self.db.get('info', 'customText', ''),
                 validator=validators.String(),
-                docstring="Ключевые слова: cpu, ram, tele, owner, uptime, version, platform"
+                doc="Ключевые слова: cpu, ram, tele, owner, uptime, version, platform"
             ),
             ConfigValue(
                 option='customImage',
-                docstring='',
+                doc='',
                 default='',
                 value=self.db.get('info', 'customImage', ''),
                 validator=validators.String()

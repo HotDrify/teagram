@@ -51,7 +51,7 @@ class WaitForDefault:
 @dataclass
 class ConfigValue:
     option: str 
-    docstring: str = ''
+    doc: str = ''
     default: Any = None
     value: Any = field(default_factory=WaitForDefault)
     validator: Union[Integer, String, Boolean] = None
@@ -84,7 +84,7 @@ class Config(dict):
         return self.config[key].default
 
     def get_doc(self, key: str) -> Union[str, None]:
-        return self.config[key].docstring
+        return self.config[key].doc
 
     def __getitem__(self, key: str) -> Any:
         try:

@@ -20,7 +20,7 @@ if translate:
             self.config = Config(
                 ConfigValue(
                     option='language',
-                    docstring='Язык',
+                    doc='Язык',
                     default='en',
                     value=self.db.get('Translator', 'language', 'en'),
                     validator=validators.String()

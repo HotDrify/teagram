@@ -26,7 +26,7 @@ class UpdateMod(loader.Module):
         self.config = Config(
             ConfigValue(
                 option='sendOnUpdate',
-                docstring='Оповещать об обновлении',
+                doc='Оповещать об обновлении',
                 default=True,
                 value=value,
                 validator=validators.Boolean()
