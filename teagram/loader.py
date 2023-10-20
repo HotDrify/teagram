@@ -224,7 +224,7 @@ def get_loops(instance: Module):
         func = getattr(instance, method)
         if (
             callable(getattr(instance, method)) and
-            hasattr(func, 'loop') and
+            hasattr(func, 'loop')
         ):
             loops.append(func)
 
