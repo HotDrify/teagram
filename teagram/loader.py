@@ -121,8 +121,8 @@ class Module:
     def get(self, key: str, _: Any = None) -> Any:
         db = getattr(self, 'db', {}) # we can't get db now
         
-        db.get(
-            module.__class__.__name__,
+        return db.get(
+            self.__class__.__name__,
             key, _
         )
 
@@ -130,7 +130,7 @@ class Module:
         db = getattr(self, 'db', {})
         
         db.set(
-            module.__class__.__name__,
+            self.__class__.__name__,
             key, value
         )
 
@@ -499,6 +499,7 @@ class ModulesManager:
     async def send_on_load(self, module: Module) -> bool:
         try:
             await module.on_load()
+            await module.client_ready(self._client, self._db)
         except Exception as error:
             return logger.exception(error)
 
