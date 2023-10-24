@@ -1,7 +1,7 @@
 import ast
 
 from .. import loader, utils
-from telethon import TelegramClient, types
+from telethon import types
 
 def insert_returns(body):
     if isinstance(body[-1], ast.Expr):
@@ -46,9 +46,17 @@ class EvalMod(loader.Module):
                 'telethon': __import__('telethon'),
                 'message': message,
                 'reply': await message.get_reply_message(),
-                'args': args
+                'args': args,
+                'me': self.manager.me
             }
         )
+
+        if getattr(result, 'stringify', ''):
+            try:
+                result = str(result.stringify())
+            except:
+                pass
+
         await utils.answer(
             message,
             "<b>💻 Code</b>:\n"
