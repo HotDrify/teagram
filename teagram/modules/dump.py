@@ -1,6 +1,6 @@
 from .. import loader, utils
 from ..__init__ import __version__
-from ..utils import BASE_PATH
+from ..utils import BASE_PATH, BASE_DIR
 
 import atexit
 import logging
@@ -13,7 +13,7 @@ data = {}
 logger = logging.getLogger()
 
 def get_token():
-    with open(PATH, 'r') as file:
+    with open(BASE_PATH + "/db.json", 'r') as file:
         json_data = json.load(file)
     try:
         json_data.get("teagram.bot", {}).get("token", "")
@@ -33,10 +33,6 @@ class DumpMod(loader.Module):
     """Makes dump with information"""
 
     strings = {'name': 'dump'}
-
-    async def on_load(self):
-        with open(PATH,'w') as f:
-            f.write() # Need for create dump file, otherwise it give error
 
     @loader.loop(5, autostart=True)
     async def dumploop(self):
@@ -99,7 +95,7 @@ class DumpMod(loader.Module):
     def create_dump():
         global data
 
-        with open(PATH,'w') as f:
+        with open(PATH, 'w') as f:
             json.dump(data, f, indent=4)
 
         logger.info(f"Dump file created, {PATH}")
