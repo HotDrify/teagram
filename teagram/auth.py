@@ -83,8 +83,8 @@ class Auth:
                 error_text = "Invalid phone number, please try again"
             except errors.PhoneNumberBannedError:
                 error_text = "Phone number blocked"
-            except errors.PhoneNumberFloodError:
-                error_text = "On the phone number floodwait"
+            except errors.PhoneNumberFloodError as e:
+                error_text = f"On the phone number floodwait, please wait {e.seconds}s"
             except errors.PhoneNumberUnoccupiedError:
                 error_text = "Number not registered"
             except errors.BadRequestError as error:
