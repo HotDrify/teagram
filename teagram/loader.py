@@ -3,6 +3,7 @@ import os
 import sys
 
 import re
+import ast
 import typing
 import subprocess
 
@@ -18,6 +19,7 @@ from importlib.util import spec_from_file_location, module_from_spec
 
 from typing import Union, List, Dict, Any, Callable
 from types import FunctionType, LambdaType
+from dataclasses import dataclass, field
 
 from telethon import TelegramClient, types
 from . import dispatcher, utils, database, bot, translation
@@ -170,9 +172,9 @@ def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
 
 def get_watcher_handlers(instance: 'Module') -> List[FunctionType]:
     return [
-        method for method_name, method in vars(instance).items()
-        if isinstance(method, FunctionType) and (
-            method_name.startswith("watcher")
+        method for method in dir(instance)
+        if callable(getattr(instance, method)) and(
+            method.startswith("watcher")
             or hasattr(method, 'watcher')
         )
     ]
@@ -299,9 +301,12 @@ def on_bot(custom_filters: LambdaType) -> FunctionType:
 def tds(cls):
     return cls
 
+
+# hikka support
 ModuleConfig = ttypes.Config
-ConfigValue = ttypes.ConfigValue
+ConfigValue = ttypes.HikkaValue
 validators = _validators
+
 
 class ModulesManager:
     """Manager of modules"""
@@ -401,7 +406,12 @@ class ModulesManager:
 
                 instance = value()
                 instance.command_handlers = get_command_handlers(instance)
-                instance.watcher_handlers = get_watcher_handlers(instance)
+                instance.watcher_handlers = list(
+                    map(
+                        lambda x: getattr(instance, x),
+                        get_watcher_handlers(instance)
+                    )
+                )
 
                 instance.loops = get_loops(instance)
                 instance.logger = logging.getLogger(instance.__module__)

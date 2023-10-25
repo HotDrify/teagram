@@ -122,6 +122,13 @@ def get_chat(message: Message) -> typing.Optional[int]:
     """
     return (message.chat.id if message.chat else None or message._chat_peer)
 
+def get_chat_id(message: Message) -> typing.Optional[int]:
+    """
+    Same as get_chat
+    """
+
+    return get_chat(message)
+
 def get_topic(message: Message) -> typing.Optional[int]:
     """
     Get topic id of message

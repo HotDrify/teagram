@@ -11,6 +11,8 @@ from .. import loader, utils, database
 from ..types import ConfigValue, Config
 from ..utils import escape_html
 
+import typing
+
 # distutils will be deleted in python 3.12
 # distutils будет удалена в python 3.12
 def strtobool(val):
@@ -41,7 +43,8 @@ class ConfigMod(loader.Module):
             'manager', 'author', 'bot', 'callback_handlers',
             'command_handlers', 'inline_handlers', 'bot_username',
             'message_handlers', 'name', 'version', 'watcher_handlers',
-            'boot_time', 'client', '_client', 'loops'
+            'boot_time', 'client', '_client', 'loops',
+            'translator', 'logger', 'prefix', 'inline'
         ]
         self.config = None  # Пoявляется после get_attrs
         self.pending = False
@@ -77,7 +80,14 @@ class ConfigMod(loader.Module):
             self.config = getattr(module, attrs[0][0])
             self.config_db: database.Database = attrs[1][1]
 
-            return attrs[0][1]
+            if isinstance(attrs[0][1], (ConfigMod, loader.ModuleConfig)):
+                return attrs[0][1]
+            else:
+                for attr in attrs:
+                    _attr = getattr(module, attr[0])
+
+                    if isinstance(_attr, (ConfigMod, loader.ModuleConfig)):
+                        return _attr
 
         return []
 
@@ -107,7 +117,7 @@ class ConfigMod(loader.Module):
             name = module.name
             attrs = self.get_attrs(self.lookup(name))
 
-            if not attrs or not isinstance(attrs, Config):
+            if not attrs:
                 continue
 
             if 'config' in name.lower():
@@ -145,7 +155,7 @@ class ConfigMod(loader.Module):
 
         buttons = []
         for count, name in enumerate(attrs, start=1):
-            _data = f'ch_attr_{mod.name.split(".")[-1]}_{name}'
+            _data = f'chattr{mod.name.split(".")[-1]}#{name}'
 
             buttons.append(
                 InlineKeyboardButton(
@@ -179,24 +189,30 @@ class ConfigMod(loader.Module):
             parse_mode='HTML'
         )
 
-    @loader.on_bot(lambda _, call: call.data.startswith('ch_attr_'))
+    @loader.on_bot(lambda _, call: call.data.startswith('chattr'))
     async def change_attribute_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
             return await call.answer(self.strings['noowner'])
 
-        data = call.data.replace('ch_attr_', '').split('_')
+        data = call.data.replace('chattr', '').split('#')
+        print(data)
         module = data[0]
         attribute = data[1]
 
         module = self.lookup(module)
-        value = self.get_attrs(module).get(attribute)
+        cfg = self.get_attrs(module)
+        value = cfg.get(attribute)
 
-        docs = self.config.get_doc(attribute)
-        default = self.config.get_default(attribute)
+        docs = cfg.get_doc(attribute)
+        default = cfg.get_default(attribute)
 
+        self.config = self.get_attrs(module)
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3).lower()
+
+        print('attrs')
+
         attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
         attrs = [
             (key, value) for key, value in attrs if not (
@@ -233,12 +249,19 @@ class ConfigMod(loader.Module):
             ),
         )
 
-        await self.inline_bot.edit_message_text(
+        if isinstance(docs, typing.Callable):
+            docs = docs()
+
+        text = (
             f'⚙ <b>{self.pending_module.name}</b>\n'
             f'➡ <b>{escape_html(self.strings["attr"])}</b>: <code>{escape_html(attribute)}</code>\n'
             f'➡ <b>{escape_html(self.strings["value"])}</b>: <code>{escape_html(value) or self.strings["nospec"]}</code>\n'
             f'↪ <b>{escape_html(self.strings["def"])}</b>: <code>{escape_html(default) or self.strings["nospec"]}</code>\n\n'+
-            (f'❔ <code>{escape_html(docs)}</code>' if docs else ""),
+            (f'❔ <code>{escape_html(docs)}</code>' if docs else "")
+        )
+
+        await self.inline_bot.edit_message_text(
+            text,
             reply_markup=keyboard,
             inline_message_id=call.inline_message_id
         )
@@ -270,8 +293,13 @@ class ConfigMod(loader.Module):
                 attr = attr.split('|')
                 data = self.inline.cfg[attr[0]]
                 validator = data['modcfg'].config.get(attr[1]).validator
+
+                mark = ''
                 try:
-                    validator._valid(data['toset'], **validator.type.keywords)
+                    if validator:
+                        validator._valid(data['toset'], **validator.type.keywords)
+                    else:
+                        mark += "\n⚠ <i>No validator</i>"
                 except Exception as error:
                     keywords = ""
                     for k, v in validator.type.keywords.items():
@@ -287,19 +315,21 @@ class ConfigMod(loader.Module):
                 
                 data['cfg'][attr[1]] = utils.validate(data['toset'])
                 data['modcfg'][attr[1]] = utils.validate(data['toset'])
+                self.config.config[attr[1]].value = utils.validate(data['toset'])
 
                 self.db.set(
-                    data['mod'].name,
+                    data['mod'].__class__.__name__,
                     attr[1],
                     utils.validate(data['toset'])
                 )
 
                 await self.bot.bot.edit_message_text(
                     inline_message_id=call.inline_message_id,
-                    text='✔ Вы изменили атрибут!',
+                    text='✔ <b>Вы изменили атрибут!</b>' + mark,
                     reply_markup=InlineKeyboardMarkup().add(
                         InlineKeyboardButton('Вернуться', callback_data='send_cfg')
-                    )
+                    ),
+                    parse_mode='html'
                 )
 
     async def changing_inline_handler(self, inline_query, args):

@@ -1,5 +1,13 @@
 from types import FunctionType
-from typing import Any, Dict, List, Union
+from typing import (
+    Any, 
+    Dict, 
+    List, 
+    Union, 
+    Callable, 
+    Awaitable, 
+    Optional
+)
 
 from telethon import TelegramClient, types
 
@@ -8,6 +16,10 @@ from  dataclasses import dataclass, field
 from .validators import Integer, String, Boolean, ValidationError
 
 from aiogram import Dispatcher
+from ast import literal_eval
+
+import asyncio
+import inspect
 
 class Module:
     """Module's descripton"""
@@ -69,6 +81,62 @@ class ConfigValue:
 
         if isinstance(value, (tuple, list, dict)):
             raise ValidationError('Неправильный тип (Проверьте типы валидаторов) / Invalid type (Check validator types)')
+
+        object.__setattr__(self, key, value)
+
+@dataclass(repr=True)
+class HikkaValue:
+    option: str
+    default: Any = None
+    doc: Union[Callable[[], str], str] = None
+    value: Any = field(default_factory=WaitForDefault)
+    validator: validator = None
+
+    def __post_init__(self):
+        if isinstance(self.value, WaitForDefault):
+            self.value = self.default
+
+    def set_no_raise(self, value: Any) -> bool:
+        """
+        Sets the config value w/o ValidationError being raised
+        Should not be used uninternally
+        """
+        return self.__setattr__("value", value, ignore_validation=True)
+
+    def __setattr__(
+        self,
+        key: str,
+        value: Any,
+        *,
+        ignore_validation: bool = False,
+    ):
+        if key == "value":
+            try:
+                value = literal_eval(value)
+            except Exception:
+                pass
+
+            # Convert value to list if it's tuple just not to mess up
+            # with json convertations
+            if isinstance(value, (set, tuple)):
+                value = list(value)
+
+            if isinstance(value, list):
+                value = [
+                    item.strip() if isinstance(item, str) else item for item in value
+                ]
+
+            if self.validator:
+                if value:
+                    from . import validators
+
+                    try:
+                        value = self.validator._valid(value)
+                    except validators.ValidationError as e:
+                        if not ignore_validation:
+                            raise e
+
+                        value = self.default
 
         object.__setattr__(self, key, value)
 
