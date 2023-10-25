@@ -81,6 +81,11 @@ class LoaderMod(loader.Module):
                 message, self.strings['errapi']
             )
 
+        ignore_imports = False
+        if 'ignore_imports' in args:
+            args = args.replace('ignore_imports', '')
+            ignore_imports = True
+
         raw_link = api_result
         modules = await utils.run_sync(requests.get, f"{raw_link}all.txt")
         if modules.status_code != 200:
@@ -131,7 +136,7 @@ class LoaderMod(loader.Module):
                 if r.status_code != 200:
                     raise requests.exceptions.ConnectionError
 
-                module_name = await self.manager.load_module(r.text, r.url)
+                module_name = await self.manager.load_module(r.text, r.url, ignore_imports=ignore_imports)
                 if module_name is True:
                     error_text = self.strings['downdedreq']
 
@@ -165,10 +170,15 @@ class LoaderMod(loader.Module):
                 '❌ Вы не указали ссылку'
             )
         
+        ignore_imports = False        
+        if 'ignore_imports' in args:
+            args = args.replace('ignore_imports', '').strip()
+            ignore_imports = True
+        
         try:
             response = await utils.run_sync(requests.get, args)
             
-            module = await self.manager.load_module(response.text, response.url)
+            module = await self.manager.load_module(response.text, response.url, ignore_imports=ignore_imports)
 
             if module is True:
                 return await utils.answer(
@@ -178,12 +188,12 @@ class LoaderMod(loader.Module):
                 return await utils.answer(
                     message, self.strings['errmod'])
 
-            with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
-                file.write(response.text)
+            self.db.set("teagram.loader", "modules",
+                        list(set(self.db.get("teagram.loader", "modules", []) + [args])))
             
             await utils.answer(
                 message, 
-                self.strings['loadedmod'].format(module)
+                self.strings['loadedmod'].format(module) + "\n<i>⚠ ignore_imports=True</i>"
             )
 
         except requests.exceptions.MissingSchema:

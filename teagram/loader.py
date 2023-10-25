@@ -34,6 +34,25 @@ VALID_PIP_PACKAGES = re.compile(
 
 logger = logging.getLogger()
 
+IGNORE_IMPORTS = r"""
+import builtins
+from types import ModuleType
+
+class DummyModule(ModuleType):
+    def __getattr__(self, key):
+        return None
+    __all__ = []
+
+def tryimport(name, globals={}, locals={}, fromlist=[], level=-1):
+    try:
+        return realimport(name, globals, locals, fromlist, level)
+    except ImportError:
+        return DummyModule(name)
+
+realimport, builtins.__import__ = builtins.__import__, tryimport
+"""
+
+
 class Loop:
     def __init__(
         self,
@@ -453,8 +472,16 @@ class ModulesManager:
 
         return instance
 
-    async def load_module(self, module_source: str, origin: str = "<string>", did_requirements: bool = False) -> str:
+    async def load_module(
+        self, 
+        module_source: str, 
+        origin: str = "<string>", 
+        did_requirements: bool = False,
+        ignore_imports: bool = False
+    ) -> str:
         module_name = f"teagram.modules.{utils.random_id()}"
+        if ignore_imports:
+            module_source = IGNORE_IMPORTS + "\n\n" + module_source
 
         try:
             spec = ModuleSpec(module_name, StringLoader(
@@ -465,6 +492,10 @@ class ModulesManager:
                 return True
             try:
                 requirements = re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source)
+                if not requirements:
+                    requirements = re.findall(r"# requires:\s+([\w-]+(?:\s+[\w-]+)*)", module_source)
+                    if not requirements:
+                        return logger.error(f'{module_name} have incorrect imports, please check them')
             except TypeError as error:
                 logger.error(traceback.format_exc())
                 return logger.warning("Installation packages not specified")
