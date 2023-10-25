@@ -13,7 +13,7 @@ data = {}
 logger = logging.getLogger()
 
 def get_token():
-    with open(BASE_PATH + "/db.json", 'r') as file:
+    with open(BASE_PATH / "db.json", 'r') as file:
         json_data = json.load(file)
     try:
         json_data.get("teagram.bot", {}).get("token", "")
