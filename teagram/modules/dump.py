@@ -5,6 +5,7 @@ from ..utils import BASE_PATH
 import atexit
 import logging
 import json
+from git import Repo
 
 PATH = f'{BASE_PATH}/dump.json'
 
@@ -21,14 +22,21 @@ def get_token():
     else:
         return True
 
-async def check_fork():
-    pass
+def get_git_url():
+    repo = Repo(BASE_DIR)
+    origin = repo.remotes.origin
+    origin_url = origin.url
+    return origin_url
 
 @loader.module(name="Dump", author="teagram")
 class DumpMod(loader.Module):
     """Makes dump with information"""
 
     strings = {'name': 'dump'}
+
+    async def on_load(self):
+        with open(PATH,'w') as f:
+            f.write() # Need for create dump file, otherwise it give error
 
     @loader.loop(5, autostart=True)
     async def dumploop(self):
@@ -48,6 +56,9 @@ class DumpMod(loader.Module):
             },
             "teagram.platform": {
                 "platform": utils.get_platform()
+            },
+            "teagram.git": {
+                "url": get_git_url()
             }
         }
 
@@ -68,6 +79,9 @@ class DumpMod(loader.Module):
             },
             "teagram.platform": {
                 "platform": utils.get_platform()
+            },
+            "teagram.git": {
+                "url": get_git_url()
             }
         }
 
