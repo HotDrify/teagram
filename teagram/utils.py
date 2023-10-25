@@ -612,12 +612,7 @@ def get_platform() -> str:
     IS_GOORM = "GOORM" in os.environ
     IS_WIN = "WINDIR" in os.environ
     IS_TRIGGER = 'TRIGGEREARTH' in os.environ
-    IS_WSL = False
-    
-    with contextlib.suppress(Exception):
-        from platform import uname
-        if "microsoft-standard" in uname().release:
-            IS_WSL = True
+    IS_WSL = 'WSL_DISTRO_NAME' in os.environ
 
     if IS_TERMUX:
         platform = "📱 Termux"
