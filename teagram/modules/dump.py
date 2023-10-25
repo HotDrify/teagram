@@ -1,22 +1,17 @@
-from asyncio import sleep
-
-from aiogram.types import (CallbackQuery, InlineKeyboardButton,
-                            InlineKeyboardMarkup, InlineQuery,
-                            InlineQueryResultArticle, InputTextMessageContent
-                            )
 from telethon import types
 
-from .. import (  # ".." - т.к. модули находятся в папке teagram/modules, то нам нужно на уровень выше
-    loader, utils, validators)
-from ..types import Config, ConfigValue
+from .. import loader, utils
 
-import json
 from ..__init__ import __version__
 from ..utils import BASE_PATH
+
 import atexit
 import logging
+import json
 
 data = {}
+
+logger = logging.getLogger()
 
 async def get_token():
     with open(f'{BASE_PATH}/db.json', 'r') as file:
@@ -41,26 +36,15 @@ def get_token_sync():
 async def check_fork():
     pass
 
-@loader.module(name="Dump", author="teagram", version=1)
+@loader.module(name="Dump", author="teagram")
 class DumpMod(loader.Module):
-    """Описание модуля"""
+    """Makes dump with information"""
 
-    def __init__(self):
-        self.config = Config(
-            ConfigValue(
-                option='backupInterval',
-                doc='⌛ Время, по истечении которого будет создана резервная копия (в секундах)',
-                default=86400,
-                value=self.db.get('None', 'none', 86400),
-                validator=validators.Integer(minimum=43200, maximum=259200)
-            )
-        )
-
-    @loader.loop(5,autostart=True)
+    @loader.loop(5, autostart=True)
     async def dumploop(self):
         global data
 
-        modules = list(map(lambda x: x.name,sorted(self.manager.modules, key=lambda mod: len(str(mod)))))
+        modules = [mod.name for mod in self.manager.modules]
 
         result = {
             "teagram.token": {
@@ -81,8 +65,8 @@ class DumpMod(loader.Module):
 
         
 
-    async def dump_cmd(self, message: types.Message, args: str):
-        modules = list(map(lambda x: x.name,sorted(self.manager.modules, key=lambda mod: len(str(mod)))))
+    async def dump_cmd(self, message: types.Message):
+        modules = [mod.name for mod in self.manager.modules]
 
         result = {
             "teagram.token": {
@@ -100,9 +84,15 @@ class DumpMod(loader.Module):
         }
 
         with open(f'{BASE_PATH}/dump.json','w') as f:
-            json.dump(result,f,indent=4)
+            json.dump(result, f, indent=4)
+
         file = await self.client.upload_file(f'{BASE_PATH}/dump.json')
-        await self.client.send_file(message.chat_id,file,reply_to=message.id,caption="Dump created")
+        await self.client.send_file(
+            message.chat_id,
+            file,
+            reply_to=message.id,
+            caption="Dump created"
+        )
 
         await message.delete()
     
@@ -111,7 +101,7 @@ class DumpMod(loader.Module):
         global data
 
         with open(f'{BASE_PATH}/dump.json','w') as f:
-            json.dump(data, f,indent=4)
+            json.dump(data, f, indent=4)
 
-        logging.info(f"Dump file created, {BASE_PATH}/dump.json")
+        logger.info(f"Dump file created, {BASE_PATH}/dump.json")
 

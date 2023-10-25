@@ -82,3 +82,4 @@ teagram.session-journal
 *.zip
 *.sqlite-journal
 *.sqlite
+dump.json
