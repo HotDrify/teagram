@@ -102,7 +102,7 @@ class Loop:
             try:
                 await self.func(self.method, *args, **kwargs)
             except Exception as error:
-                logger.error(error)
+                logger.error(traceback.format_exc())
 
             await asyncio.sleep(self.interval)
 
@@ -460,7 +460,8 @@ class ModulesManager:
 
                 if instance.loops:
                     for loop in self.loops:
-                        setattr(loop, 'method', instance)
+                        if not getattr(loop, 'method', ''):
+                            setattr(loop, 'method', instance)
                 
                 instance.strings = translation.Strings(
                     instance, self.translator)
