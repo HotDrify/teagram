@@ -118,3 +118,6 @@ settings:
   nouser: "<b>❔ Benutzer nicht gefunden</b>"
   user: "<b>Benutzer:</b>"
   chbot: "<b>✔ Du hast den Inline-Bot erfolgreich geändert!\nBitte starte den Bot neu, um die Änderungen zu übernehmen (<code>{}</code>)</b>"
+
+dump:
+  dumped: "Dump erstellt"
