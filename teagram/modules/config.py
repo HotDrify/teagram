@@ -195,6 +195,7 @@ class ConfigMod(loader.Module):
             return await call.answer(self.strings['noowner'])
 
         data = call.data.replace('chattr', '').split('#')
+        print(data)
         module = data[0]
         attribute = data[1]
 
@@ -209,7 +210,9 @@ class ConfigMod(loader.Module):
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3).lower()
-        
+
+        print('attrs')
+
         attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
         attrs = [
             (key, value) for key, value in attrs if not (
