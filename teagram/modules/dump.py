@@ -9,6 +9,7 @@ import json
 from git import Repo
 
 PATH = f'{BASE_PATH}/dump.json'
+REPO = Repo(BASE_DIR)
 
 data = {}
 logger = logging.getLogger()
@@ -23,11 +24,16 @@ def get_token():
     else:
         return True
 
-def get_git_url():
-    repo = Repo(BASE_DIR)
-    origin = repo.remotes.origin
-    origin_url = origin.url
-    return origin_url
+def get_git_info(commit=False,url=False):
+    repo = REPO
+    if commit:
+        commit = repo.commit()
+        return commit
+    if url:
+        origin = repo.remotes.origin
+        origin_url = origin.url
+        return origin_url
+    
 
 @loader.module(name="Dump", author="teagram")
 class DumpMod(loader.Module):
@@ -56,7 +62,8 @@ class DumpMod(loader.Module):
                 "platform": utils.get_platform()
             },
             "teagram.git": {
-                "url": get_git_url()
+                "url": get_git_info(url=True),
+                "commit": get_git_info(commit=True)
             }
         }
 
@@ -80,7 +87,8 @@ class DumpMod(loader.Module):
                 "platform": utils.get_platform()
             },
             "teagram.git": {
-                "url": get_git_url()
+                "url": get_git_info(url=True),
+                "commit": get_git_info(commit=True)
             }
         }
 
