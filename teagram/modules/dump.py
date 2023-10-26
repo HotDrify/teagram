@@ -1,6 +1,7 @@
 from .. import loader, utils
 from ..__init__ import __version__
 from ..utils import BASE_PATH, BASE_DIR
+import telethon
 
 import atexit
 import logging
@@ -48,7 +49,8 @@ class DumpMod(loader.Module):
                 "modules": modules
             },
             "teagram.version": {
-                "version":  __version__
+                "version":  __version__,
+                "telethon": telethon.__version__
             },
             "teagram.platform": {
                 "platform": utils.get_platform()
@@ -71,7 +73,8 @@ class DumpMod(loader.Module):
                 "modules": modules
             },
             "teagram.version": {
-                "version":  __version__
+                "version":  __version__,
+                "telethon": telethon.__version__
             },
             "teagram.platform": {
                 "platform": utils.get_platform()
