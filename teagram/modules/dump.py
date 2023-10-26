@@ -24,15 +24,20 @@ def get_token():
     else:
         return True
 
-def get_git_info(commit=False,url=False):
+def get_git_info(commit=False,url=False,branch=False):
     repo = REPO
+
     if commit:
         commit = repo.commit()
         return commit
+    
     if url:
         origin = repo.remotes.origin
         origin_url = origin.url
         return origin_url
+    
+    if branch:
+        return repo.active_branch.name
     
 
 @loader.module(name="Dump", author="teagram")
@@ -63,7 +68,8 @@ class DumpMod(loader.Module):
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
-                "commit": str(get_git_info(commit=True))
+                "commit": str(get_git_info(commit=True)),
+                "branch": str(get_git_info(branch=True))
             }
         }
 
@@ -88,7 +94,8 @@ class DumpMod(loader.Module):
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
-                "commit": str(get_git_info(commit=True))
+                "commit": str(get_git_info(commit=True)),
+                "branch": str(get_git_info(branch=True))
             }
         }
 
