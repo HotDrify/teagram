@@ -63,7 +63,7 @@ class DumpMod(loader.Module):
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
-                "commit": get_git_info(commit=True)
+                "commit": str(get_git_info(commit=True))
             }
         }
 
@@ -88,7 +88,7 @@ class DumpMod(loader.Module):
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
-                "commit": get_git_info(commit=True)
+                "commit": str(get_git_info(commit=True))
             }
         }
 
