@@ -1,60 +1,150 @@
-body{
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    background-color: black;
-    overflow: hidden;
-    color: white;
-    outline: 0;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
 }
-.login {
-    animation: gradient 5s cubic-bezier(0.92, -0.04, 0.25, 1) infinite;
-    background: linear-gradient(10deg, #01b04a, #077477);
-    background-size: 400% 400%;
-    justify-content: center;
-    overflow: hidden;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-.flexx{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 23px;
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
-h1{
-    flex: 1;
-    margin-left: 15px;
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
+  font-size: large;
 }
-input{
-    flex: 2;
-    padding: 8px;
-    border-radius: 10px;
-    margin-right: 10px;
-    max-width: 250px;
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
 }
-.buttons{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
-button{
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    background-color: azure;
-    border-radius: 15px;    
-    width: 350px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding: 5px;
+
+input[type="submit"]:hover {
+  background-color: #45a049;
 }
-@keyframes gradient {
-    0%{background-position: 0% 50%}
-    50%{background-position: 100% 50%}
-    100%{background-position: 0% 50%}
+
+.notification-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 500px;
 }
-.teagram{
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%); 
+
+.notification {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: greenyellow;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: bold;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease, margin-bottom 0.3s ease;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.2s;
+  margin-bottom: 0;
+}
+
+.modal {
+  position: fixed;
+  text-align: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  text-align: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: rgba(1, 129, 235, 0.486);
+  text-align: center;
+  padding: 20px;
+  border-radius: 5px;
+  position: relative;
+  z-index: 1000;
+  width: 80%;
+  max-width: 800px;
+  height: 80%;
+  max-height: 400px;
+  margin: 0 auto;
+  overflow-y: auto;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+#modal-title {
+  margin-top: 0;
+}
+
+#modal-text {
+  margin-bottom: 20px;
+}
+
+#modal-button {
+  display: block;
+  margin: 0 auto;
+  margin-top: 300px;
+}
+
+#modal-button:hover {
+  background-color: #45a049;
+}
+
+#qr_placeholder {
+  background-color: gray;
+  display: block;
+  margin: 10px auto;
+  width: 350px;
+  height: 350px;
 }

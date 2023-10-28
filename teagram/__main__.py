@@ -4,7 +4,7 @@ import asyncio
 import logging
 
 from . import main, database
-from .web import server
+from .web import Web
 
 if sys.version_info < (3, 9, 0):
     print("Needs python 3.9 or higher")
@@ -58,10 +58,14 @@ if __name__ == "__main__":
         pass
 
     if database.db.get('teagram.loader', 'web_auth', ''):
+        web_config = Web(8000)
         async def serve():
-            await server.serve()
+            await web_config.server.serve()
 
-        asyncio.run(serve())
+        try:
+            asyncio.run(serve())
+        except:
+            pass
     else:
         try:
             asyncio.run(main.main())

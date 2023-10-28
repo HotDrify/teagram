@@ -1,3 +1,3 @@
-__all__ = ['server']
+__all__ = ['Web']
 
-from .backend import server
+from .backend import Web

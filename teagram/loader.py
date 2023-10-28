@@ -3,8 +3,6 @@ import os
 import sys
 
 import re
-import ast
-import typing
 import subprocess
 
 import logging
@@ -19,7 +17,6 @@ from importlib.util import spec_from_file_location, module_from_spec
 
 from typing import Union, List, Dict, Any, Callable
 from types import FunctionType, LambdaType
-from dataclasses import dataclass, field
 
 from telethon import TelegramClient, types
 from . import dispatcher, utils, database, bot, translation
@@ -306,7 +303,6 @@ def tds(cls):
 ModuleConfig = ttypes.Config
 ConfigValue = ttypes.HikkaValue
 validators = _validators
-
 
 class ModulesManager:
     """Manager of modules"""

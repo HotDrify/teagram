@@ -1,38 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teagram login</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+  <title>Teagram auth</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" type="text/css" href="static/style.css">
 </head>
 <body>
-    <div class='login'>
-        
-        <h2 class="teagram">TEAGRAM</h2>
+  <div class="container">
+    
+    <h2>Teagram auth</h2>
 
-        <div class="flexx">
-            <h1>Api id</h1>
-            <input id='api_id' type="text"> 
-        </div>
-        
-        <div class="flexx">
-            <h1>Api hash</h1>
-        <input id='api_hash' type="text"> 
-        </div>
-        
-        <div class="flexx">
-            <h1>2FA password</h1>
-            <input id='_2fa' type="password"> 
-        </div>
-        
-        <div id="_buttons" class="buttons">
-            <button id="enterTokens">Enter api tokens</button>
-            <button id="entertwofa">Enter 2FA</button>
-        </div>
-        
-    </div>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <script src="{{ url_for('static', path='/index.js') }}"></script>    
+    <label for="api_id">API ID:</label>
+    <input type="text" id="api_id" name="api_id" required>
+
+    <label for="api_hash">API HASH:</label>
+    <input type="text" id="api_hash" name="api_hash" required>
+
+    <label for="password">2FA password:</label>
+    <input type="password" id="password" name="password">
+
+    <input type="submit" id="enter" value="Войти">
+    
+    <div class="notification-container" id="notification-container"></div>
+    <div class="modal-container" id="modal-container"></div>
+
+    <button id="show-modal" style="visibility: hidden;">Show QR</button>
+    
+    <div id="qr_placeholder"></div>
+  </div>
+  
+  <script src="static/script.js"></script>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </body>
 </html>
