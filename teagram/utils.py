@@ -17,6 +17,29 @@ from pyrogram import Client
 
 from . import database
 
+def escape_html(text: str, /) -> str:  # sourcery skip
+    """
+    Pass all untrusted/potentially corrupt input here
+    :param text: Text to escape
+    :return: Escaped text
+    """
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+# from hikka
+def escape_quotes(text: str, /) -> str:
+    """
+    Escape quotes to html quotes
+    :param text: Text to escape
+    :return: Escaped text
+    """
+    return escape_html(text).replace('"', "&quot;")
+
+
+def get_args(message: Message) -> str:
+    return get_full_command(message)
+
+def get_args_raw(message: Message) -> str:
+    return get_full_command(message)[2]
 
 def get_full_command(message: Message) -> Union[
     Tuple[Literal[""], Literal[""], Literal[""]], Tuple[str, str, str]
