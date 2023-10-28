@@ -35,7 +35,7 @@ class Events(Item):
                 photo='https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true',
                 caption='☕ Добро пожаловать! Это инлайн бот <b>Teagram</b>\n'
                 '✒ Предлагаем вам настроить конфиг\n'
-                '✒ Используйте инлайн команду <b>префикс</b><code>config</code>',
+                '✒ Используйте инлайн команду <code>{}config</code>'.format(self.manager._db.get('teagram.loader', 'prefixes', ['.']),
                 parse_mode='html'
             )
 
