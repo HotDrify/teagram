@@ -85,7 +85,15 @@ class Web:
         self.api = FastAPI()
         self.config = Config(self.api, host='0.0.0.0', port=self.port, log_level=60)
         self.server = Server(self.config)
-        
+		
+        self.api.add_middleware(
+    	CORSMiddleware,
+    		allow_origins=["*"],
+    		allow_methods=["*"],
+    		allow_headers=["*"],
+    		allow_credentials=True,
+		)
+		
         self.login_data = {
             'id': 123,
             'hash': "123",
