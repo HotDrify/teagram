@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teagram</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+</head>
+<body>
+  
+  <div class="container">
+    
+    <h2>Teagram authorization</h2>
+
+    <label for="api_id">API ID:</label>
+    <input type="text" id="api_id" name="api_id" required>
+
+    <label for="api_hash">API HASH:</label>
+    <input type="text" id="api_hash" name="api_hash" required>
+
+    <label for="password">2FA password:</label>
+    <input type="password" id="password" name="password">
+
+    <input type="submit" id="enter" value="Войти">
+    <button id="theme-toggle">Toggle Dark Theme</button>
+    
+    
+    <div class="notification-container" id="notification-container"></div>
+    <div class="notification-container-err" id="notification-container-err"></div>
+    <div class="modal-container" id="modal-container"></div>
+
+    <button id="show-modal" style="visibility: hidden;">Show QR</button>
+    
+    <div id="qr_placeholder"></div>
+  </div>
+  
+  <script src="static/script.js"></script>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</body>
