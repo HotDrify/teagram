@@ -25,7 +25,7 @@ function showNotification(title, text) {
       notificationContainer.removeChild(notification);
     }, 300);
   }, 3000);
-}
+};
 
 function showNotificationError(title, text) {
   let notificationContainer = document.getElementById("notification-container-err");
@@ -54,65 +54,7 @@ function showNotificationError(title, text) {
       notificationContainer.removeChild(notification);
     }, 300);
   }, 3000);
-}
-  
-let modalContainer = document.getElementById("modal-container");
-let showModalButton = document.getElementById("show-modal");
-
-showModalButton.addEventListener("click", function() {
-  let modal = document.createElement("div");
-  modal.className = "modal";
-  
-  let modalOverlay = document.createElement("div");
-  modalOverlay.className = "modal-overlay";
-  
-  let modalContent = document.createElement("div");
-  modalContent.className = "modal-content";
-  
-  let close = document.createElement("span");
-  close.className = "close";
-  close.innerHTML = "&times;";
-  
-  let modalTitle = document.createElement("h3");
-  modalTitle.className = "modal-title";
-  modalTitle.textContent = "Заголовок окна";
-  
-  let modalText = document.createElement("p");
-  modalText.className = "modal-text";
-  modalText.textContent = "Текст окна";
-  
-  let modalButton = document.createElement("button");
-  modalButton.id = "modal-button";
-  modalButton.textContent = "Закрыть";
-  
-  modalContent.appendChild(close);
-  modalContent.appendChild(modalTitle);
-  modalContent.appendChild(modalText);
-  modalContent.appendChild(modalButton);
-  
-  modal.appendChild(modalOverlay);
-  modal.appendChild(modalContent);
-  
-  modalContainer.appendChild(modal);
-  
-  close.addEventListener("click", function() {
-    modalContainer.removeChild(modal);
-  });
-  
-  modalButton.addEventListener("click", function() {
-    modalContainer.removeChild(modal);
-  });
-  
-  modalOverlay.addEventListener("click", function() {
-    modalContainer.removeChild(modal);
-  });
-  
-  document.addEventListener("keydown", function(event) {
-    if (event.key === "Escape") {
-      modalContainer.removeChild(modal);
-    }
-  });
-})
+};
 
 let tries = 0;
 let __qr = true;
@@ -142,8 +84,6 @@ function genqr(){
             }
           );
           _qr.title = "";
-
-          console.log("GENERATED QRCODE, TRY: ", tries)
       }
   )
 }
@@ -157,7 +97,7 @@ function updating_qr(){
           (response) => {return response.text()}
       ).then(
           (data) => {
-              if (data == '"password"') {
+              if (data == 'password') {
                   __qr = false
                   _2fa = true
                   showNotification("2FA", 'Enter 2FA password')
@@ -182,15 +122,15 @@ function updating_qr(){
 
 async function post(endpoint, headers) {
   try {
-    const response = await fetch('http://localhost:8000/' + endpoint, {
+      const response = await fetch('http://localhost:8000/' + endpoint, {
       method: 'POST',
       headers: headers,
     });
+
     const data = await response.text();
     return data.replace(/["']/g, '');
   } catch (error) {
     showNotificationError("Error", error)
-    throw error;
   }
 }
 
@@ -212,9 +152,9 @@ document.getElementById("enter").onclick = async () => {
     try {
       const data = await post('tokens', headers);
 
-      if (!data || data === null) {
+      if (!data || data == null) {
         showNotification('Success', 'You are successfully logged, wait for inline bot!');
-      } else if (data === 'qrcode') {
+      } else if (data == 'qrcode') {
         showNotification('QRCode', 'Scan QRCode');
         if (!_interval){
           genqr();
@@ -254,9 +194,23 @@ document.getElementById("enter").onclick = async () => {
   }  
 }
 
-let themeToggle = document.getElementById("theme-toggle");
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+  document.body.classList.add(savedTheme);
+  let container = document.querySelector(".container")
+  container.classList.toggle("dark-theme")
+}
+
+let themeToggle = document.getElementById("theme-toggle")
 themeToggle.addEventListener("click", function() {
-  document.body.classList.toggle("dark-theme");
-  let container = document.querySelector(".container");
-  container.classList.toggle("dark-theme");
+  document.body.classList.toggle("dark-theme")
+
+  if (document.body.classList.contains("dark-theme")){
+    localStorage.setItem('theme', 'dark-theme')
+  }else{
+    localStorage.setItem('theme', '')
+  }
+
+  let container = document.querySelector(".container")
+  container.classList.toggle("dark-theme")
 });

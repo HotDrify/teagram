@@ -34,9 +34,3 @@ class Web(MainWeb):
 
         super().__init__()
         
-        self.api.add_event_handler('startup', self.proxy)
-        
-
-    async def proxy(self):
-        asyncio.ensure_future(self.tunnel.proxytunnel())
-        
