@@ -139,17 +139,15 @@ class MainWeb:
             await self.client.connect()
 
         try:
-            # password = await self.client(GetPasswordRequest())
             await self.client.sign_in(password=__2fa)
 
-            return Response('')
+            return Response(content='')
         except errors.PasswordHashInvalidError:
             return Response(
                 "Invalid 2FA password",
                 status.HTTP_401_UNAUTHORIZED
             )
         except Exception as e:
-            print(e)
             return Response(
                 f"Error: {e}"
             )
