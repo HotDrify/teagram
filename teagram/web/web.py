@@ -5,6 +5,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
+from telethon.tl.functions.account import GetPasswordRequest
+from telethon.tl.functions.auth import CheckPasswordRequest
+from telethon.password import compute_check
+
 from telethon import TelegramClient, types, errors
 from uvicorn import Config, Server
 
@@ -42,7 +46,10 @@ api.mount(
 
 class MainWeb:
     def __init__(self):
-        self.config = Config(api, host='0.0.0.0', port=self.port)
+        self.config = Config(api, 
+                             host='0.0.0.0', 
+                             port=self.port,
+                             log_level=60)
         self.server = Server(self.config)
         
         self.login_data = {
@@ -54,9 +61,7 @@ class MainWeb:
             '2fa': None
         }
         self.client_error = False
-        self.client = TelegramClient('./teagram',
-                                     self.login_data['id'],
-                                     self.login_data['hash'])
+        self.client = None
         
         api.add_route('/', self.index, methods=["GET"])
         api.add_route('/tokens', self.loginToClient, methods=["POST"])
@@ -81,7 +86,7 @@ class MainWeb:
             _data = data.headers
             _id, _hash = self._get_api_tokens(_data)
 
-            if self.client.api_hash != 123:
+            if not self.client:
                 self.client = TelegramClient('./teagram', _id, _hash)
                 await self.client.connect()
             
@@ -91,15 +96,16 @@ class MainWeb:
             if await self.client.get_me():
                 self._shutdown()
             else:
-                await self.client.disconnect()
-                return Response('qrcode')
+                return Response(content='qrcode')
         except Exception as error:
-            await self.client.disconnect()
+            self.logger.exception(error)
             return Response(str(error))
     
     async def qrcode(self, _: Request):
         try:
-            await self.client.connect()
+            if not self.client.is_connected():
+                await self.client.connect()
+
             qr_login = await self.client.qr_login()
             self.login_data['qr_login'] = qr_login
 
@@ -109,34 +115,44 @@ class MainWeb:
                 await self.qrcode()
             else:
                 self.client_error = False
-                print(error)
                 return Response(error)
         
     
     async def checkqr(self, _: Request):
         try:
-            await self.client.connect()
+            if not self.client.is_connected():
+                await self.client.connect()
+
             qrlogin = await self.client.qr_login()
+            password = Response(content='password')
 
             if isinstance(qrlogin, types.auth.LoginTokenSuccess):
-                return Response('password')
+                return password
             else:
-                return Response("password")
+                return Response()
         except errors.SessionPasswordNeededError:
-            return Response('password')
-        finally:
-            await self.client.disconnect()
+            return Response(content='password')
 
     async def _2fa(self, data: Request):
         __2fa = data.headers['2fa']
-        
-        await self.client.connect()
-        await self.client.sign_in(password=__2fa)
-        if not await self.client.get_me():
-            return Response('Enter valid 2FA password')
-        
-        await self.client.disconnect()
-        self._shutdown()
+        if not self.client.is_connected():
+            await self.client.connect()
+
+        try:
+            # password = await self.client(GetPasswordRequest())
+            await self.client.sign_in(password=__2fa)
+
+            return Response('')
+        except errors.PasswordHashInvalidError:
+            return Response(
+                "Invalid 2FA password",
+                status.HTTP_401_UNAUTHORIZED
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                f"Error: {e}"
+            )
 
     def _get_api_tokens(self, data):
         try:
@@ -153,6 +169,7 @@ class MainWeb:
             config.read('config.ini')
             config_id = config.get('telethon', 'api_id')
             config_hash = config.get('telethon', 'api_hash')
+
             if config_id and config_hash:
                 _id, _hash = config_id, config_hash
         except (configparser.NoSectionError, configparser.NoOptionError):
@@ -164,5 +181,4 @@ class MainWeb:
     
     def _shutdown(self):
         shutdown()
-        with contextlib.suppress(Exception):
-            asyncio.get_running_loop().stop()
+        asyncio.get_running_loop().stop()

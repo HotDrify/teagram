@@ -127,8 +127,7 @@ async function post(endpoint, headers) {
       headers: headers,
     });
 
-    const data = await response.text();
-    return data.replace(/["']/g, '');
+    return await response.text();
   } catch (error) {
     showNotificationError("Error", error)
   }
@@ -160,6 +159,8 @@ document.getElementById("enter").onclick = async () => {
           genqr();
           setInterval(updating_qr, 1000)
         }
+      } else{
+        console.log(data)
       }
     } catch (error) {
       console.error('Error:', error);
@@ -189,7 +190,7 @@ document.getElementById("enter").onclick = async () => {
         console.log(data)
       }
     } catch(error) {
-      showNotificationError("Unexpected error", error)
+      console.log(data)
     }
   }  
 }
