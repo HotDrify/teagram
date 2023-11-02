@@ -69,9 +69,9 @@ class BotManager(Events, TokenManager):
 
 
             self._token = await self._create_bot()
-            if not self._token:
-                logging.error(error_text)
-                sys.exit(1)
+        if not self._token:
+            logging.error(error_text)
+            sys.exit(1)
 
         try:
             self.bot = Bot(self._token, parse_mode="html")
@@ -133,7 +133,7 @@ class BotManager(Events, TokenManager):
             (await self.bot.get_me()).username,
             inline_id
         )
-    
+
     async def form(
         self,
         *,

@@ -67,7 +67,7 @@ class Events(Item):
                 "❌ Вы не владелец",
                 cache_time=0
             )
-            
+
         if call.data.startswith('cfg'):
             if (attr := call.data.replace('cfgyes', '')):
                 attr = attr.split('|')
@@ -87,7 +87,7 @@ class Events(Item):
                         InlineKeyboardButton('Вернуться', callback_data='send_cfg')
                     )
                 )
-        
+
         try:
             if call.data == 'teagram_perm_delete':
                 call.data = '_loader_permdel'
@@ -120,7 +120,7 @@ class Events(Item):
 
                         await self._app.log_out()
                         return
-                    
+
                     try:
                         await unit.callback(call)
                     except Exception as error:

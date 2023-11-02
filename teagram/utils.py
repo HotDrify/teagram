@@ -130,7 +130,7 @@ def strtobool(val):
         return 0
     else:
         raise ValueError("invalid truth value %r" % (val,))
-    
+
 def validate(attribute):
     """Делает валидацию типа из строки (в int, bool)
         Validation type from string (in int, bool)"""
@@ -182,7 +182,7 @@ async def answer(
     Example:
         response_text = "Thank you for your message!"
         await utils.answer(message, response_text)
-        
+
         response_image_path = "image.jpg"
         await utils.answer(message, response_image_path, photo=True, caption="Here's an image for you.")
     """
@@ -304,7 +304,7 @@ def get_ram() -> float:
     Returns:
         float: Memory usage in megabytes.
     """
-    
+
     try:
         import psutil
         process = psutil.Process(os.getpid())
@@ -335,7 +335,7 @@ def get_cpu() -> float:
         return cpu
     except:
         return 0
-    
+
 def get_display_name(entity: Union[types.User, types.Chat]) -> str:
     """
     Get display name of user or chat.
@@ -364,7 +364,7 @@ def get_platform() -> str:
     IS_WIN = "WINDIR" in os.environ
     IS_TRIGGER = 'TRIGGEREARTH' in os.environ
     IS_WSL = False
-    
+
     with contextlib.suppress(Exception):
         from platform import uname
         if "microsoft-standard" in uname().release:
@@ -386,7 +386,7 @@ def get_platform() -> str:
         platform = "🌍 TriggerEarth"
     else:
         platform = "🖥️ VDS"
-    
+
     return platform
 
 def random_id(length: int = 10) -> str:

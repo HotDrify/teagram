@@ -16,11 +16,11 @@ class Validator:
 class Integer(Validator):
     """
     Целое число/Integer
-    
+
     Args:
         minimum (``int``, optional):
             Минимальное значение/Minimum value
-        
+
         maximum (``int``, optional):
             Максимальное значение/Maximum value
     """
@@ -46,20 +46,20 @@ class Integer(Validator):
 
         if minimum and value < minimum:
             raise ValidationError('Значение должно быть больше минимума / Value must be greater than minimum')
-        
+
         if maximum and value > maximum:
             raise ValidationError('Значение должно быть меньше максимума / Value must be lower than maximum')
-        
+
         return value
 
 class String(Validator):
     """
     Строка/String
-    
+
     Args:
         min_len (``int``, optional):
             Минимальная длина строки/Minimum length of string
-        
+
         max_len (``int``, optional):
             Максимальная длина строки/Maximum length of string
     """
@@ -85,12 +85,12 @@ class String(Validator):
 
         if min_len and len(value) < min_len:
             raise ValidationError('Длина должно быть больше минимума / Length must be greater than minimum')
-        
+
         if max_len and len(value) > max_len:
             raise ValidationError('Длина должна быть меньше максимума / Length must be lower than maximum')
-        
+
         return value
-            
+
 
 
 class Boolean(Validator):

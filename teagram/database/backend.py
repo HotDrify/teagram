@@ -27,7 +27,7 @@ class CloudDatabase:
     async def get_chat(self):
         if not self.chat or not self.input_chat:
             chat = None
-            
+
             async for dialog in self._client.iter_dialogs():
                 if dialog.name == 'teagram-logs':
                     chat = dialog
@@ -48,7 +48,7 @@ class CloudDatabase:
                     file=BASE_PATH / 'assets' / 'channel_avatar.png'
                     )
                 )
-                
+
                 await self._client(
                     EditPhotoRequest(
                         self.chat, photo

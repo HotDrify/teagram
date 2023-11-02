@@ -82,7 +82,7 @@ class ExampleMod(loader.Module):  # Example - название класса мо
                 )
             ]
         )
-        
+
     # Сработает только если каллбек дата равняется "example_button_callback"
     # _callback_handler на конце функции чтобы обозначить что это каллбек-хендлер
     @loader.on_bot(lambda self, call: call.data == "example_button_callback")  
