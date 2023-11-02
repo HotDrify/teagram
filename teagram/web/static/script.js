@@ -69,20 +69,32 @@ function genqr(){
   ).then(
       (data) => {
           let _qr = document.getElementById("qr_placeholder");
-          let img = _qr.getElementsByTagName("img")[0]
+          let img = _qr.getElementsByTagName("canvas")[0]
+        
 
           if (img){
-              img.remove()
+            img.remove()
           }
 
-          new QRCode(
-            _qr,
-            {
-              text: data.replace(/["']/g, ''),
-              width: 350,
-              height: 350
-            }
-          );
+          const qrCode = new QRCodeStyling({
+            "width": 350,
+            "height": 350,
+            "data": data,
+            "margin":5,
+            "imageOptions":{
+              "hideBackgroundDots":true,
+              "imageSize":0.4,
+              "margin":0
+            },
+            "dotsOptions":{
+              "type":"extra-rounded",
+              "color":"#000000",
+              "gradient":null
+            },
+            "image": "https://avatars.githubusercontent.com/u/6113871"
+          });
+
+          qrCode.append(_qr)
           _qr.title = "";
       }
   )

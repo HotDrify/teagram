@@ -15,6 +15,17 @@ async def sendbot(bot, db, prefix, app):
             f'🤖 <b>Version: {__version__}</b>\n'
             f'❔ <b>Prefix: {prefix}</b>',
         )
+
+        try:
+            with open('teagram.log', 'r') as log:
+                log = log.read()
+
+                await bot.send_message(
+                    db.cloud.input_chat,
+                    f'📁 <b>Logs</b>\n<code>{log}</code>'
+                )
+        except:
+            pass
     except:
         id = (await bot.get_me()).id
         admin = ChatAdminRights(

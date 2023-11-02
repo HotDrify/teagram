@@ -141,6 +141,8 @@ class MainWeb:
         try:
             await self.client.sign_in(password=__2fa)
 
+
+            self._shutdown()
             return Response(content='')
         except errors.PasswordHashInvalidError:
             return Response(
@@ -178,5 +180,7 @@ class MainWeb:
         return _id, _hash
     
     def _shutdown(self):
+        self.logger.info("Wait for inline bot..")
+
         shutdown()
         asyncio.get_running_loop().stop()
