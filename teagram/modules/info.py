@@ -39,7 +39,7 @@ class AboutMod(loader.Module):
     async def info_inline_handler(self, inline):
         platform = utils.get_platform()
         uptime = timedelta(seconds=round(time.time() - utils._init_time))
-        
+
         last = utils.git_hash()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
         version = f'v{__version__}' + (' '+self.strings['update'] if last != now else "")
@@ -89,7 +89,7 @@ class AboutMod(loader.Module):
                 )
             ]
         )
-    
+
     async def info_cmd(self, message: Message):
         """Информация о вашем 🍵teagram."""
         await self.bot.invoke_unit('info', message)

@@ -17,7 +17,7 @@ class DispatcherManager:
     def __init__(self, app: TelegramClient, manager: "loader.ModulesManager") -> None:
         self.app = app
         self.manager = manager
-    
+
     async def check_filters(
         self,
         func: FunctionType,
@@ -33,7 +33,7 @@ class DispatcherManager:
                 return False
         else:
             _users = self.manager._db.get('teagram.loader', 'users', [])
-            
+
             if not message.out and message.sender_id not in _users:
                 return False
 
@@ -67,10 +67,10 @@ class DispatcherManager:
         func = self.manager.command_handlers.get(command.lower())
         if not func:
             return
-    
+
         if not await self.check_filters(func, message):
             return
-        
+
         try:
             if (
                 len(vars_ := getfullargspec(func).args) > 2

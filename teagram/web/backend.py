@@ -115,7 +115,7 @@ async def check_tokens(data: Request):
             return 'Enter phone'
     except Exception as error:
         return error
-    
+
 @api.post('/phone')
 async def phone_request(data: Request):
     data = data.headers
@@ -146,12 +146,12 @@ async def phonecode(data: Request):
     except:
         if not _2fa:
             return 'Enter 2fa password'
-        
+
         await client.sign_in(password=_2fa)
         if not await client.get_me():
             return 'Enter valid 2fa password'
-            
+
     shutdown()
-    
+
     await client.disconnect()
     asyncio.get_running_loop().stop()

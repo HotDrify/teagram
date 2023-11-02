@@ -10,7 +10,7 @@ async def bash_exec(command):
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
-    
+
     if not (out := await a.stdout.read(-1)):
         try:
             return (await a.stderr.read(-1)).decode()

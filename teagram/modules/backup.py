@@ -67,7 +67,7 @@ class BackupMod(loader.Module):
     async def toloop(self):
         if not (interval := self.config['backupInterval']):
             await asyncio.sleep(10)
-        
+
         await asyncio.sleep(interval)
 
         self.client: TelegramClient

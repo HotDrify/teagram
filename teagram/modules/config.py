@@ -230,7 +230,7 @@ class ConfigMod(loader.Module):
     async def _change_callback_handler(self, call: CallbackQuery):
         if call.from_user.id != self.me:
             return await call.answer(self.strings['noowner'])
-        
+
         if 'def' in call.data:
             attr = self.config.get_default(self.pending)
 

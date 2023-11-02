@@ -9,7 +9,7 @@ from googletrans.models import Translated
 class TranslatorMod(loader.Module):
     """Переводчик"""
     strings = {'name': 'translator'}
-    
+
     def __init__(self):
         self.config = Config(
             ConfigValue(
@@ -30,15 +30,15 @@ class TranslatorMod(loader.Module):
                     message,
                     self.strings['notext']
                 )
-        
+
         if (lang := self.config.get('language')) not in LANGUAGES:
             return await utils.answer(
                 message,
                 self.strings['wronglang'].format(lang)
             )
-        
+
         translated: Translated = Translator().translate((text or reply.raw_text), dest=lang)
-        
+
         await utils.answer(
             message,
             f"👅 <b>{self.strings['lang']} {translated.src} -> {lang}</b>\n"

@@ -133,7 +133,7 @@ class BotManager(Events, TokenManager):
             (await self.bot.get_me()).username,
             inline_id
         )
-    
+
     async def form(
         self,
         *,

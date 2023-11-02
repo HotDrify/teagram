@@ -36,7 +36,7 @@ class SettingsMod(loader.Module):
             self._logger = log.handlers[0]
 
         logs = '\n'.join(str(error) for error in self._logger.logs).encode('utf-8')
-        
+
         if not logs:
             return await utils.answer(
                 message, self.strings['no_lvl'].format(lvl=lvl,
@@ -186,7 +186,7 @@ class SettingsMod(loader.Module):
         start = time.perf_counter_ns()
         client: TelegramClient = message._client
         msg = await client.send_message(utils.get_chat(message), "☕", reply_to=utils.get_topic(message))
-        
+
         ping = round((time.perf_counter_ns() - start) / 10**6, 3)
         uptime = timedelta(seconds=round(time.time() - utils._init_time))
 
@@ -217,7 +217,7 @@ class SettingsMod(loader.Module):
                 message,
                 self.strings['owner']
             )
-        
+
         user = reply.sender_id
         users = self.db.get('teagram.loader', 'users', [])
         self.db.set('teagram.loader', 'users', users + [user])
@@ -243,7 +243,7 @@ class SettingsMod(loader.Module):
                 message,
                 self.strings['owner']
             )
-        
+
         user = reply.sender_id
         users = self.db.get('teagram.loader', 'users', [])
         self.db.set('teagram.loader', 'users', list(filter(lambda x: x != user, users)))
@@ -265,7 +265,7 @@ class SettingsMod(loader.Module):
 
         # TODO:
         # translation
-        
+
         keyboard = InlineKeyboardMarkup()
         keyboard.add(
             InlineKeyboardButton(
