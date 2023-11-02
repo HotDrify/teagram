@@ -46,18 +46,13 @@ class DumpMod(loader.Module):
 
     strings = {'name': 'dump'}
 
-    @loader.loop(5, autostart=True)
-    async def dumploop(self):
-        global data
-
-        modules = [mod.name for mod in self.manager.modules]
-
-        result = {
+    def gen(self) -> dict:
+        {
             "teagram.token": {
                 "token": get_token()
             },
             "teagram.modules": {
-                "modules": modules
+                "modules": [mod.name for mod in self.manager.modules]
             },
             "teagram.version": {
                 "version":  __version__,
@@ -71,33 +66,10 @@ class DumpMod(loader.Module):
                 "commit": str(get_git_info(commit=True)),
                 "branch": str(get_git_info(branch=True))
             }
-        }
-
-        data = result   
+        }  
 
     async def dump_cmd(self, message):
-        modules = [mod.name for mod in self.manager.modules]
-
-        result = {
-            "teagram.token": {
-                "token": get_token()
-            },
-            "teagram.modules": {
-                "modules": modules
-            },
-            "teagram.version": {
-                "version":  __version__,
-                "telethon": telethon.__version__
-            },
-            "teagram.platform": {
-                "platform": utils.get_platform()
-            },
-            "teagram.git": {
-                "url": get_git_info(url=True),
-                "commit": str(get_git_info(commit=True)),
-                "branch": str(get_git_info(branch=True))
-            }
-        }
+        result = self.gen()
 
         with open(PATH, 'w') as f:
             json.dump(result, f, indent=4)
@@ -108,6 +80,12 @@ class DumpMod(loader.Module):
             document=True,
             caption=self.strings("dumped")
         )
+    
+    @loader.loop(5, autostart=True)
+    async def dumploop(self):
+        global data
+        result = self.gen()
+        data = result 
     
     @atexit.register
     def create_dump():

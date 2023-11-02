@@ -2,10 +2,8 @@ import logging
 import inspect
 import traceback
 from aiogram.types import (
-    CallbackQuery, Message, InlineKeyboardButton,
-    InlineKeyboardMarkup, InlineQuery, InlineQueryResultArticle, InlineQueryResultGif,
+    CallbackQuery, Message, InlineQuery, InlineQueryResultArticle, InlineQueryResultGif,
     InputTextMessageContent, InlineQueryResultPhoto, InlineQueryResultDocument)
-from .markup import _generate_markup
 from .types import Item
 from .. import utils
 
@@ -169,9 +167,6 @@ class Events(Item):
             form = self._units[query]
             text = form.get('text')
             keyboard = form.get('keyboard') or form.get('reply_markup')
-
-            if isinstance(form.get("reply_markup"), dict) or isinstance(form.get("keyboard"), dict):
-                keyboard = _generate_markup(self, keyboard)
 
             if not form['photo'] and not form['doc'] and not form['gif']:
                 await inline_query.answer(

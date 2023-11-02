@@ -155,7 +155,10 @@ class BotManager(Events, TokenManager):
             'type': 'form',
             'title': title,
             'description': description,
-            'text': text or reply_markup.get('text', '...'),
+            'text': text or (
+                reply_markup.get('text', '...') 
+                if isinstance(reply_markup, dict) else "..."
+            ),
             'keyboard': reply_markup,
             'reply_markup': reply_markup,
             'callback': callback,

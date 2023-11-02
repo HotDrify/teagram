@@ -1,14 +1,13 @@
 from aiogram.types import (
     CallbackQuery, InlineKeyboardButton,
     InlineKeyboardMarkup, InlineQuery,
-    InlineQueryResultArticle, InputTextMessageContent,
-    Message
+    InlineQueryResultArticle, InputTextMessageContent
 )
 from inspect import getmembers, isroutine
 from telethon import types
 
 from .. import loader, utils, database
-from ..types import ConfigValue, Config
+from ..types import Config
 from ..utils import escape_html
 
 import typing
@@ -195,7 +194,6 @@ class ConfigMod(loader.Module):
             return await call.answer(self.strings['noowner'])
 
         data = call.data.replace('chattr', '').split('#')
-        print(data)
         module = data[0]
         attribute = data[1]
 
@@ -210,8 +208,6 @@ class ConfigMod(loader.Module):
         self.pending = attribute
         self.pending_module = module
         self.pending_id = utils.random_id(3).lower()
-
-        print('attrs')
 
         attrs = getmembers(self.pending_module, lambda a: not isroutine(a))
         attrs = [
