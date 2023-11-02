@@ -13,7 +13,9 @@ def insert_returns(body):
         if isinstance(body[-1], ast.With):
             insert_returns(body[-1].body)
 
-async def execute_python_code(code, env={}):
+async def execute_python_code(code, env=None):
+    if env is None:
+        env = {}
     try:
         fn_name = "_eval_expr"
         cmd = "\n".join(f" {i}" for i in code.splitlines())
