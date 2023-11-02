@@ -47,7 +47,7 @@ async def main():
         if not (me := await app.get_me()):
             if db.get('teagram.loader', 'web_success', ''):
                 db.pop('teagram.loader', 'web_success')
-                
+
                 me, app = await auth.Auth().authorize()
                 await app.connect()
             else:
@@ -57,7 +57,7 @@ async def main():
                     inpt = input('Web or manual (y/n): ')
                     if not inpt:
                         inpt = 'n'
-                    
+
                 if inpt.lower() in ['y', 'yes', 'ye']:
                     db.set('teagram.loader', 'web_auth', True)
                     def restart():
@@ -68,10 +68,10 @@ async def main():
                 else:
                     me, app = await auth.Auth().authorize()
                     await app.connect()
-    
+
     db.init_cloud(app, me)
     await db.cloud.get_chat()
-    
+
     modules = loader.ModulesManager(app, db, me)
     bot: Bot = await modules.load(app)
 
@@ -107,7 +107,7 @@ async def main():
             if lang == 'ru'
             else en
         )
-        
+
         try:
             _id = list(map(int, restart["msg"].split(":")))
             msg = await app.get_messages(_id[0], ids=_id[1])

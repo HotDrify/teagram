@@ -20,7 +20,7 @@ class TokenManager(Item):
     async def _create_bot(self) -> Union[str, None]:
         """
         Create and configure a bot.
-        
+
         Returns:
             Union[str, None]: The bot token or None on failure.
         """
@@ -96,7 +96,7 @@ class TokenManager(Item):
     async def _revoke_token(self) -> str:
         """
         Revoke a bot token.
-        
+
         Returns:
             str: The revoked bot token.
         """

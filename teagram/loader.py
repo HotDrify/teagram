@@ -42,7 +42,7 @@ class Loop:
         **kwargs
     ):
         """Args, kwargs using in start"""
-        
+
         self.func = func
         self.interval = interval
         self.autostart = autostart
@@ -382,7 +382,7 @@ class ModulesManager:
                 if instance.loops:
                     for loop in self.loops:
                         setattr(loop, 'method', instance)
-                
+
                 name = getattr(instance, 'strings', {}).get('name', '').lower()
                 mods = [
                     'backup', 'config', 'eval', 'help', 'info', 
@@ -482,7 +482,7 @@ class ModulesManager:
                 if command in module.command_handlers:
                     del self.aliases[alias]
                     del self.command_handlers[command]
-            
+
             for loop in self.loops:
                 if loop in module.loops:
                     loop.stop()

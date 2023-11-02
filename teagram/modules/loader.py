@@ -165,10 +165,10 @@ class LoaderMod(loader.Module):
                 message,
                 '❌ Вы не указали ссылку'
             )
-        
+
         try:
             response = await utils.run_sync(requests.get, args)
-            
+
             module = await self.manager.load_module(response.text, response.url)
 
             if module is True:
@@ -181,7 +181,7 @@ class LoaderMod(loader.Module):
 
             with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
                 file.write(response.text)
-            
+
             await utils.answer(
                 message, 
                 self.strings['loadedmod'].format(module)
@@ -226,7 +226,7 @@ class LoaderMod(loader.Module):
             'tester',
             'updater'
         ]
-        
+
         for mod in modules:
             if _file == mod:
                 return await utils.answer(
@@ -247,10 +247,10 @@ class LoaderMod(loader.Module):
         if not module_name:
             return await utils.answer(
                 message, self.strings['errmod'])
-        
+
         with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
             file.write(_file)
-        
+
         await utils.answer(
             message, self.strings['loadedmod'].format(module_name))
 
@@ -259,7 +259,7 @@ class LoaderMod(loader.Module):
         if not (module_name := self.manager.unload_module(args)):
             return await utils.answer(
                 message, self.strings['modnamerr'])
-        
+
         modules = [
             'config',
             'eval',
@@ -271,7 +271,7 @@ class LoaderMod(loader.Module):
             'updater',
             'loader'
         ]
-        
+
         if module_name in modules:
             return await utils.answer(
                 message,
@@ -280,7 +280,7 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, self.strings['unloadedmod'].format(module_name))
-    
+
     async def reloadmod_cmd(self,  message: types.Message, args: str):
         if not args:
             return await utils.answer(
@@ -335,7 +335,7 @@ class LoaderMod(loader.Module):
 
         return await utils.answer(
             message, self.strings['reloaded'].format(module))
-    
+
     @loader.command('Скинуть модуль из папки модулей')
     async def showmod(self, message: types.Message, args):
         if not (mod := args.split()) or f'{mod[0]}.py' not in os.listdir(
@@ -368,4 +368,3 @@ class LoaderMod(loader.Module):
 
         await utils.answer(message, self.strings['restarting'])
         sys.exit(0)
-    

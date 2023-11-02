@@ -26,7 +26,7 @@ class ModulesManager:
         self.modules: List[Module]
         self.loops: List[FunctionType]
         self.watcher_handlers: List[FunctionType]
-        
+
         self.command_handlers: Dict[str, FunctionType]
         self.message_handlers: Dict[str, FunctionType]
         self.inline_handlers: Dict[str, FunctionType]
@@ -52,7 +52,7 @@ class ConfigValue:
     default: Any = None
     value: Any = field(default_factory=WaitForDefault)
     validator: Union[Integer, String, Boolean] = None
-    
+
     def __post_init__(self):
         if isinstance(self.value, WaitForDefault) or not self.value:
             self.value = self.default
@@ -88,9 +88,8 @@ class Config(dict):
             return self.config[key].value
         except KeyError:
             return None 
-        
+
     def reload(self):
         for key in self.config:
             super().__setitem__(key, self.config[key].value)
 
-        
