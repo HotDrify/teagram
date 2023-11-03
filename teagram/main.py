@@ -7,7 +7,7 @@ import os, sys, atexit, time, logging
 
 logger = logging.getLogger()
 
-async def sendbot(bot, db, prefix, app):
+async def sendbot(bot: Bot, db, prefix: str, app):
     try:
         await bot.send_message(
             db.cloud.input_chat,
@@ -89,14 +89,16 @@ async def main():
     bot: Bot = await modules.load(app)
 
     prefix = db.get("teagram.loader", "prefixes", ["."])[0]
-    print("""
+    restart = db.get("teagram.loader", "restart")
+    if not restart:
+        print("""
 ▀▀█▀▀  █▀▀▀  █▀▀█  █▀▀█  █▀▀█  █▀▀█  █▀▄▀█ 
   █    █▀▀▀  █▄▄█  █ ▄▄  █▄▄▀  █▄▄█  █ █ █ 
   █    █▄▄▄  █  █  █▄▄█  █  █  █  █  █   █
-    """)
-    logger.info(f'Userbot has started! Prefix "{prefix}"')    
+        """)
+        logger.info(f'Userbot has started! Prefix "{prefix}"')    
 
-    if (restart := db.get("teagram.loader", "restart")):
+    if restart:
         restarted = round(time.time())-int(restart['start'])
         ru = (
             f"<b>✅ Перезагрузка прошла успешно! ({restarted} сек.)</b>"
@@ -139,4 +141,3 @@ async def main():
         await sendbot(bot, db, prefix, app)
 
     await app.run_until_disconnected()
-    logger.info("Goodbye!")

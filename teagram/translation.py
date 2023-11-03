@@ -29,7 +29,8 @@ class Strings:
         translator.load_translation()
         self.name = module.__class__.__name__.replace("Mod", "").lower()
         self.strings = translator.translations.get(self.name)
-        self._strings = getattr(module, 'strings', {})
+        self._strings = getattr(module, 'strings', 
+                                {"name": self.name})
     
     def get(self, key: str) -> str:
         try:

@@ -320,21 +320,21 @@ class ModulesManager:
         self.message_handlers: Dict[str, FunctionType] = {}
         self.inline_handlers: Dict[str, FunctionType] = {}
         self.callback_handlers: Dict[str, FunctionType] = {}
-        self.loops = []
+        self.loops: List[FunctionType] = []
 
         self._local_modules_path: str = "./teagram/modules"
 
-        self._client = client
-        self._db = db
-        self.me = me
+        self._client: TelegramClient = client
+        self._db: database.Database = db
+        self.me: types.User = me
 
-        self.aliases = self._db.get(__name__, "aliases", {})
-        self.strings = utils.get_langpack().get('manager')
+        self.aliases: dict = self._db.get(__name__, "aliases", {})
+        self.strings: dict = utils.get_langpack().get('manager')
         self.translator = translation.Translator(self._db)
 
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None
-        self.inline = None
+        self.inline: bot.BotManager = None # same as bot_manager
 
     async def load(self, app: TelegramClient) -> bool:
         setattr(app, 'loader', self)
@@ -373,6 +373,72 @@ class ModulesManager:
                     f"Error loading third party module {custom_module}: {error}")
 
         return self.bot_manager.bot
+    
+    def _init(self, value) -> Any:
+        """Init module's attributes"""
+        value.db = self._db
+        value.manager = self
+        value.client = self._client
+        value._client = self._client
+        value.bot = self.bot_manager
+        value.inline = self.bot_manager
+        value.prefix = self.get_prefix()
+        value.get_prefix = self.get_prefix
+        value.lookup = self.lookup
+
+        return value
+
+    def _init_instance(self, instance) -> Any:
+        """Init instance"""
+        instance.command_handlers = get_command_handlers(instance)
+        instance.watcher_handlers = list(
+            map(
+                lambda x: getattr(instance, x),
+                get_watcher_handlers(instance)
+            )
+        )
+
+        instance.loops = get_loops(instance)
+        instance.logger = logging.getLogger(instance.__module__)
+
+        instance.message_handlers = get_message_handlers(instance)
+        instance.callback_handlers = get_callback_handlers(instance)
+        instance.inline_handlers = get_inline_handlers(instance)
+
+        if (
+            not instance.name or 
+            instance.name.lower() == 'unknown' and 
+            (
+                name := getattr(
+                    instance, 'strings', {}
+                ).get('name', '')
+            )
+        ):
+            instance.name = name
+        
+        instance.strings = translation.Strings(
+            instance, self.translator)
+        instance.translator = self.translator
+
+        self.modules.append(instance)
+        self.command_handlers.update(instance.command_handlers)
+        self.watcher_handlers.extend(instance.watcher_handlers)
+        self.loops.append(*instance.loops) if instance.loops else None
+
+        self.message_handlers.update(instance.message_handlers)
+        self.callback_handlers.update(instance.callback_handlers)
+        self.inline_handlers.update(instance.inline_handlers)
+
+        if instance.loops:
+            for loop in self.loops:
+                if not getattr(loop, 'method', ''):
+                    setattr(loop, 'method', instance)
+
+        return instance
+
+    def get_prefix(self) -> list:
+        """Returns prefix"""
+        return self._db.get('teagram.loader', 'prefixes', ['.'])
 
     def register_instance(
         self,
@@ -392,61 +458,11 @@ class ModulesManager:
                     if module.__class__.__name__ == value.__name__:
                         self.unload_module(module, True)
 
-                value.db = self._db
-                value.manager = self
-                value.client, value._client = self._client, self._client
-                value.bot = self.bot_manager
-                value.inline = value.bot
-                value.prefix = self._db.get('teagram.loader', 'prefixes', ['.'])
-                value.lookup = self.lookup
-
-                instance = value()
-                instance.command_handlers = get_command_handlers(instance)
-                instance.watcher_handlers = list(
-                    map(
-                        lambda x: getattr(instance, x),
-                        get_watcher_handlers(instance)
-                    )
-                )
-
-                instance.loops = get_loops(instance)
-                instance.logger = logging.getLogger(instance.__module__)
-
-                instance.message_handlers = get_message_handlers(instance)
-                instance.callback_handlers = get_callback_handlers(instance)
-                instance.inline_handlers = get_inline_handlers(instance)
-
-                self.modules.append(instance)
-                self.command_handlers.update(instance.command_handlers)
-                self.watcher_handlers.extend(instance.watcher_handlers)
-                self.loops.append(*instance.loops) if instance.loops else None
-
-                self.message_handlers.update(instance.message_handlers)
-                self.callback_handlers.update(instance.callback_handlers)
-                self.inline_handlers.update(instance.inline_handlers)
-
-                if (
-                    not instance.name or 
-                    instance.name.lower() == 'unknown' and 
-                    (
-                        name := 
-                        getattr(instance, 'strings', {}).get('name', '')
-                    )
-                ):
-                    instance.name = name
-
-                if instance.loops:
-                    for loop in self.loops:
-                        if not getattr(loop, 'method', ''):
-                            setattr(loop, 'method', instance)
-                
-                instance.strings = translation.Strings(
-                    instance, self.translator)
-                instance.translator = self.translator
-
+                value = self._init(value)
+                instance = self._init_instance(value())
 
         if not instance:
-            logger.warn("Could not find module class ending with `Mod`")
+            logger.warn(f"Could not find module class ending with `Mod` ({module_name})")
 
         return instance
 
@@ -561,3 +577,4 @@ class ModulesManager:
     def lookup(self, name: str) -> Union[Module, None]:
         """Finds module by name"""
         return next((module for module in self.modules if module.name.lower() in name.lower()), None)
+    
