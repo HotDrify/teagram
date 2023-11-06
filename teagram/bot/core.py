@@ -132,18 +132,16 @@ class BotManager(Events, TokenManager):
     async def invoke_unit(self, inline_id: str, message: Message) -> Message:
         return await utils.invoke_inline(
             message,
-            (await self.bot.get_me()).username,
+            self.me.username,
             inline_id
         )
     
     async def form(
         self,
-        title: str,
         *,
-        description: Union[str, None] = None,
-        text: str = '',
+        text: str = 'Teagram',
         message: Message, 
-        reply_markup: Union[InlineKeyboardMarkup, None] = None,
+        reply_markup: Union[InlineKeyboardMarkup, list, None] = None,
         callback: typing.Any = None,
         gif: typing.Any = None,
         photo: Photo = None,
@@ -153,12 +151,9 @@ class BotManager(Events, TokenManager):
         unit_id = callback or utils.random_id()
         self._units[unit_id] = {
             'type': 'form',
-            'title': title,
-            'description': description,
-            'text': text or (
-                reply_markup.get('text', '...') 
-                if isinstance(reply_markup, dict) else "..."
-            ),
+            'title': 'Teagram',
+            'description': "Teagram's form",
+            'text': text,
             'keyboard': reply_markup,
             'reply_markup': reply_markup,
             'callback': callback,

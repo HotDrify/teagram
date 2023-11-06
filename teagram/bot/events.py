@@ -33,7 +33,9 @@ class Events(Item):
                 photo='https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true',
                 caption='☕ Добро пожаловать! Это инлайн бот <b>Teagram</b>\n'
                 '✒ Предлагаем вам настроить конфиг\n'
-                f"✒ Используйте инлайн команду {self._db.get('teagram.loader', 'prefixes', ['.'])[0]}config",
+                "✒ Используйте инлайн команду {}config".format(
+                    self._manager.get_prefix()[0]
+                ),
                 parse_mode='html'
             )
 
@@ -166,7 +168,12 @@ class Events(Item):
         try:
             form = self._units[query]
             text = form.get('text')
-            keyboard = form.get('keyboard') or form.get('reply_markup')
+            keyboard = None
+            
+            if isinstance(form['keyboard'], list):
+                keyboard = self._generate_markup(form['keyboard'])
+            elif isinstance(form['reply_markup'], list):
+                keyboard = self._generate_markup(form['reply_markup'])
 
             if not form['photo'] and not form['doc'] and not form['gif']:
                 await inline_query.answer(
@@ -233,6 +240,8 @@ class Events(Item):
                         )
                     ]
                 )
+            
+            return
         except KeyError:
             pass
         except Exception as error:

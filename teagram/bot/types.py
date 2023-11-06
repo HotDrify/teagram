@@ -6,8 +6,9 @@ from aiogram.types import CallbackQuery, InlineQuery, Message
 from telethon import TelegramClient
 
 from .. import database, types
+from .utils import Utils
 
-class Item:
+class Item(Utils):
     """
     Base class for items.
     This class provides functionality for checking filters applied to event handlers.
