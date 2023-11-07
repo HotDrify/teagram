@@ -1,6 +1,8 @@
 import typing
 import logging
+
 from aiogram import types
+from ..utils import random_id
 
 logger = logging.getLogger()
 
@@ -30,20 +32,23 @@ class Utils:
         for btn in markup:
             try:
                 if btn.get('callback', ''):
-                    if isinstance(btn['callback'], str):
-                        keyboard.add(
-                            types.InlineKeyboardButton(
-                                btn['text'],
-                                callback_data=btn['callback']
-                            )
+                    callback = None
+
+                    if callable(btn['callback']):
+                        callback = random_id(20)
+                        self._manager.callback_handlers[callback] = btn['callback']
+
+                    keyboard.add(
+                        types.InlineKeyboardButton(
+                            btn['text'],
+                            callback_data=callback or btn['callback']
                         )
-                    else:
-                        logger.debug("Button's callback must be string")
+                    )
                 elif btn.get('input', ''):
                     keyboard.add(
                         types.InlineKeyboardButton(
                             btn['text'],
-                            switch_inline_query_current_chat=btn['input']
+                            switch_inline_query=btn['input']
                         )
                     )
                 elif btn.get('url', ''):
