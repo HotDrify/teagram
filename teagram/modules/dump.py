@@ -18,11 +18,10 @@ def get_token():
     with open(BASE_PATH / "db.json", 'r') as file:
         json_data = json.load(file)
     try:
-        json_data.get("teagram.bot", {}).get("token", "")
+        if json_data["teagram.bot"]["token"]:
+            return True
     except Exception:
         return False
-    else:
-        return True
 
 def get_git_info(commit=False,url=False,branch=False):
     repo = REPO
