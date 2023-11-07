@@ -49,7 +49,8 @@ async def sendbot(bot: Bot, db, prefix: str, app):
 
         await bot.send_message(
             db.cloud.input_chat,
-            f'☕ <b>Teagram userbot has started!</b>\n🤖 <b>Version: {__version__}</b>\n❔ <b>Prefix: {prefix}</b>',
+            '☕ <b>Teagram userbot has started!</b>\n'
+            f'🤖 <b>Version: {__version__}</b>\n❔ <b>Prefix: {prefix}</b>',
         )
 
 async def main():

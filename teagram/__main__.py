@@ -11,6 +11,9 @@ if sys.version_info < (3, 9, 0):
     print("Needs python 3.9 or higher")
     sys.exit(1)
 
+teagram = sys.modules['teagram']
+teagram.inline = teagram.bot # alias
+
 class TeagramStreamHandler(logging.StreamHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,16 +69,17 @@ if __name__ == "__main__":
         port = randint(1000, 65535)
         if 'windows' not in get_platform().lower():
             while True:
-                with closing(
-                    socket.socket(
-                        socket.AF_INET, 
-                        socket.SOCK_STREAM
-                    )
-                ) as sock:
-                    if sock.connect_ex(("localhost", port)) == 0:
-                        break
+                port = randint(1000, 65535)
+                try:
+                    with socket.socket(
+                        socket.AF_INET, socket.SOCK_STREAM
+                        ) as sock:
+                        sock.bind(("localhost", port))
 
-                    port = randint(1000, 65535)
+                    break
+                except OSError as e:
+                    if e.errno == 98:
+                        continue
 
         web_config = Web(port)
         async def serve():
