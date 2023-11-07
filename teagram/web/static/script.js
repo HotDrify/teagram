@@ -63,7 +63,7 @@ let _interval = null;
 let _2fa = false;
 
 function genqr(){
-  fetch("http://localhost:8000/qrcode", {method: "GET"})
+  fetch(`${window.location.href}qrcode`, {method: "GET"})
   .then(
       (response) => {return response.text()}
   ).then(
@@ -104,7 +104,7 @@ function updating_qr(){
   tries += 1
 
   if (__qr) {
-      fetch("http://localhost:8000/checkqr", {method: "GET"})
+      fetch(`${window.location.href}checkqr`, {method: "GET"})
       .then(
           (response) => {return response.text()}
       ).then(
@@ -134,7 +134,7 @@ function updating_qr(){
 
 async function post(endpoint, headers) {
   try {
-      const response = await fetch('http://localhost:8000/' + endpoint, {
+      const response = await fetch(window.location.href + endpoint, {
       method: 'POST',
       headers: headers,
     });
