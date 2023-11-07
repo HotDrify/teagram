@@ -4,6 +4,7 @@ import asyncio
 import logging
 
 from . import main, database
+from .utils import get_platform
 from .web import Web
 
 if sys.version_info < (3, 9, 0):
@@ -58,7 +59,25 @@ if __name__ == "__main__":
         pass
 
     if database.db.get('teagram.loader', 'web_auth', ''):
-        web_config = Web(8000)
+        import socket
+        from random import randint
+        from contextlib import closing
+
+        port = randint(1000, 65535)
+        if 'windows' not in get_platform().lower():
+            while True:
+                with closing(
+                    socket.socket(
+                        socket.AF_INET, 
+                        socket.SOCK_STREAM
+                    )
+                ) as sock:
+                    if sock.connect_ex(("localhost", port)) == 0:
+                        break
+
+                    port = randint(1000, 65535)
+
+        web_config = Web(port)
         async def serve():
             await web_config.server.serve()
 

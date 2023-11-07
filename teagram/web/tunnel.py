@@ -6,9 +6,6 @@ import atexit
 import asyncio
 import logging
 
-
-GREP = 'kill $(pgrep -f "ssh -o StrictHostKeyChecking=no -R 80:localhost:8000 nokey@localhost.run")'
-
 class Tunnel:
     def __init__(self, logger: logging.Logger, port: int, event: asyncio.Event):
         self.logger = logger
@@ -62,7 +59,13 @@ class Tunnel:
             self.logger.info("Proxy isn't working on windows, please use WSL")
 
         if url:
-            atexit.register(lambda: os.system(GREP))
-            self.logger.info(f'To login in account, open in browser {url}')
+            atexit.register(lambda: os.system(
+                'kill $(pgrep -f "ssh -o StrictHostKeyChecking=no -R '
+                f'80:localhost:{self.port} nokey@localhost.run")'
+                )
+            )
+            self.logger.info(url) # most hosts do not show the latest output
         else:
-            self.logger.info(f'To login in account, open in browser http://localhost:{self.port}')
+            self.logger.info(f'http://localhost:{self.port}')
+            
+        self.logger.info("Login in account")

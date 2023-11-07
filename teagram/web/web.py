@@ -19,11 +19,11 @@ import asyncio
 import contextlib
 import configparser
 
-GREP = 'kill $(pgrep -f "ssh -o StrictHostKeyChecking=no -R 80:localhost:8000 nokey@localhost.run")'
-
-def shutdown():
+def shutdown(port):
     def restart():
-        os.system(GREP)
+        os.system(
+            f'kill $(pgrep -f "ssh -o StrictHostKeyChecking=no -R 80:localhost:{port} nokey@localhost.run")'
+        )
         os.execl(sys.executable, sys.executable, "-m", "teagram")
 
     atexit.register(restart)
@@ -182,5 +182,5 @@ class MainWeb:
     def _shutdown(self):
         self.logger.info("Wait for inline bot..")
 
-        shutdown()
+        shutdown(self.port)
         asyncio.get_running_loop().stop()

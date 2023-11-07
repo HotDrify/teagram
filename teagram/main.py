@@ -67,7 +67,9 @@ async def main():
                 if db.get('teagram.loader', 'web_auth', '') is False:
                     inpt = 'yes'
                 else:
+                    print("Input y/n")
                     inpt = input('Use web? (y/n): ')
+
                     if not inpt:
                         inpt = 'n'
                     
