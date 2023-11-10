@@ -1,3 +1,14 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 from . import auth, database, loader, __version__
 from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequest
 from telethon.types import ChatAdminRights
@@ -7,65 +18,119 @@ import os, sys, atexit, time, logging
 
 logger = logging.getLogger()
 
-async def sendbot(bot: Bot, db, prefix: str, app):
-    try:
-        await bot.send_message(
-            db.cloud.input_chat,
-            '☕ <b>Teagram userbot has started!</b>\n'
-            f'🤖 <b>Version: {__version__}</b>\n'
-            f'❔ <b>Prefix: {prefix}</b>',
+teagram = sys.modules['teagram']
+teagram.inline = teagram.bot # alias
+
+class TeagramStreamHandler(logging.StreamHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.logs = {
+            'INFO': [],
+            'WARNING': [],
+            'ERROR': [],
+            'CRITICAL': [],
+            'DEBUG': [],
+            'NOTSET': []
+        }
+
+        with open("teagram.log", "w", encoding='utf-8') as l:
+            l.write("")
+
+    def emit(self, record):
+        lvl = logging.getLevelName(record.levelno)
+        self.logs[lvl].append(record)
+
+        with open("teagram.log", "a", encoding='utf-8') as l:
+            l.write(f'{self.format(record)}\n')
+        
+        super().emit(record)
+
+class Main:
+    def __init__(self) -> None:
+        self.db = database.Database
+
+        fmt = logging.Formatter(
+            '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+            '%Y-%m-%d %H:%M:%S'
         )
+        handler = TeagramStreamHandler()
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(fmt)
 
+        self.log = logging.getLogger()
+        self.log.addHandler(handler)
+        self.log.setLevel(logging.DEBUG)
+
+        logging.getLogger('telethon').setLevel(logging.WARNING)
+        logging.getLogger('aiohttp').setLevel(logging.WARNING)
+        logging.getLogger('aiogram').setLevel(logging.WARNING)
+
+    async def on_start(self, 
+                      bot: Bot, 
+                      db: database.Database, 
+                      prefix: str, app):
         try:
-            with open('teagram.log', 'r') as log:
-                log = log.read()
+            await bot.send_message(
+                db.cloud.input_chat,
+                '☕ <b>Teagram userbot has started!</b>\n'
+                f'🤖 <b>Version: {__version__}</b>\n'
+                f'❔ <b>Prefix: {prefix}</b>',
+            )
 
-                await bot.send_message(
+            try:
+                with open('teagram.log', 'r') as log:
+                    log = log.read()
+
+                    await bot.send_message(
+                        db.cloud.input_chat,
+                        f'📁 <b>Logs</b>\n<code>{log}</code>'
+                    )
+            except:
+                pass
+        except:
+            id = bot.me.id
+            admin = ChatAdminRights(
+                post_messages=True,
+                ban_users=True,
+                edit_messages=True,
+                delete_messages=True
+            )
+
+            await app(
+                InviteToChannelRequest(
                     db.cloud.input_chat,
-                    f'📁 <b>Logs</b>\n<code>{log}</code>'
+                    [id]
                 )
+            )
+
+            await app(
+                EditAdminRequest(
+                    db.cloud.input_chat,
+                    id, 
+                    admin,
+                    'Teagram'
+                )
+            )
+
+            await bot.send_message(
+                db.cloud.input_chat,
+                '☕ <b>Teagram userbot has started!</b>\n'
+                f'🤖 <b>Version: {__version__}</b>\n'
+                f'❔ <b>Prefix: {prefix}</b>',
+            )
+
+    async def main(self):
+        try:
+            if os.geteuid() == 0:
+                self.log.warning("Please do not use root for userbot")
         except:
             pass
-    except:
-        id = (await bot.get_me()).id
-        admin = ChatAdminRights(
-            post_messages=True,
-            ban_users=True,
-            edit_messages=True,
-            delete_messages=True
-        )
 
-        await app(InviteToChannelRequest(
-            db.cloud.input_chat,
-            [id]
-        ))
-
-        await app(EditAdminRequest(
-            db.cloud.input_chat,
-            id, 
-            admin,
-            'Teagram'
-        ))
-
-        await bot.send_message(
-            db.cloud.input_chat,
-            '☕ <b>Teagram userbot has started!</b>\n'
-            f'🤖 <b>Version: {__version__}</b>\n❔ <b>Prefix: {prefix}</b>',
-        )
-
-async def main():
-    db = database.db
-
-    if (app := auth.Auth(manual=False).app):
-        await app.connect()
-        if not (me := await app.get_me()):
-            if db.get('teagram.loader', 'web_success', ''):
-                db.pop('teagram.loader', 'web_success')
-                
-                me, app = await auth.Auth().authorize()
-                await app.connect()
-            else:
-                if db.get('teagram.loader', 'web_auth', '') is False:
+        if (app := auth.Auth(manual=False).app):
+            await app.connect()
+            if not (me := await app.get_me()):
+                if not self.db.get('teagram.loader', 'web_auth', ''):
                     inpt = 'yes'
                 else:
                     print("Input y/n")
@@ -75,7 +140,7 @@ async def main():
                         inpt = 'n'
                     
                 if inpt.lower() in ['y', 'yes', 'ye']:
-                    db.set('teagram.loader', 'web_auth', True)
+                    self.db.set('teagram.loader', 'web_auth', True)
                     def restart():
                         os.execl(sys.executable, sys.executable, "-m", "teagram")
 
@@ -84,63 +149,64 @@ async def main():
                 else:
                     me, app = await auth.Auth().authorize()
                     await app.connect()
-    
-    db.init_cloud(app, me)
-    await db.cloud.get_chat()
-    
-    modules = loader.ModulesManager(app, db, me)
-    bot: Bot = await modules.load(app)
+        
+        self.db.init_cloud(app, me)
+        await self.db.cloud.get_chat()
+        
+        modules = loader.ModulesManager(app, self.db, me)
+        bot: Bot = await modules.load(app)
 
-    prefix = db.get("teagram.loader", "prefixes", ["."])[0]
-    restart = db.get("teagram.loader", "restart")
-    if not restart:
-        print("""
+        prefix = self.db.get("teagram.loader", "prefixes", ["."])[0]
+        restart = self.db.get("teagram.loader", "restart")
+
+        if not restart:
+            print("""
 ▀▀█▀▀  █▀▀▀  █▀▀█  █▀▀█  █▀▀█  █▀▀█  █▀▄▀█ 
   █    █▀▀▀  █▄▄█  █ ▄▄  █▄▄▀  █▄▄█  █ █ █ 
   █    █▄▄▄  █  █  █▄▄█  █  █  █  █  █   █
-        """)
-        logger.info(f'Userbot has started! Prefix "{prefix}"')    
+            """)
+            logger.info(f'Userbot has started! Prefix "{prefix}"')    
 
-    if restart:
-        restarted = round(time.time())-int(restart['start'])
-        ru = (
-            f"<b>✅ Перезагрузка прошла успешно! ({restarted} сек.)</b>"
-            if restart["type"] == "restart"
-            else f"<b>✅ Обновление прошло успешно! ({restarted} сек.)</b>"
-        )
-        en = (
-            f"<b>✅ Reboot was successful! ({restarted} сек.)</b>"
-            if restart["type"] == "restart"
-            else f"<b>✅ The update was successful! ({restarted} сек.)</b>"
-        )
+        if restart:
+            restarted = round(time.time())-int(restart['start'])
+            ru = (
+                f"<b>✅ Перезагрузка прошла успешно! ({restarted} сек.)</b>"
+                if restart["type"] == "restart"
+                else f"<b>✅ Обновление прошло успешно! ({restarted} сек.)</b>"
+            )
+            en = (
+                f"<b>✅ Reboot was successful! ({restarted} сек.)</b>"
+                if restart["type"] == "restart"
+                else f"<b>✅ The update was successful! ({restarted} сек.)</b>"
+            )
 
-        lang = db.get('teagram.loader', 'lang', '')
-        # if there was no lang in db
-        if not lang:
-            lang = 'en'
-            db.set('teagram.loader', 'lang', 'en')
+            lang = self.db.get('teagram.loader', 'lang', '')
+            # if there was no lang in db
+            if not lang:
+                lang = 'en'
+                self.db.set('teagram.loader', 'lang', 'en')
 
-        restarted_text = (
-            ru 
-            if lang == 'ru'
-            else en
-        )
-        
-        try:
-            _id = list(map(int, restart["msg"].split(":")))
-            msg = await app.get_messages(_id[0], ids=_id[1])
+            restarted_text = (
+                ru 
+                if lang == 'ru'
+                else en
+            )
+            
+            try:
+                _id = list(map(int, restart["msg"].split(":")))
+                msg = await app.get_messages(_id[0], ids=_id[1])
 
-            if (
-                msg and msg.text != (
-                    restarted_text
-                )
-            ):
-                await app.edit_message(_id[0], _id[1], restarted_text, parse_mode='html')
-        except:
-            await sendbot(bot, db, prefix, app)
+                if (
+                    msg and msg.text != (
+                        restarted_text
+                    )
+                ):
+                    await app.edit_message(_id[0], _id[1], restarted_text, parse_mode='html')
+            except:
+                await self.on_start(bot, self.db, prefix, app)
 
-        db.pop("teagram.loader", "restart")
-    else:
-        await sendbot(bot, db, prefix, app)
+            self.db.pop("teagram.loader", "restart")
+        else:
+            await self.on_start(bot, self.db, prefix, app)
 
-    await app.run_until_disconnected()
+        await app.run_until_disconnected()

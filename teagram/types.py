@@ -1,3 +1,4 @@
+from datetime import datetime
 from types import FunctionType
 from typing import (
     Any, 
@@ -10,6 +11,8 @@ from typing import (
 )
 
 from telethon import TelegramClient, types
+from telethon.tl import types
+from telethon.tl.custom import Message as TeleMessage
 
 from . import database, bot
 from  dataclasses import dataclass, field
@@ -164,4 +167,14 @@ class Config(dict):
         for key in self.config:
             super().__setitem__(key, self.config[key].value)
 
-        
+class Message(TeleMessage):
+    """`telethon.tl.custom.Message`"""
+    def __init__(self, *args, **kwargs):
+        super.__init__(*args, **kwargs)
+    
+    def __str__(self):
+        return self.text
+    
+    def __invert__(self):
+        return self.raw_text
+    

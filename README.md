@@ -23,4 +23,5 @@ You can install it via scripts like <a href="https://github.com/itzlayz/teagram-
     <li>Loading modules via git</li>
     <li>Login via website</li>
     <li>Inline bot</li>
+    <li>Translations</li>
 </ul>

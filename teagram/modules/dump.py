@@ -1,11 +1,11 @@
-from .. import loader, utils
-from ..__init__ import __version__
+from .. import loader, utils, __version__
 from ..utils import BASE_PATH, BASE_DIR
-import telethon
 
+import telethon
 import atexit
 import logging
 import json
+
 from git import Repo
 
 PATH = f'{BASE_PATH}/dump.json'
@@ -23,7 +23,7 @@ def get_token():
     except Exception:
         return False
 
-def get_git_info(commit=False,url=False,branch=False):
+def get_git_info(commit=False, url=False, branch=False):
     repo = REPO
 
     if commit:

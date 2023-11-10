@@ -1,3 +1,14 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 from aiogram.types import (
     CallbackQuery, InlineKeyboardButton,
     InlineKeyboardMarkup, InlineQuery,
@@ -11,24 +22,6 @@ from ..types import Config
 from ..utils import escape_html
 
 import typing
-
-# distutils will be deleted in python 3.12
-# distutils будет удалена в python 3.12
-def strtobool(val):
-    # distutils.util.strtobool
-    """Convert a string representation of truth to true (1) or false (0).
-
-    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
-    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
-    'val' is anything else.
-    """
-    val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
-        return 1
-    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
-        return 0
-    else:
-        raise ValueError("invalid truth value %r" % (val,))
 
 @loader.module(name="config", author="teagram", version=1)
 class ConfigMod(loader.Module):
@@ -62,7 +55,7 @@ class ConfigMod(loader.Module):
                 attribute = int(attribute)
             except:
                 try:
-                    attribute = bool(strtobool(attribute))
+                    attribute = bool(utils.strtobool(attribute))
                 except:
                     pass
 

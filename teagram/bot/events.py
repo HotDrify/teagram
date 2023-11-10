@@ -63,10 +63,7 @@ class Events(Item):
             CallbackQuery: The processed callback query.
         """
         if call.from_user.id != self._manager.me.id:
-            await call.answer(
-                "❌ Вы не владелец",
-                cache_time=0
-            )
+           return
         
         try:
             if call.data == 'teagram_perm_delete':
@@ -131,8 +128,19 @@ class Events(Item):
         Returns:
             InlineQuery: The processed inline query.
         """
+        query = inline_query.query
+        query_ = query.split()
 
-        if not (query := inline_query.query):
+        cmd = query_[0]
+        args = " ".join(query_[1:])
+        inline_query.args = args
+
+        func = self._manager.inline_handlers.get(cmd)
+        if func:
+            if not await self._check_filters(func, func.__self__, inline_query):
+                return
+            
+        if query_:
             commands = ""
             for command, func in self._manager.inline_handlers.items():
                 if func:
@@ -154,16 +162,7 @@ class Events(Item):
                 ], cache_time=0
             )
     
-        query_ = query.split()
-
-        cmd = query_[0]
-        args = " ".join(query_[1:])
-        inline_query.args = args
-
-        func = self._manager.inline_handlers.get(cmd)
-        if func:
-            if not await self._check_filters(func, func.__self__, inline_query):
-                return
+        
 
         try:
             form = self._units[query]

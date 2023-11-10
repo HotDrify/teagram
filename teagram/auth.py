@@ -2,8 +2,6 @@ import configparser
 import logging
 import sys
 
-import asyncio
-
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
@@ -11,14 +9,21 @@ from telethon.password import compute_check
 from telethon import TelegramClient, errors, types
 from telethon.tl.functions.account import GetPasswordRequest
 from telethon.tl.functions.auth import CheckPasswordRequest
+from telethon.tl import types as tltypes
+
 from qrcode.main import QRCode
 
-from . import __version__
+from . import __version__, database
+
+db = database.Database
 
 class Auth:
     def __init__(self, session_name: str = "./teagram", manual=True) -> None:
         if manual:
             self._check_api_tokens()
+
+        if db.get('teagram.loader', 'web_success', ''):
+            db.pop('teagram.loader', 'web_success')
 
         config = configparser.ConfigParser()
         config.read("./config.ini")
@@ -125,28 +130,29 @@ class Auth:
             qr = input("Login by QR-CODE? y/n ").lower().split()
 
             if qr[0] == "y":
-                tries = 0
                 while True:                    
                     try:
                         qrcode = await self.app.qr_login()
                     except errors.UnauthorizedError:                        
                         break
-
-                    if isinstance(qrcode, types.auth.LoginTokenSuccess):
-                        break
-                    if tries % 30 == 0:
-                        print('Settings > Devices > Scan QR Code (or Add device)\n')
-                        print('Scan QR code below:' )
-
-                        await qrcode.recreate()
-                        qr = QRCode()
-                        
-                        qr.clear()
-                        qr.add_data(qrcode.url)
-                        qr.print_ascii()
                     
-                    tries += 1
-                    await asyncio.sleep(1)
+                    try:
+                        _qr = await qrcode.wait(30)
+                        if isinstance(_qr, tltypes.User):
+                            break
+                    except:
+                        pass
+
+                    await qrcode.recreate()
+
+                    print('Settings > Devices > Scan QR Code (or Add device)\n')
+                    print('Scan QR code below:' )
+                    
+                    qr = QRCode()
+                    
+                    qr.clear()
+                    qr.add_data(qrcode.url)
+                    qr.print_ascii()
                 
                 await self._2fa()
 
@@ -162,4 +168,5 @@ class Auth:
             self.app.disconnect()
 
             return sys.exit(64)
+        
         return me, self.app

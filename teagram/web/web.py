@@ -1,13 +1,20 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 from .. import database
 
 from fastapi import FastAPI, Request, templating, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-
-from telethon.tl.functions.account import GetPasswordRequest
-from telethon.tl.functions.auth import CheckPasswordRequest
-from telethon.password import compute_check
 
 from telethon import TelegramClient, types, errors
 from uvicorn import Config, Server
@@ -16,7 +23,6 @@ import os
 import sys
 import atexit
 import asyncio
-import contextlib
 import configparser
 
 def shutdown(port):
