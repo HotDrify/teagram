@@ -140,7 +140,7 @@ class Events(Item):
             if not await self._check_filters(func, func.__self__, inline_query):
                 return
             
-        if query_:
+        if not query_:
             commands = ""
             for command, func in self._manager.inline_handlers.items():
                 if func:
