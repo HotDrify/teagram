@@ -1,0 +1,130 @@
+help:
+  no: "<b>Ushbu buyruq uchun tavsif mavjud emas</b>"
+  nomd: "<b>Modul uchun tavsif mavjud emas</b>"
+  nocmd: "<b>Berilgan buyruq topilmadi</b>"
+  nomod: "Bunday modul mavjud emas"
+  ebot: "<b>Xatolik yuzaga keldi, iltimos, botni qayta ishlang</b>"
+  ibot: "Inline Bot"
+  mods: "Mavjud Modullar"
+  author: "Muallif"
+  version: "Versiya"
+  desc: "Ta'rif"
+
+manager:
+  errorcmd: "❌ <b>Buyruqni bajarishda xato yuzaga keldi</b>: {}\n❔ <b>Jo'natmalar</b>:\n<code>{}</code>"
+
+info:
+  update: "<b>Yangilanish mavjud</b>"
+  owner: "Egasi"
+  version: "Versiya"
+  uptime: "Ish vaqt"
+
+updater:
+  updating: "🛠 <b>Yangilanmoqda...</b>"
+  lastver: "✔ <b>Sizda eng so'nggi versiya o'rnatilgan</b>"
+  update: "🔁 <b>Yangilanmoqda...</b>"
+  hupdate: "🔄 <b>Yangilanish mavjud</b>"
+  nodialog: "❌ <b>Siz botni bloklagan bo'lsiz, iltimos, uning blokini olib tashlang</b>"
+  eone: "❌ <b>Yangilanish uchun tekshirishda xato yuzaga keldi.</b>"
+  etwo: "❌ <b>Iltimos, GIT buyruqining ishlashi ta'minlanganligiga ishonch hosil qiling</b>"
+  error: "❌ <b>Xato yuzaga keldi: {}</b>"
+  downloading: "📁 <b>Talablarni yuklab olish...</b>"
+
+loader:
+  noargs: "❌ <b>Argumentlar mavjud emas</b>"
+  noreq: "❌ <b>Import xatosi, ammo talabalar topilmadi</b>"
+  urlrepo: "✅ <b>Repository havolasi tiklandi</b>"
+  wrongurl: "❌ <b>Noto'g'ri URL kiritildi</b>"
+  yesurl: "✅ <b>Repository havolasi qo'yildi</b>"
+  errapi: "❌ <b>Noto'g'ri repository havolasi.</b>\n<b>Uni quyidagi buyruq orqali o'zgartiring: dlrepo <repository havolasi yoki tiklash></b>"
+  noalltxt: "❌ <b><a href=\"{modules_repo}\">all.txt</a> fayli <a href=\"{modules_repo}\">repository</a>da topilmadi</b>\n"
+  listmods: "📥 <b><a href=\"{modules_repo}\">Repositorydan</a> mavjud bo'lgan modullar ro'yxati:</b>\n\n<code>all</code> - barcha modullarni yuklab olish\n"
+  downdedreq: "✅ <b>Qo'shimchalar o'rnatildi. Qayta ishlovchi</b>"
+  errmod: "❌ <b>Modulni yuklab bo'lmadi. Tafsilotlar uchun jurnallarga qarang</b>"
+  modurlerr: "❌ <b>Modul havolasi orqali mavjud emas</b>"
+  modnameerr: "❌ <b>Noto'g'ri modul nomi</b>"
+  basicerr: '❌ <b>Xato yuzaga keldi, jurnallarni tekshirib ko'ring</b>'
+  reqerr: "❌ <b>Kutilmagan xato yuzaga keldi. Jurnallarni tekshirib ko'ring</b>"
+  loadedmod: "✅ <b>Modul \"<code>{}</code>\" yuklandi</b>"
+  unloadedmod: "✅ <b>Modul \"<code>{}</code>\" yuklanmadi</b>"
+  reloaded: "✅ <b>Modul \"<code>{}</code>\" qayta yuklandi</b>"
+  loaded: "✅ <b><b>{}</b> ta <b>{}</b> modul yuklandi</b>"
+  notfound: '❌ <b>Modul topilmadi {}</b>'
+  noreply: "❌ <b>Faylga javob berilmadi</b>"
+  errunicode: "❌ <b>Noto'g'ri fayl kodlashi</b>"
+  cantload: "❌ <b>Ichki modullarni yuklab bo'lmaydi</b>"
+  cantunload: "❌ <b>Ichki modullarni o'chirib bo'lmaydi</b>"
+  restarting: "🔄 <b>Qayta ishlayapti...</b>"
+  wrongmod: '❌ <b>Noto'g'ri modulni kiritdingiz</b>'
+  replymod: '⚙ <b>Modul <code>{}</code></b>'
+  replytoload: '📁 <b>Modulni o'rnatish uchun, bu xabarga javob sifatida <code>{}loadmod</code>ni yuboring</b>'
+
+translator:
+  notext: '❌ <b>Matnni kiritmadingiz</b>'
+  wronglang: '❌ <b>Noto'g'ri til (<code>{}</code>)</b>'
+  lang: "Til"
+  pronun: "Ovoz"
+  text: "Matn"
+  trans: "Tarjima"
+
+terminal:
+  cmd: "Buyruq"
+  output: "Chiqish"
+
+config:
+  noowner: "❌ Siz egasi emassiz"
+  opencfg: "Sozlamalarni oching"
+  cfg: "Sozlamalar"
+  chdef: '✔ Siz muvaffaqiyatli ravishda standart qiymatni o\'zgartirdingiz'
+  ch: 'O\'zgartirish'
+  attr: 'Atribut'
+  value: 'Qiymat'
+  def: 'Standart'
+  nospec: '<b>Belgilanmagan</b>'
+  back: 'Orqaga'
+  sure: "❔ <b>Atributni o'zgartirishga ishonchingiz komilmi?</b>"
+  confirm: "✔ Tasdiqlash"
+  decline: "❌ Bekor qilish"
+  specvalue: "Qiymatni kiriting"
+  errvalue: "❌ <b>Siz qiymatni kiritmadingiz</b>"
+  chvalue: '✔ <b>Siz atributni o\'zgartirdingiz!</b>'
+
+backup:
+  docstring: '<b>⌛ Qanday vaqtdan keyin omborini olish (Soni sekundda)</b>'
+  attempt: '<b>👀 Ombor olish urinishi boshlanmoqda...</b>'
+  done: "<b>✅ Muvaffaqiyatli yaratildi.</b>"
+  error: "<b>🚫 Xato, jurnallarni tekshirib ko'ring.</b>"
+
+settings:
+  flushed: "<b>✅ Jurnallar tozalandi</b>"
+  no_logs: "<b>❌ <b>Siz darajasini ko'rsatmadingiz yoki noto'g'ri log darajasini ko'rsatdingiz:</b>\n"
+  no_lvl: "<b>❌ <b>Noto'g'ri log darajasi {lvl} ({name})</b>"
+  logs: "<b>📤 {lvl} ({name}) darajasidagi jurnallar</b>"
+  wprefix: "<b>❔ Qaysi prefixni o'zgartirmoqchisiz?</b>"
+  prefix: "<b>✅ Prefix {prefixes} ga o'zgartirildi</b>"
+  wlang: "<b>❔ Qaysi tilni o'zgartirmoqchisiz?</b>"
+  elang: "<b>❌ Til topilmadi. Mavjud tillar: {langs}</b>"
+  lang: "<b>✅ Tilga o'zgartirildi </b><code>{language}</code>"
+  walias: "<b>❔ Qaysi aliasni qo'shmoqchisiz?</b>"
+  ealias: "<b>❌ Ko'rsatilgan argumentlar noto'g'ri. To'g'ri: addalias <yangi alias> <buyruq></b>"
+  nalias: "<b>❌ Bunday alias allaqachon mavjud</b>"
+  calias: "<b>❌ Bunday buyruq yo'q</b>"
+  alias: "<b>✅ <code>{cmd}</code> buyruqi uchun <code>{alias}</code> aliasi qo'shildi</b>"
+  dwalias: "<b>❔ Qaysi aliasni o'chirmoqchisiz?</b>"
+  dealias: "<b>❌ Bunday alias mavjud emas</b>"
+  dalias: "<b>✅ <code>{}</code> aliasi o'chirildi</b>"
+  noalias: "<b>Aliaslar mavjud emas</b>"
+  allalias: "<b>🗄 Barcha aliaslar:</b>\n"
+  ping: "<b>Telegram javob vaqti</b>"
+  uptime: "<b>Ish vaqti</b>"
+  noreply: "<b>❌ Siz javobni ko'rsatmadingiz</b>"
+  yourself: "<b>❌ Siz o'zingizni ko'rsatolmaysiz</b>"
+  owner: "<b>❌ Buyruq faqat egasi tomonidan ruxsat etiladi</b>"
+  adduser: "<b>✔ Siz muvaffaqiyatli foydalanuvchini qo'shdingiz</b>"
+  deluser: "<b>✔ Siz muvaffaqiyatli foydalanuvchini o'chirdingiz</b>"
+  nouser: "<b>❔ Foydalanuvchilar topilmadi</b>"
+  user: "<b>Foydalanuvchilar:</b>"
+  chbot: "<b>✔ Siz muvaffaqiyatli inline botni o'zgartirdingiz!\nO'zgartirish uchun qayta ishlang (<code>{}</code>)</b>"
+
+dump:
+  dumped: "Dump yaratildi"
