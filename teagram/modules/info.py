@@ -47,32 +47,31 @@ class InfoMod(loader.Module):
         )
         self.bot: BotManager = self.bot
 
-    async def info_inline_handler(self, inline):
+    async def text(self) -> str:
         platform = utils.get_platform()
         uptime = timedelta(seconds=round(time.time() - utils._init_time))
         
         last = utils.git_hash()
         now = str(await bash_exec('git rev-parse HEAD')).strip()
-        version = f'v{__version__}' + (' '+self.strings('update') if last != now else "")
+        version = f'v{__version__}' + (' ' + self.strings('update') if last != now else "")
+        git_version = f'<a href="https://github.com/itzlayz/teagram-tl/commit/{last}">{last[:7]}</a>'
 
-        me = (await self.client.get_me()).username
+        me = self.manager.me.username
 
         default = f"""
-<b>💎 {self.strings('owner')}</b>:  <code>{me}</code>
-<b>🐧 {self.strings('version')}</b>:  <code>{version}</code> (<a href="https://github.com/itzlayz/teagram-tl/commit/{last}">{last[:7]}</a>)
+<b>👑 {self.strings('owner')}</b>:  <code>{me}</code>
+<b>☕ {self.strings('version')}</b>:  <code>{version}</code> ({git_version})
 
-<b>🧠 CPU</b>:  <code>{utils.get_cpu()}%</code>
-<b>📀 RAM</b>:  <code>{utils.get_ram()}MB</code>
+<b>💽 CPU</b>: ~<code>{utils.get_cpu()}%</code>
+<b>🧠 RAM</b>: ~<code>{utils.get_ram()}MB</code>
 
-<b>⌚ {self.strings('uptime')}</b>:  <code>{uptime}</code>
+<b>⏱️ {self.strings('uptime')}</b>:  <code>{uptime}</code>
 <b>📱 {self.strings('version')} telethon: <code>{telethon.__version__}</code></b>
 
 <b>{platform}</b>
 """
-        davatar = 'https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true'
 
         custom = self.config.get('customText')
-        avatar = self.config.get('customImage')
 
         if custom:
             custom = custom.format(
@@ -85,22 +84,21 @@ class InfoMod(loader.Module):
                 tele=telethon.__version__
             )
 
-        await inline.answer(
-            [
-                InlineQueryResultPhoto(
-                    id=utils.random_id(),
-                    title='teagram',
-                    thumb_url=avatar or davatar,
-                    photo_url=avatar or davatar,
-                    caption=default or custom,
-                    reply_markup=InlineKeyboardMarkup().row(
-                        InlineKeyboardButton('❓ Teagram', url='https://t.me/UBteagram'),
-                        InlineKeyboardButton('🤖 Github', url='https://github.com/itzlayz/teagram-tl')
-                    )
-                )
-            ]
-        )
+        return custom or default
     
     async def info_cmd(self, message: Message):
-        """Информация о вашем 🍵teagram."""
-        await self.bot.invoke_unit('info', message)
+        """Some information about userbot"""
+        avatar = self.config.get('customImage')
+        davatar = 'https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true'
+
+        await self.inline.form(
+            message=message,
+            text=(await self.text()),
+            photo=avatar or davatar,
+            reply_markup=[
+                {"text": "🤝 Support chat", 
+                 "url": "https://t.me/UBteagram"},
+                {"text": "🐙 Github", 
+                 "url": "https://github.com/itzlayz/teagram-tl"}
+            ]
+        )

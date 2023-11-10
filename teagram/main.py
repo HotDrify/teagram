@@ -9,12 +9,12 @@
 #                                    🔒 Licensed under the GNU AGPLv3
 #                                 https://www.gnu.org/licenses/agpl-3.0.html
 
-from . import auth, database, loader, __version__
+from . import auth, database, loader, web, utils, __version__
 from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequest
 from telethon.types import ChatAdminRights
 
 from aiogram import Bot
-import os, sys, atexit, time, logging
+import os, sys, time, logging, argparse
 
 logger = logging.getLogger()
 
@@ -47,8 +47,9 @@ class TeagramStreamHandler(logging.StreamHandler):
         super().emit(record)
 
 class Main:
-    def __init__(self) -> None:
-        self.db = database.Database
+    def __init__(self, args) -> None:
+        self.db = database.db
+        self.args = args
 
         fmt = logging.Formatter(
             '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
@@ -127,29 +128,39 @@ class Main:
         except:
             pass
 
-        if (app := auth.Auth(manual=False).app):
-            await app.connect()
-            if not (me := await app.get_me()):
-                if not self.db.get('teagram.loader', 'web_auth', ''):
-                    inpt = 'yes'
-                else:
-                    print("Input y/n")
-                    inpt = input('Use web? (y/n): ')
+        app = auth.Auth(manual=False).app
+        await app.connect()
 
-                    if not inpt:
-                        inpt = 'n'
-                    
-                if inpt.lower() in ['y', 'yes', 'ye']:
-                    self.db.set('teagram.loader', 'web_auth', True)
-                    def restart():
-                        os.execl(sys.executable, sys.executable, "-m", "teagram")
+        if (
+            not getattr(self.args, 'disweb', '') and 
+            not await app.get_me()
+        ):
+            import socket
+            from random import randint
 
-                    atexit.register(restart)
-                    sys.exit(1)
-                else:
-                    me, app = await auth.Auth().authorize()
-                    await app.connect()
+            port = randint(1000, 65535)
+            if 'windows' not in utils.get_platform().lower():
+                while True:
+                    port = randint(1000, 65535)
+                    try:
+                        with socket.socket(
+                            socket.AF_INET, socket.SOCK_STREAM
+                        ) as sock:
+                            sock.bind(("localhost", port))
+
+                        break
+                    except OSError as e:
+                        if e.errno == 98:
+                            continue
+
+            web_config = web.Web(port)
+            await web_config.server.serve()
+            
+            return
         
+        await app.disconnect()
+
+        me, app = await auth.Auth().authorize()
         self.db.init_cloud(app, me)
         await self.db.cloud.get_chat()
         

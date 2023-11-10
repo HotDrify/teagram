@@ -15,7 +15,7 @@ from qrcode.main import QRCode
 
 from . import __version__, database
 
-db = database.Database
+db = database.db
 
 class Auth:
     def __init__(self, session_name: str = "./teagram", manual=True) -> None:
@@ -40,7 +40,6 @@ class Auth:
             api_hash=_hash,
             session=session_name,
             app_version=f"v{__version__}"
-            
         )
 
     def _check_api_tokens(self) -> bool:
@@ -130,6 +129,7 @@ class Auth:
             qr = input("Login by QR-CODE? y/n ").lower().split()
 
             if qr[0] == "y":
+                qr_ = False
                 while True:                    
                     try:
                         qrcode = await self.app.qr_login()
@@ -137,13 +137,17 @@ class Auth:
                         break
                     
                     try:
-                        _qr = await qrcode.wait(30)
-                        if isinstance(_qr, tltypes.User):
-                            break
+                        if qr_:
+                            _qr = await qrcode.wait(15)
+                            if isinstance(_qr, tltypes.User):
+                                break
                     except:
                         pass
 
-                    await qrcode.recreate()
+                    try:
+                        await qrcode.recreate()
+                    except:
+                        break
 
                     print('Settings > Devices > Scan QR Code (or Add device)\n')
                     print('Scan QR code below:' )
@@ -153,6 +157,8 @@ class Auth:
                     qr.clear()
                     qr.add_data(qrcode.url)
                     qr.print_ascii()
+
+                    qr_ = True
                 
                 await self._2fa()
 
