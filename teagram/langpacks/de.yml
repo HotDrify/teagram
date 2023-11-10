@@ -39,7 +39,7 @@ loader:
   cantunload: "❌ <b>Eingebaute Module können nicht entladen werden</b>"
   restarting: "🔄 <b>Neustart...</b>"
   wrongmod: '❌ <b>Sie haben das falsche Modul angegeben</b>'
-  replymod: '⚙ <b>Modul <code>{}</code></b>\n'
+  replymod: '⚙ <b>Modul <code>{}</code></b>'
   replytoload: '📁 <b>Um ein Modul zu installieren, schreiben Sie <code>{}loadmod</code> als Reply auf diese Nachricht</b>'
 
 translator:

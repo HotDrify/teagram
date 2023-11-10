@@ -56,7 +56,7 @@ loader:
   cantunload: "❌ <b>You cannot unload built-in modules</b>"
   restarting: "🔄 <b>Restarting...</b>"
   wrongmod: '❌ <b>You specified the wrong module</b>'
-  replymod: '⚙ <b>Module <code>{}</code></b>\n'
+  replymod: '⚙ <b>Module <code>{}</code></b>'
   replytoload: '📁 <b>To install the module, send <code>{}loadmod</code> as a reply to this message</b>'
 
 translator:

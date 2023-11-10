@@ -357,7 +357,7 @@ class LoaderMod(loader.Module):
             message, 
             f'teagram/modules/{mod[0]}.py',
             document=True,
-            caption=self.strings['replymod'].format(mod[0])
+            caption=self.strings['replymod'].format(mod[0])+'\n'
             +self.strings['replytoload'].format(self.prefix[0])
         )
 
