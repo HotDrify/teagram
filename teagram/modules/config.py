@@ -298,7 +298,7 @@ class ConfigMod(loader.Module):
                         inline_message_id=call.inline_message_id,
                         text=f'❌ <b>{error}\nAttribute keywords:</b> {keywords}',
                         reply_markup=InlineKeyboardMarkup().add(
-                            InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                            InlineKeyboardButton(self.strings('back'), callback_data='send_cfg')
                         )
                     )
                 
@@ -314,9 +314,9 @@ class ConfigMod(loader.Module):
 
                 await self.bot.bot.edit_message_text(
                     inline_message_id=call.inline_message_id,
-                    text='✔ <b>Вы изменили атрибут!</b>' + mark,
+                    text=self.strings("chvalue") + mark,
                     reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton('Вернуться', callback_data='send_cfg')
+                        InlineKeyboardButton(self.strings('back'), callback_data='send_cfg')
                     ),
                     parse_mode='html'
                 )
@@ -332,9 +332,9 @@ class ConfigMod(loader.Module):
                             InlineQueryResultArticle(
                                 id=utils.random_id(),
                                 title="Teagram",
-                                description='Укажите значение',
+                                description=self.strings("specvalue"),
                                 input_message_content=InputTextMessageContent(
-                                    "❌ Вы не указали значение")
+                                    self.strings("errvalue"))
                             )
                         ], cache_time=0
                     )
@@ -349,10 +349,10 @@ class ConfigMod(loader.Module):
                             id=utils.random_id(),
                             title="☕ Teagram",
                             input_message_content=InputTextMessageContent(
-                                "Вы уверены что хотите изменить атрибут?"),
+                                self.strings("sure")),
                             reply_markup=InlineKeyboardMarkup()
-                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
+                            .add(InlineKeyboardButton(self.strings("confirm"), callback_data=f'cfgyes{cmd}|{attr}'))
+                            .add(InlineKeyboardButton(self.strings("decline"), callback_data='send_cfg'))
                         )
                     ], cache_time=0
                 )
@@ -362,10 +362,10 @@ class ConfigMod(loader.Module):
                             id=utils.random_id(),
                             title="☕ Teagram",
                             input_message_content=InputTextMessageContent(
-                                "Вы уверены что хотите изменить атрибут?"),
+                                self.strings("sure")),
                             reply_markup=InlineKeyboardMarkup()
-                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
+                            .add(InlineKeyboardButton(self.strings("confirm"), callback_data=f'cfgyes{cmd}|{attr}'))
+                            .add(InlineKeyboardButton(self.strings("decline"), callback_data='send_cfg'))
                         )
                     ], cache_time=0
                 )

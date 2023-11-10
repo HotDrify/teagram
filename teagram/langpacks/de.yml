@@ -67,6 +67,12 @@ config:
   def: 'Standard'
   nospec: '<b>Nicht angegeben</b>'
   back: '🔄 Zurück'
+  sure: "❔ <b>Sind Sie sicher, dass Sie das Attribut ändern möchten?</b>"
+  confirm: " ✔ Bestätigen"
+  decline: "❌ Abbrechen"
+  specvalue: "Geben Sie einen Wert an"
+  errvalue: "❌ <b>Sie haben keinen Wert angegeben</b>"
+  chvalue: "✔ <b>Sie haben das Attribut geändert!</b>"
 
 updater:
   updating: "🛠 <b>Versuch des Updates...</b>"

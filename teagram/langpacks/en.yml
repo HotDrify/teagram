@@ -82,6 +82,12 @@ config:
   def: 'Default'
   nospec: '<b>Not specified</b>'
   back: 'Back'
+  sure: "❔ <b>Are you sure you want to change the attribute?</b>"
+  confirm: "✔ Confirm"
+  decline: "❌ Cancel"
+  specvalue: "Specify a value"
+  errvalue: "❌ <b>You did not specify a value</b>"
+  chvalue: '✔ <b>You changed the attribute!</b>'
 
 backup:
   docstring: '<b>⌛ Time after which the backup will be made (In seconds)</b>'
