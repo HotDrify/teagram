@@ -27,7 +27,7 @@ def get_token():
     except Exception:
         return False
 
-def get_git_info(commit=False, url=False, branch=False):
+def get_git_info(commit: bool=False, url: bool=False, branch: bool=False):
     repo = REPO
 
     if commit:
@@ -61,12 +61,6 @@ class DumpMod(loader.Module):
         )
 
     def gen(self) -> dict:
-        ver = ""
-        
-        if "windows" in platform.platform():
-            ver = platform.platform()
-        else:
-            ver = f"{distro.name()} {distro.version()}"
 
         return {
             "teagram.token": {
@@ -81,7 +75,7 @@ class DumpMod(loader.Module):
             },
             "teagram.platform": {
                 "platform": utils.get_platform(),
-                "os": ver
+                "os": platform.platform() # 
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
