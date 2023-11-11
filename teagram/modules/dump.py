@@ -1,5 +1,5 @@
 from .. import loader, utils, __version__
-from ..utils import BASE_PATH, BASE_DIR
+from ..utils import BASE_PATH, BASE_DIR, get_distro
 from ..types import Config, ConfigValue
 
 import telethon
@@ -61,6 +61,12 @@ class DumpMod(loader.Module):
         )
 
     def gen(self) -> dict:
+        ver = ""
+        
+        if "windows" in platform.platform():
+            ver = platform.platform()
+        else:
+            ver = get_distro()
 
         return {
             "teagram.token": {
@@ -75,7 +81,7 @@ class DumpMod(loader.Module):
             },
             "teagram.platform": {
                 "platform": utils.get_platform(),
-                "os": platform.platform() # 
+                "os": ver
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
