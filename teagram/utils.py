@@ -19,6 +19,8 @@ import yaml
 import time
 import os
 import io
+import re
+import subprocess
 
 from pathlib import Path
 
@@ -677,3 +679,27 @@ def get_langpack() -> Any:
             pack = yaml.safe_load(file)
 
         return pack
+
+def get_distro() -> str:
+    '''
+    Get linux distribution.
+
+    Returns:
+        str: Information about linux distro.
+    '''
+
+    result = subprocess.run(["lsb_release","-a"], capture_output=True, text=True)
+    info = result.stdout
+
+    pattern = r'Description:\s+(.+)'
+    match = re.search(pattern, info)
+    if match:
+        distro = match.group(1)
+        return distro
+    else:  
+        return
+
+
+
+
+
