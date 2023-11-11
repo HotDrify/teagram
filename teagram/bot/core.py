@@ -100,7 +100,7 @@ class BotManager(Events, TokenManager):
                     await conv.send_message("/setinline")
                     await conv.get_response()
 
-                    await conv.send_message(self.bot_username)
+                    await conv.send_message(name)
                     await conv.get_response()
 
                     await conv.send_message("~teagram~ $")
