@@ -10,7 +10,6 @@
 #                                 https://www.gnu.org/licenses/agpl-3.0.html
 
 from . import auth, database, loader, web, utils, __version__
-from .utils import BASE_PATH
 
 from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequest
 from telethon.types import ChatAdminRights
@@ -70,7 +69,6 @@ class Main:
         logging.getLogger('telethon').setLevel(logging.WARNING)
         logging.getLogger('aiohttp').setLevel(logging.WARNING)
         logging.getLogger('aiogram').setLevel(logging.WARNING)
-
 
     async def on_start(self, 
                       bot: Bot, 
