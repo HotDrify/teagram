@@ -94,7 +94,7 @@ class Main:
             except:
                 pass
         except:
-            id = json.loads(str(await bot.get_me()))["id"]
+            id = dict(await bot.get_me())["id"]
             admin = ChatAdminRights(
                 post_messages=True,
                 ban_users=True,
