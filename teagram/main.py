@@ -10,11 +10,13 @@
 #                                 https://www.gnu.org/licenses/agpl-3.0.html
 
 from . import auth, database, loader, web, utils, __version__
+from .utils import BASE_PATH
+
 from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequest
 from telethon.types import ChatAdminRights
 
 from aiogram import Bot
-import os, sys, time, logging, argparse
+import os, sys, time, logging, argparse, json
 
 logger = logging.getLogger()
 
@@ -47,6 +49,8 @@ class TeagramStreamHandler(logging.StreamHandler):
         super().emit(record)
 
 class Main:
+    
+    
     def __init__(self, args) -> None:
         self.db = database.db
         self.args = args
@@ -67,10 +71,12 @@ class Main:
         logging.getLogger('aiohttp').setLevel(logging.WARNING)
         logging.getLogger('aiogram').setLevel(logging.WARNING)
 
+
     async def on_start(self, 
                       bot: Bot, 
                       db: database.Database, 
                       prefix: str, app):
+
         try:
             await bot.send_message(
                 db.cloud.input_chat,
@@ -90,7 +96,7 @@ class Main:
             except:
                 pass
         except:
-            id = await bot.me.id
+            id = json.loads(str(await bot.get_me()))["id"]
             admin = ChatAdminRights(
                 post_messages=True,
                 ban_users=True,
