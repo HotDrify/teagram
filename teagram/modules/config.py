@@ -284,23 +284,24 @@ class ConfigMod(loader.Module):
                 validator = data['modcfg'].config.get(attr[1]).validator
 
                 mark = ''
-                try:
-                    if validator:
-                        validator._valid(data['toset'], **validator.type.keywords)
-                    else:
-                        mark += "\n⚠ <i>No validator</i>"
-                except Exception as error:
-                    keywords = ""
-                    for k, v in validator.type.keywords.items():
-                        keywords += f"\n{k}: {v}"
+                if getattr(validator.type, 'keywords', ''):
+                    try:
+                        if validator:
+                            validator._valid(data['toset'], **validator.type.keywords)
+                        else:
+                            mark += "\n⚠ <i>No validator</i>"
+                    except Exception as error:
+                        keywords = ""
+                        for k, v in validator.type.keywords.items():
+                            keywords += f"\n{k}: {v}"
 
-                    return await self.bot.bot.edit_message_text(
-                        inline_message_id=call.inline_message_id,
-                        text=f'❌ <b>{error}\nAttribute keywords:</b> {keywords}',
-                        reply_markup=InlineKeyboardMarkup().add(
-                            InlineKeyboardButton(self.strings('back'), callback_data='send_cfg')
+                        return await self.bot.bot.edit_message_text(
+                            inline_message_id=call.inline_message_id,
+                            text=f'❌ <b>{error}\nAttribute keywords:</b> {keywords}',
+                            reply_markup=InlineKeyboardMarkup().add(
+                                InlineKeyboardButton(self.strings('back'), callback_data='send_cfg')
+                            )
                         )
-                    )
                 
                 data['cfg'][attr[1]] = utils.validate(data['toset'])
                 data['modcfg'][attr[1]] = utils.validate(data['toset'])

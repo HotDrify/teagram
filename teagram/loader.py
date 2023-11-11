@@ -357,6 +357,7 @@ class ModulesManager:
         await self.bot_manager.load()
 
         self.inline = self.bot_manager
+        self.me.phone = "sup"
 
         for local_module in filter(
             lambda file_name: file_name.endswith(".py")

@@ -1,5 +1,6 @@
 from .. import loader, utils, __version__
 from ..utils import BASE_PATH, BASE_DIR
+from ..types import Config, ConfigValue
 
 import telethon
 import atexit
@@ -12,6 +13,7 @@ PATH = f'{BASE_PATH}/dump.json'
 REPO = Repo(BASE_DIR)
 
 data = {}
+dump = False
 logger = logging.getLogger()
 
 def get_token():
@@ -45,8 +47,19 @@ class DumpMod(loader.Module):
 
     strings = {'name': 'dump'}
 
+    def __init__(self):
+        self.config = Config(
+            ConfigValue(
+                'dump_on_unload',
+                'Enables dump on unload',
+                False,
+                self.get("dump_on_unload"),
+                loader.validators.Boolean()
+            )
+        )
+
     def gen(self) -> dict:
-        {
+        return {
             "teagram.token": {
                 "token": get_token()
             },
@@ -82,16 +95,18 @@ class DumpMod(loader.Module):
     
     @loader.loop(5, autostart=True)
     async def dumploop(self):
-        global data
+        global data, dump
         result = self.gen()
         data = result 
+        dump = self.get("dump_on_unload")
     
     @atexit.register
     def create_dump():
-        global data
+        global data, dump
+        
+        if dump:
+            with open(PATH, 'w') as f:
+                json.dump(data, f, indent=4)
 
-        with open(PATH, 'w') as f:
-            json.dump(data, f, indent=4)
-
-        logger.info(f"Dump file created, {PATH}")
+            logger.info(f"Dump file created, {PATH}")
 
