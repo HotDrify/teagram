@@ -6,6 +6,8 @@ import telethon
 import atexit
 import logging
 import json
+import distro
+import platform
 
 from git import Repo
 
@@ -59,6 +61,13 @@ class DumpMod(loader.Module):
         )
 
     def gen(self) -> dict:
+        ver = ""
+        
+        if "windows" in platform.platform():
+            ver = platform.platform()
+        else:
+            ver = f"{distro.name()} {distro.version()}"
+
         return {
             "teagram.token": {
                 "token": get_token()
@@ -71,7 +80,8 @@ class DumpMod(loader.Module):
                 "telethon": telethon.__version__
             },
             "teagram.platform": {
-                "platform": utils.get_platform()
+                "platform": utils.get_platform(),
+                "os": cmd
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
