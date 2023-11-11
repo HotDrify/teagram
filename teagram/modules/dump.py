@@ -81,7 +81,7 @@ class DumpMod(loader.Module):
             },
             "teagram.platform": {
                 "platform": utils.get_platform(),
-                "os": cmd
+                "os": ver
             },
             "teagram.git": {
                 "url": get_git_info(url=True),
