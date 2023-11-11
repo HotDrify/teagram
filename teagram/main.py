@@ -90,7 +90,7 @@ class Main:
             except:
                 pass
         except:
-            id = bot.me.id
+            id = await bot.me.id
             admin = ChatAdminRights(
                 post_messages=True,
                 ban_users=True,
