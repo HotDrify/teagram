@@ -1,6 +1,7 @@
 import configparser
 import logging
 import sys
+import platform
 
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
@@ -39,6 +40,7 @@ class Auth:
             api_id=_id,
             api_hash=_hash,
             session=session_name,
+            device_model="Teagram Userbot",
             app_version=f"v{__version__}"
         )
 
