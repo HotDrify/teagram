@@ -23,7 +23,7 @@ def get_token():
     try:
         if json_data["teagram.bot"]["token"]:
             return True
-    except Exception:
+    except KeyError:
         return False
 
 def get_git_info(commit: bool=False, url: bool=False, branch: bool=False):
