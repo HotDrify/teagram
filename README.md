@@ -24,4 +24,6 @@ You can install it via scripts like <a href="https://github.com/itzlayz/teagram-
     <li>Login via website</li>
     <li>Inline bot</li>
     <li>Translations</li>
+    <li>Actual userbot with latest api version</li>
+    <li>Compatible with hikka modules</li>
 </ul>
