@@ -13,8 +13,10 @@ User bot allows you to create modules that do not require much knowledge
 > Needs python 3.9+
 
 You can install it via scripts like <a href="https://github.com/itzlayz/teagram-tl/blob/main/main.sh">main.sh</a> or manual: <br>
-<code>apt update && apt upgrade -y && apt install -y openssl git python3 python3-pip</code><br>
-<code>git clone https://github.com/itzlayz/teagram-tl && cd teagram-tl && pip install -r requirements.txt && python3 -m teagram</code>
+```bash
+apt update && apt upgrade -y && apt install -y openssl git python3 python3-pip
+git clone https://github.com/itzlayz/teagram-tl && cd teagram-tl && pip install -r requirements.txt && python3 -m teagram
+```
 
 <h1>✨ Advantages:</h1>
 <ul>
