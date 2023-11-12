@@ -1,7 +1,6 @@
 import configparser
 import logging
 import sys
-import platform
 
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
