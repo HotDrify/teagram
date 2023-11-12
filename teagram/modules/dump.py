@@ -6,7 +6,6 @@ import telethon
 import atexit
 import logging
 import json
-import distro
 import platform
 
 from git import Repo
