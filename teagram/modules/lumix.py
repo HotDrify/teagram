@@ -5,16 +5,20 @@ from .. import loader, utils
 class LumixMod(loader.Module):
     strings = {
         "name": "Lumix",
+        "searching": "🔎 <b>Searching module</b>",
         "installed": "✅ <b>Module successfully loaded</b>\n",
         "not_found": "❌ <b>Module not found</b>",
+        "installing": "📥 <b>Installing module</b>"
     }
     strings_ru = {
         "name": "Lumix",
+        "searching": "🔎 <b>Поиск модуля</b>",
         "installed": "✅ <b>Модуль успешно установлен</b>\n",
         "not_found": "❌ <b>Модуль не найден</b>",
+        "installing": "📥 <b>Устанавливаем модуль</b>"
     }
     def __init__(self):
-        self.api = "http://teagram.ddns.net:5810"
+        self.api = "http://lumix.myddns.me:5810"
 
     def prep_docs(self, module: str) -> str:
         module = self.lookup(module)
@@ -26,7 +30,18 @@ class LumixMod(loader.Module):
 
     @loader.command()
     async def lumix(self, message, args: str):
+        if not args:
+            return await utils.answer(
+                message,
+                self.strings("not_found")
+            )
+        
         data = {"module": args.split()[0]}
+
+        await utils.answer(
+            message,
+            self.strings("searching")
+        )
         async with aiohttp.ClientSession(trust_env=True) as session:
             async with session.get(
                 f"{self.api}/search", 
@@ -43,6 +58,11 @@ class LumixMod(loader.Module):
                 message,
                 self.strings("not_found")
             )
+        
+        await utils.answer(
+            message,
+            self.strings("installing")
+        )
         
         name = await self.manager.load_module(text)
         await utils.answer(
