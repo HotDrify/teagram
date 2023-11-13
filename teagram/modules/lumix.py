@@ -10,8 +10,8 @@ class LumixMod(loader.Module):
     }
     strings_ru = {
         "name": "Lumix",
-        "installed": "✅ <b>Module found</b>\n",
-        "not_found": "❌ <b>Module not found</b>",
+        "installed": "✅ <b>Модуль успешно установлен</b>\n",
+        "not_found": "❌ <b>Модуль не найден</b>",
     }
     def __init__(self):
         self.api = "http://teagram.ddns.net:5810"

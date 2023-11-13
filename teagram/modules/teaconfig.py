@@ -51,13 +51,15 @@ class TeaConfigMod(loader.Module):
         config = module.config
 
         config[option] = value
+        config.config[option].value = value
+
         module.set(option, value)
     
         markup = [
             {
                 "text": self.strings("back"), 
                 "callback": self.configure,
-                "args": (module)
+                "args": (module.name)
             },
             {
                 "text": self.strings("close"),
@@ -76,17 +78,19 @@ class TeaConfigMod(loader.Module):
         module: str,
         option: str
     ):
-        module = self.lookup(module)
+        module = self.lookup(module.lower())
         config = module.config
         value = config.get_default(option)
 
         config[option] = value
+        config.config[option].value = value
+
         module.set(option, value)
         markup = [
             {
                 "text": self.strings("back"), 
                 "callback": self.configure,
-                "args": (module)
+                "args": (module.name)
             },
             {
                 "text": self.strings("close"),
@@ -95,7 +99,7 @@ class TeaConfigMod(loader.Module):
         ]
 
         await call.edit(
-            self.strings("edited_default_value").format(option),
+            self.strings("edit_default_value"),
             self.inline._generate_markup(markup)
         )
         
@@ -108,7 +112,7 @@ class TeaConfigMod(loader.Module):
 
         option = self._id['option']
         module = self._id['module']
-        value = call.query.replace('set_value ', '')
+        value = utils.validate(call.query.replace('set_value ', ''))
 
         module = self.lookup(module)
         config = module.config
@@ -153,9 +157,8 @@ class TeaConfigMod(loader.Module):
                                 "text": self.strings("change"),
                                 "callback": self.change,
                                 "args": (self._id['module'], option, value)
-                            },
-                            markup
-                        ]
+                            }
+                        ] + [markup]
                     )
                 )
             ]
@@ -192,12 +195,13 @@ class TeaConfigMod(loader.Module):
         call: InlineCall, 
         module: str
     ):
+        print(module)
         markup = [
             {
                 'text': option,
                 'callback': self.configure_value,
                 'args': (module, option)
-            } for option in self.lookup(module.lower()).config
+            } for option in self.lookup(module).config
         ] + [
             [
                 {
@@ -234,10 +238,17 @@ class TeaConfigMod(loader.Module):
         self._id = {"id": _id, "module": module.lower(), "option": option}
         
         markup = [
-            {
-                "text": self.strings("change"),
-                "input": "set_value"
-            },
+            [
+                {
+                    "text": self.strings("change"),
+                    "input": "set_value"
+                },
+                {
+                    "text": self.strings("default"),
+                    "callback": self.set_default_value,
+                    "args": (module, option)
+                },
+            ],
             [
                 {
                     "text": self.strings("back"), 
@@ -269,7 +280,12 @@ class TeaConfigMod(loader.Module):
         await call.edit(
             text=self.strings("choose_module"),
             reply_markup=self.inline._generate_markup(
-                utils.sublist(
+                [
+                    {
+                        "text": self.strings("close"),
+                        "callback": self.close
+                    }
+                ] + utils.sublist(
                     [
                         {
                             "text": module.name.title(), 

@@ -30,17 +30,12 @@ class UpdateMod(loader.Module):
     strings = {'name': 'updater'}
 
     def __init__(self):
-        value = self.db.get('Updater', 'sendOnUpdate')
-
-        if value is None:
-            value = True
-
         self.config = Config(
             ConfigValue(
                 option='sendOnUpdate',
                 doc='Оповещать об обновлении',
                 default=True,
-                value=value,
+                value=self.get("sendOnUpdate"),
                 validator=validators.Boolean()
             )
         )

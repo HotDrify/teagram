@@ -185,8 +185,7 @@ def strtobool(val):
         raise ValueError("invalid truth value %r" % (val,))
     
 def validate(attribute):
-    """Делает валидацию типа из строки (в int, bool)
-        Validation type from string (in int, bool)"""
+    """Validation type from string (in int, bool)"""
     if isinstance(attribute, str):
         try:
             attribute = int(attribute)
