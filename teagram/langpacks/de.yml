@@ -96,7 +96,7 @@ backup:
 settings:
   flushed: "<b>✅ Logs geleert</b>"
   no_logs: "<b>❌ Sie haben das Level nicht angegeben oder ein falsches Level angegeben:</b>\n"
-  no_lvl: "<b>❌ Falsches Level {lvl} ({name})</b>"
+  no_lvl: "<b>❌ Falsches Level {lvl} ({name})</b>\n"
   logs: "<b>📤 Logs mit Level {lvl} ({name})</b>"
   wprefix: "<b>❔ Welchen Präfix soll ich setzen?</b>"
   prefix: "<b>✅ Präfix wurde auf {prefixes} gesetzt</b>"

@@ -97,7 +97,7 @@ backup:
 settings:
   flushed: "<b>✅ Jurnallar tozalandi</b>"
   no_logs: "<b>❌ <b>Siz darajasini ko'rsatmadingiz yoki noto'g'ri log darajasini ko'rsatdingiz:</b>\n"
-  no_lvl: "<b>❌ <b>Noto'g'ri log darajasi {lvl} ({name})</b>"
+  no_lvl: "<b>❌ <b>Noto'g'ri log darajasi {lvl} ({name})</b>\n"
   logs: "<b>📤 {lvl} ({name}) darajasidagi jurnallar</b>"
   wprefix: "<b>❔ Qaysi prefixni o'zgartirmoqchisiz?</b>"
   prefix: "<b>✅ Prefix {prefixes} ga o'zgartirildi</b>"
