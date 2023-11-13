@@ -35,10 +35,6 @@ class TeaConfigMod(loader.Module):
         text = ", ".join(f'<b>{key[0]}</b> - <code>{key[1]}</code>' for key in keys)
 
         return f"🔎 {text}"
-
-    async def close(self, call: InlineCall):
-        self._id = {}
-        await call.delete()
     
     async def change(
         self, 
@@ -60,10 +56,6 @@ class TeaConfigMod(loader.Module):
                 "text": self.strings("back"), 
                 "callback": self.configure,
                 "args": (module.name)
-            },
-            {
-                "text": self.strings("close"),
-                "callback": self.close
             }
         ]
 
@@ -91,10 +83,6 @@ class TeaConfigMod(loader.Module):
                 "text": self.strings("back"), 
                 "callback": self.configure,
                 "args": (module.name)
-            },
-            {
-                "text": self.strings("close"),
-                "callback": self.close
             }
         ]
 
@@ -121,10 +109,6 @@ class TeaConfigMod(loader.Module):
                 "text": self.strings("back"), 
                 "callback": self.configure,
                 "args": (module)
-            },
-            {
-                "text": self.strings("close"),
-                "callback": self.close
             }
         ]
 
@@ -176,11 +160,6 @@ class TeaConfigMod(loader.Module):
             } 
             for module in self.manager.modules
             if getattr(self.lookup(module.name), 'config', '')
-        ] + [
-            {
-                "text": self.strings("close"),
-                "callback": self.close
-            }
         ]
 
         await call.edit(
@@ -195,7 +174,6 @@ class TeaConfigMod(loader.Module):
         call: InlineCall, 
         module: str
     ):
-        print(module)
         markup = [
             {
                 'text': option,
@@ -207,10 +185,6 @@ class TeaConfigMod(loader.Module):
                 {
                     "text": self.strings("back"), 
                     "callback": self.back_modules
-                },
-                {
-                    "text": self.strings("close"),
-                    "callback": self.close
                 }
             ]
         ]
@@ -254,10 +228,6 @@ class TeaConfigMod(loader.Module):
                     "text": self.strings("back"), 
                     "callback": self.configure,
                     "args": (module)
-                },
-                {
-                    "text": self.strings("close"),
-                    "callback": self.close
                 }
             ]
         ]
@@ -280,12 +250,7 @@ class TeaConfigMod(loader.Module):
         await call.edit(
             text=self.strings("choose_module"),
             reply_markup=self.inline._generate_markup(
-                [
-                    {
-                        "text": self.strings("close"),
-                        "callback": self.close
-                    }
-                ] + utils.sublist(
+                utils.sublist(
                     [
                         {
                             "text": module.name.title(), 
