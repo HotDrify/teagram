@@ -30,14 +30,10 @@ def get_git_info(commit: bool=False, url: bool=False, branch: bool=False):
     repo = REPO
 
     if commit:
-        commit = repo.commit()
-        return commit
-    
+        return repo.commit()
     if url:
         origin = repo.remotes.origin
-        origin_url = origin.url
-        return origin_url
-    
+        return origin.url
     if branch:
         return repo.active_branch.name
     
