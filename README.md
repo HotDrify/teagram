@@ -1,7 +1,7 @@
 <p align="center">
+    
     [![Teagram](https://github.com/MuRuLOSE/teagram-assets/raw/main/teagram_banner2v1.png)](tg://resolve?domain=UBteagram)
-
-    [![eagram](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=Teagram+Userbot)](https://t.me/UBteagram)
+    
 </p>
 
 <p align="center">
