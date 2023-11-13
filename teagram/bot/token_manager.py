@@ -1,15 +1,17 @@
 import logging
+import asyncio
 import time
 import sys
 import re
 from typing import Union
 
-from loguru import logger
 from telethon import errors
 from telethon.tl.functions.contacts import UnblockRequest
 
 from .. import utils
 from .types import Item
+
+logger = logging.getLogger()
 
 class TokenManager(Item):
     """
@@ -24,7 +26,7 @@ class TokenManager(Item):
         Returns:
             Union[str, None]: The bot token or None on failure.
         """
-        logging.info("Starting the process of creating a new bot...")
+        logger.info("Starting the process of creating a new bot...")
 
         async with self._app.conversation('@BotFather') as conv:
             try:
@@ -47,15 +49,15 @@ class TokenManager(Item):
                 elif '20 bots' in response.text:
                     logger.error("You have 20 bots, please delete one of your bots to continue")
                 else:
-                    logging.error("An error occurred while creating the bot. @BotFather's response:")
-                    logging.error(response.text)
+                    logger.error("An error occurred while creating the bot. @BotFather's response:")
+                    logger.error(response.text)
 
                 return sys.exit(0)
 
 
             await conv.send_message(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
             await conv.get_response()
-
+            
             bot_username = f"teagram_{utils.random_id(6)}_bot"
 
             await conv.send_message(bot_username)
@@ -68,29 +70,34 @@ class TokenManager(Item):
                 r"\d{1,}:[0-9a-zA-Z_-]{35}",
                 response.text
             )):
-                logging.error("An error occurred while creating the bot. @BotFather's response:")
-                return logging.error(response.text)
+                logger.error("An error occurred while creating the bot. @BotFather's response:")
+                return logger.error(response.text)
 
             token = search.group(0)
+
             await conv.send_message("/setuserpic")
             await conv.get_response()
 
             await conv.send_message(f"@{bot_username}")
             await conv.get_response()
 
-            await conv.send_message_media("assets/bot_avatar.png", media_type="photo")
+            await conv.send_file("assets/teagram_bot.png")
             await conv.get_response()
+            
+            for message in [
+                "/setinline",
+                f"@{bot_username}",
+                "teagram-command",
+                "/setinlinefeedback",
+                f"@{bot_username}",
+                "Enabled"
+            ]:
+                await conv.send_message(message)
+                await conv.get_response()
 
-            await conv.send_message("/setinline")
-            await conv.get_response()
+                await asyncio.sleep(1)
 
-            await conv.send_message(f"@{bot_username}")
-            await conv.get_response()
-
-            await conv.send_message("teagram-command")
-            await conv.get_response()
-
-            logger.success("Bot created successfully")
+            logger.info("Bot created successfully")
             return token
 
     async def _revoke_token(self) -> str:
@@ -112,7 +119,7 @@ class TokenManager(Item):
             response = await conv.get_response()
 
             if "/newbot" in response.text:
-                return logging.error("No created bots")
+                return logger.error("No created bots")
 
             if not response.reply_markup:
                 logger.warning('reply_markup not found')
@@ -121,7 +128,7 @@ class TokenManager(Item):
 
             if not getattr(response.reply_markup, 'rows', None):
                 logger.warning('Retrying (CTRL + Z/C to stop)')
-                self._revoke_token()
+                await self._revoke_token()
 
             found = False
             for row in response.reply_markup.rows:

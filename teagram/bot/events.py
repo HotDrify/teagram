@@ -2,11 +2,11 @@ import logging
 import inspect
 import traceback
 from aiogram.types import (
-    CallbackQuery, Message, InlineKeyboardButton,
-    InlineKeyboardMarkup, InlineQuery, InlineQueryResultArticle, 
-    InputTextMessageContent, InlineQueryResultPhoto, InlineQueryResultDocument)
-
-from .types import Item
+    CallbackQuery, Message, InlineQuery, InlineQueryResultArticle, InlineQueryResultGif,
+    InputTextMessageContent, InlineQueryResultPhoto, InlineQueryResultDocument,
+    InputMediaPhoto, InputMediaAnimation, InputMediaDocument, ChosenInlineResult,
+    InputFile)
+from .types import Item, InlineCall
 from .. import utils
 
 class Events(Item):
@@ -16,7 +16,9 @@ class Events(Item):
     """
     def __init__(self):
         super().__init__()
+
         self._units: dict
+        self.callback_units: dict
 
     async def _message_handler(self, message: Message) -> Message:
         """
@@ -32,10 +34,16 @@ class Events(Item):
         """
         if message.text == '/start':
             return await message.reply_photo(
-                photo='https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true',
-                caption='☕ Добро пожаловать! Это инлайн бот <b>Teagram</b>\n'
-                '✒ Предлагаем вам настроить конфиг\n'
-                '✒ Используйте инлайн команду <b>префикс</b><code>config</code>',
+                photo=InputFile('assets/teagram_banner.png'),
+                caption=self._manager.strings['inline_hello'],
+                reply_markup=self._generate_markup(
+                    [
+                        {
+                            "text": "🐙 Github",
+                            "url": "https://github.com/itzlayz/teagram-tl"
+                        }
+                    ]
+                ),
                 parse_mode='html'
             )
 
@@ -62,80 +70,60 @@ class Events(Item):
         Returns:
             CallbackQuery: The processed callback query.
         """
-        if call.from_user.id != (await self._app.get_me()).id:
-            await call.answer(
-                "❌ Вы не владелец",
-                cache_time=0
-            )
-
-        if call.data.startswith('cfg'):
-            if (attr := call.data.replace('cfgyes', '')):
-                attr = attr.split('|')
-                data = self.cfg[attr[0]]
-                data['cfg'][attr[1]] = utils.validate(data['toset'])
-
-                self._db.set(
-                    data['mod'].name,
-                    attr[1],
-                    utils.validate(data['toset'])
-                )
-
-                await self.bot.edit_message_text(
-                    inline_message_id=call.inline_message_id,
-                    text='✔ Вы изменили атрибут!',
-                    reply_markup=InlineKeyboardMarkup().add(
-                        InlineKeyboardButton('Вернуться', callback_data='send_cfg')
-                    )
-                )
-
+        if call.from_user.id != self._manager.me.id:
+           return
+        
+        call = InlineCall(call, self)
         try:
-            if call.data == 'teagram_perm_delete':
-                call.data = '_loader_permdel'
-
-            if (unit := self._units[call.data]):
-                if unit.get('callback'):
-                    if (
-                        self._units.get('_loader_permdel', '') 
-                        and 'teagram_perm_delete' in str(unit)
-                    ):
-                        self._units.pop(call.data)
-                        from os import rmdir, remove
-
-                        try:
-                            remove(utils.BASE_PATH / 'config.ini')
-                            remove(utils.BASE_PATH / 'db.json')
-
-                            try:
-                                rmdir(utils.BASE_PATH / 'teagram')
-                            except:
-                                pass
-
-                            await call.answer('✔ Успешно...', True)
-                        except PermissionError:
-                            await call.answer('⚠ Недостаточно прав', True)
-                        except FileNotFoundError:
-                            await call.answer('⚠ Не удалось найти папку, удаляем сессию', True)
-                        except:
-                            await call.answer('⚠ Неизвестная ошибка, удаляем сессию', True)
-
-                        await self._app.log_out()
-                        return
-
+            if (func := self._units[call.data]):
+                if func.get('callback'):
                     try:
-                        await unit.callback(call)
+                        await func.callback(call)
                     except Exception as error:
                         logging.exception(error)
         except KeyError:
             pass
+        
+        try:
+            if (func := self._manager.callback_handlers[call.data]):
+                args = self.callback_units[call.data]
+                try:
+                    if args:
+                        if isinstance(args, (list, tuple)):
+                            await func(call, *args)
+                        else:
+                            await func(call, args)
+                    else:
+                        if len(inspect.getfullargspec(
+                            func
+                        ).args) == 2:
+                            await func(call)
+                except Exception as error:
+                    logging.exception(error)
 
-        for func in self._manager.callback_handlers.values():
-            if not await self._check_filters(func, func.__self__, call):
-                continue
+            return call
+        except KeyError:
+            pass
+        except:
+            traceback.print_exc()
 
-            try:
-                await func(call)
-            except Exception as error:
-                logging.exception(error)
+        try:
+            for key, func in self._manager.callback_handlers.items():
+                if not await self._check_filters(func, func.__self__, call):
+                    continue
+
+                try:
+                    if len(inspect.getfullargspec(func).args) == 2: 
+                        await func(call)
+                    else:
+                        if (
+                            args := self.callback_units.get(key, ())
+                        ):
+                            await func(call, args)
+                except Exception as error:
+                    logging.exception(error)
+        except RuntimeError:
+            pass
 
         return call
 
@@ -151,24 +139,24 @@ class Events(Item):
         Returns:
             InlineQuery: The processed inline query.
         """
-        if inline_query.from_user.id != (await self._app.get_me()).id:
-            await inline_query.answer(
-                    [
-                        InlineQueryResultArticle(
-                            id=utils.random_id(),
-                            title="Teagram",
-                            description='Вы не владелец',
-                            input_message_content=InputTextMessageContent(
-                                "❌ Вы не владелец")
-                        )
-                    ], cache_time=0
-                )
+        query = inline_query.query
+        query_ = query.split()
 
-        if not (query := inline_query.query):
+        cmd = query_[0]
+        args = " ".join(query_[1:])
+        inline_query.args = args
+
+        func = self._manager.inline_handlers.get(cmd)
+        if func:
+            if not await self._check_filters(func, func.__self__, inline_query):
+                return
+            
+        if not query_:
             commands = ""
             for command, func in self._manager.inline_handlers.items():
-                if await self._check_filters(func, func.__self__, inline_query):
-                    commands += f"\n💬 <code>@{(await self.bot.me).username} {command}</code>"
+                if func:
+                    if await self._check_filters(func, func.__self__, inline_query):
+                        commands += f"\n💬 <code>@{self.bot_username} {command}</code>"
 
             message = InputTextMessageContent(
                 f"👇 <b>Available Commands</b>\n"
@@ -185,18 +173,73 @@ class Events(Item):
                 ], cache_time=0
             )
 
-
-        query_ = query.split()
-
-        cmd = query_[0]
-        args = " ".join(query_[1:])
-
         try:
             form = self._units[query]
             text = form.get('text')
-            keyboard = form.get('keyboard')
-
-            if not form['photo'] and not form['doc']:
+            keyboard = None
+            
+            if isinstance(form['keyboard'], list):
+                keyboard = self._generate_markup(form['keyboard'])
+            elif isinstance(form['reply_markup'], list):
+                keyboard = self._generate_markup(form['reply_markup'])
+                
+            if form['photo']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultPhoto(
+                            id=utils.random_id(),
+                            title=form.get('title'),
+                            description=form.get('description'),
+                            input_message_content=InputMediaPhoto(
+                                form['photo'],
+                                form.get('caption', text),
+                                'HTML'
+                            ),
+                            caption=form.get('caption', text),
+                            reply_markup=keyboard,
+                            photo_url=form['photo'],
+                            thumb_url=form['photo']
+                        )
+                    ]
+                )
+            elif form['gif']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultGif(
+                            id=utils.random_id(20),
+                            title=form.get("title"),
+                            caption=form.get('caption', text),
+                            parse_mode="HTML",
+                            thumb_url=form.get("thumb", form["gif"]),
+                            gif_url=form["gif"],
+                            reply_markup=keyboard,
+                            input_message_content=InputMediaAnimation(
+                                form['gif'],
+                                form.get('caption', text),
+                                'HTML'
+                            ),
+                        ),
+                    ]
+                )
+            elif form['doc']:
+                await inline_query.answer(
+                    [
+                        InlineQueryResultDocument(
+                            id=utils.random_id(),
+                            title=form.get('title'),
+                            description=form.get('description'),
+                            input_message_content=InputMediaDocument(
+                                form['doc'],
+                                caption=form.get('caption', text),
+                                parse_mode='HTML'
+                            ),
+                            reply_markup=keyboard,
+                            document_url=form['doc'],
+                            caption=form.get('caption', text)
+                        )
+                    ]
+                )
+            else:
                 await inline_query.answer(
                     [
                         InlineQueryResultArticle(
@@ -212,95 +255,12 @@ class Events(Item):
                         )
                     ]
                 )
-            elif form['photo']:
-                await inline_query.answer(
-                    [
-                        InlineQueryResultPhoto(
-                            id=utils.random_id(),
-                            title=form.get('title'),
-                            description=form.get('description'),
-                            input_message_content=InputTextMessageContent(
-                                text,
-                                parse_mode='HTML',
-                                disable_web_page_preview=True
-                            ),
-                            reply_markup=keyboard,
-                            photo_url=form['photo'],
-                            thumb_url=form['photo']
-                        )
-                    ]
-                )
-            else:
-                await inline_query.answer(
-                    [
-                        InlineQueryResultDocument(
-                            id=utils.random_id(),
-                            title=form.get('title'),
-                            description=form.get('description'),
-                            input_message_content=InputTextMessageContent(
-                                text,
-                                parse_mode='HTML',
-                                disable_web_page_preview=True
-                            ),
-                            reply_markup=keyboard,
-                            document_url=form['doc']
-                        )
-                    ]
-                )
+            return
         except KeyError:
             pass
         except Exception as error:
             traceback.print_exc()
-
-        try:    
-            if (data := self.cfg[cmd]):
-                if not args:
-                    return await inline_query.answer(
-                        [
-                            InlineQueryResultArticle(
-                                id=utils.random_id(),
-                                title="Teagram",
-                                description='Укажите значение',
-                                input_message_content=InputTextMessageContent(
-                                    "❌ Вы не указали значение")
-                            )
-                        ], cache_time=0
-                    )
-                attr = data['attr']
-                data['toset'] = args
-                attr = data['attr']
-                data['toset'] = args
-
-                await inline_query.answer(
-                    [
-                        InlineQueryResultArticle(
-                            id=utils.random_id(),
-                            title="☕ Teagram",
-                            input_message_content=InputTextMessageContent(
-                                "Вы уверены что хотите изменить атрибут?"),
-                            reply_markup=InlineKeyboardMarkup()
-                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
-                        )
-                    ], cache_time=0
-                )
-                await inline_query.answer(
-                    [
-                        InlineQueryResultArticle(
-                            id=utils.random_id(),
-                            title="☕ Teagram",
-                            input_message_content=InputTextMessageContent(
-                                "Вы уверены что хотите изменить атрибут?"),
-                            reply_markup=InlineKeyboardMarkup()
-                            .add(InlineKeyboardButton('✔ Подвердить', callback_data=f'cfgyes{cmd}|{attr}'))
-                            .add(InlineKeyboardButton('❌ Отмена', callback_data='send_cfg'))
-                        )
-                    ], cache_time=0
-                )
-        except KeyError:
-            pass
-
-        func = self._manager.inline_handlers.get(cmd)
+        
         if not func:
             return await inline_query.answer(
                 [
@@ -308,13 +268,10 @@ class Events(Item):
                         id=utils.random_id(),
                         title="Error",
                         input_message_content=InputTextMessageContent(
-                            "❌ No such inline command")
+                            "❌ <b>No such inline command</b>")
                     )
                 ], cache_time=0
             )
-
-        if not await self._check_filters(func, func.__self__, inline_query):
-            return
 
         try:
             if (
@@ -328,3 +285,17 @@ class Events(Item):
             logging.exception(error)
 
         return inline_query
+
+    async def _chosen_inline_handler(self, chosen_inline_query: ChosenInlineResult):
+        query = chosen_inline_query.query
+        
+        if (input_handler := self.input_handlers.get(query, '')):
+            try:
+                await input_handler['handler'](
+                    InlineCall(chosen_inline_query, self),
+                    query,
+                    *input_handler.get("args", [])
+                )
+            except Exception:
+                logging.exception("Chosen inline handler error")
+                

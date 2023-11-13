@@ -1,3 +1,14 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 from telethon import types, TelegramClient
 from .. import loader, utils, validators
 from ..types import Config, ConfigValue
@@ -52,10 +63,10 @@ class BackupMod(loader.Module):
         self.config = Config(
             ConfigValue(
                 option='backupInterval',
-                docstring='⌛ Время, по истечении которого будет создана резервная копия (в секундах)',
+                doc='⌛ Время, по истечении которого будет создана резервная копия (в секундах)',
                 default=86400,
                 value=self.db.get('Backuper', 'backupInterval', 86400),
-                validator=validators.Integer(minimum=43200)
+                validator=validators.Integer(minimum=43200, maximum=259200)
             )
         )
 
@@ -63,13 +74,7 @@ class BackupMod(loader.Module):
         if self.config['backupInterval']:
             self.toloop.start()
 
-    @loader.loop(1, autostart=True)
-    async def toloop(self):
-        if not (interval := self.config['backupInterval']):
-            await asyncio.sleep(10)
-
-        await asyncio.sleep(interval)
-
+    async def backup(self):
         self.client: TelegramClient
         backup = await create_backup('./teagram/modules/', '')
 
@@ -87,6 +92,17 @@ class BackupMod(loader.Module):
                 self.strings['error'],
                 parse_mode='html'
             )
+    
+    async def on_unload(self):
+        await self.backup()
+
+    @loader.loop(1, autostart=True)
+    async def toloop(self):
+        if not (interval := self.config['backupInterval']):
+            await asyncio.sleep(10)
+        
+        await asyncio.sleep(interval)
+        await self.backup()
 
     @loader.command('Backup mods')
     async def backupmods(self, message: types.Message):
@@ -96,22 +112,7 @@ class BackupMod(loader.Module):
             self.strings['attempt']
         )
 
-        backup = await create_backup('./teagram/modules/', '')
-
-        if backup[1]:
-            await utils.answer(
-                message,
-                backup[0],
-                document=True,
-                caption=self.strings['done']
-            )
-        else:
-            logger.error(backup[0])
-
-            await utils.answer(
-                message,
-                self.strings['error']
-            )
+        await self.backup()
 
     @loader.command('Backup db')
     async def backupdb(self, message: types.Message):

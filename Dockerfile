@@ -1,5 +1,7 @@
 FROM python:3.10
 ENV DOCKER=true
+ENV GIT_PYTHON_REFRESH=quiet
+
 ADD . /
 RUN if [ "${DOCKERSYSTEM}" = "arch" ]; then \
         pacman -Syu --noconfirm && \
@@ -17,5 +19,5 @@ RUN if [ "${DOCKERSYSTEM}" = "arch" ]; then \
         apt install -y openssl git python3 python3-pip; \
     fi
 
-RUN pip install -r requirements.txt
-CMD python3.10 -m teagram
+RUN pip install --no-warn-script-location -r requirements.txt
+CMD python3.10 -m teagram   

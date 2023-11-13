@@ -1,8 +1,20 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 import time
 import io
 import os
 import logging
 
+from logging import _nameToLevel, _levelToName
 from datetime import timedelta
 from telethon import types, TelegramClient
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -20,27 +32,40 @@ class SettingsMod(loader.Module):
        Userbot's settings"""
 
     strings = {'name': 'settings'}
+    levels = "\n".join(f"<code>{k}</code>: <code>{v}</code>" for k, v in _nameToLevel.items())
 
     async def logs_cmd(self, message: types.Message, args: str):
         """Отправляет логи. Использование: logs <уровень>"""
-        if not args:
-            args = "40"
+        try:
+            args = int(args)
+        except:
+            args = args.strip().upper()
 
-        lvl = int(args)
-
-        if not args or lvl < 0 or lvl > 60:
+        if not args or (
+            (args < 0 or args > 50) if isinstance(args, int)
+            else (_nameToLevel.get(args, '') and _levelToName.get(args, ''))
+        ):
             return await utils.answer(
-                message, self.strings['no_logs'])
+                message, self.strings['no_logs'] + self.levels)
 
         if not getattr(self, '_logger', ''):
             self._logger = log.handlers[0]
 
-        logs = '\n'.join(str(error) for error in self._logger.logs).encode('utf-8')
+        lvl = logging.getLevelName(args)
+        if isinstance(lvl, int):
+            lvl = _levelToName.get(lvl)
 
+        logs = '\n'.join(
+            self._logger.format(log) for log in self._logger.logs[lvl]
+        ).encode('utf-8')
+        
         if not logs:
             return await utils.answer(
-                message, self.strings['no_lvl'].format(lvl=lvl,
-                                                 name=logging.getLevelName(lvl)))
+                message, self.strings['no_lvl'].format(
+                    lvl=lvl,
+                    name=logging.getLevelName(lvl)
+                ) + self.levels
+            )
 
         logs = io.BytesIO(logs)
         logs.name = "teagram.log"
@@ -60,7 +85,14 @@ class SettingsMod(loader.Module):
             self._logger = log.handlers[0]
 
         self._logger.flush()
-        self._logger.logs = []
+        self._logger.logs = {
+            'INFO': [],
+            'WARNING': [],
+            'ERROR': [],
+            'CRITICAL': [],
+            'DEBUG': [],
+            'NOTSET': []
+        }
 
         await utils.answer(message, self.strings['flushed'])
 
@@ -83,14 +115,14 @@ class SettingsMod(loader.Module):
         """Изменить язык. Использование: setlang <язык>"""
         args = args.split()
 
+        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
+        langs = f" (<code>{', '.join(languages)}</code>)"
+
         if not args:
             return await utils.answer(
-                message, self.strings['wlang'])
+                message, self.strings['wlang'] + langs)
 
         language = args[0]
-        languages = list(map(lambda x: x.replace('.yml', ''), os.listdir('teagram/langpacks')))
-
-
 
         if language not in languages:
             langs = ' '.join(languages)
@@ -98,29 +130,7 @@ class SettingsMod(loader.Module):
                 message, self.strings['elang'].format(langs=langs))
 
         self.db.set("teagram.loader", "lang", language)
-
-        pack = utils.get_langpack()
-        setattr(self.manager, 'strings', pack.get('manager'))
-
-        for instance in self.manager.modules:
-            if name := getattr(instance, 'strings', None):
-                stringsname = name.get('name', '').lower()
-                if stringsname in [
-                    'backup',
-                    'config',
-                    'eval',
-                    'help',
-                    'info',
-                    'loader',
-                    'moduleguard',
-                    'settings',
-                    'terminal',
-                    'translator',
-                    'updater'
-                ]:
-                    if _pack := pack.get(stringsname, None):
-                        _pack['name'] = stringsname
-                        setattr(instance, 'strings', pack.get(stringsname))
+        self.manager.translator.load_translation()
 
         return await utils.answer(
             message, self.strings['lang'].format(language=language))
@@ -257,34 +267,6 @@ class SettingsMod(loader.Module):
             message,
             (f'➡ {self.strings["user"]} <code>' + ', '.join(str(user) for user in _users) + '</code>')
               if _users else self.strings['nouser']
-        )
-
-    @loader.command('Deleting teagram')
-    async def uninstall_teagram(self, message: types.Message):
-        manager: bot.BotManager = self.bot
-
-        # TODO:
-        # translation
-
-        keyboard = InlineKeyboardMarkup()
-        keyboard.add(
-            InlineKeyboardButton(
-                '⚠ Подтвердить',
-                callback_data='teagram_perm_delete'
-            ),
-            InlineKeyboardButton(
-                '❌ Отменить',
-                callback_data='no_perm_delete'
-            )
-        )
-
-        await manager.form(
-            title='Delete teagram',
-            description='Delete teagram permanently',
-            text='⚠ <b>Вы уверены что хотите удалить teagram?</b>\n',
-            message=message,
-            reply_markup=keyboard,
-            callback='_loader_permdel'
         )
 
     @loader.command()

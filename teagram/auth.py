@@ -2,8 +2,6 @@ import configparser
 import logging
 import sys
 
-import asyncio
-
 from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
@@ -11,14 +9,21 @@ from telethon.password import compute_check
 from telethon import TelegramClient, errors, types
 from telethon.tl.functions.account import GetPasswordRequest
 from telethon.tl.functions.auth import CheckPasswordRequest
+from telethon.tl import types as tltypes
+
 from qrcode.main import QRCode
 
-from . import __version__
+from . import __version__, database
+
+db = database.db
 
 class Auth:
     def __init__(self, session_name: str = "./teagram", manual=True) -> None:
         if manual:
             self._check_api_tokens()
+
+        if db.get('teagram.loader', 'web_success', ''):
+            db.pop('teagram.loader', 'web_success')
 
         config = configparser.ConfigParser()
         config.read("./config.ini")
@@ -34,8 +39,8 @@ class Auth:
             api_id=_id,
             api_hash=_hash,
             session=session_name,
+            device_model="Teagram Userbot",
             app_version=f"v{__version__}"
-
         )
 
     def _check_api_tokens(self) -> bool:
@@ -83,8 +88,8 @@ class Auth:
                 error_text = "Invalid phone number, please try again"
             except errors.PhoneNumberBannedError:
                 error_text = "Phone number blocked"
-            except errors.PhoneNumberFloodError:
-                error_text = "On the phone number floodwait"
+            except errors.PhoneNumberFloodError as e:
+                error_text = f"On the phone number floodwait, please wait {e.seconds}s"
             except errors.PhoneNumberUnoccupiedError:
                 error_text = "Number not registered"
             except errors.BadRequestError as error:
@@ -125,29 +130,37 @@ class Auth:
             qr = input("Login by QR-CODE? y/n ").lower().split()
 
             if qr[0] == "y":
-                tries = 0
+                qr_ = False
                 while True:                    
                     try:
                         qrcode = await self.app.qr_login()
                     except errors.UnauthorizedError:                        
                         break
+                    
+                    try:
+                        if qr_:
+                            _qr = await qrcode.wait(15)
+                            if isinstance(_qr, tltypes.User):
+                                break
+                    except:
+                        pass
 
-                    if isinstance(qrcode, types.auth.LoginTokenSuccess):
-                        break
-                    if tries % 30 == 0:
-                        print('Settings > Devices > Scan QR Code (or Add device)\n')
-                        print('Scan QR code below:' )
-
+                    try:
                         await qrcode.recreate()
-                        qr = QRCode()
+                    except:
+                        break
 
-                        qr.clear()
-                        qr.add_data(qrcode.url)
-                        qr.print_ascii()
+                    print('Settings > Devices > Scan QR Code (or Add device)\n')
+                    print('Scan QR code below:' )
+                    
+                    qr = QRCode()
+                    
+                    qr.clear()
+                    qr.add_data(qrcode.url)
+                    qr.print_ascii()
 
-                    tries += 1
-                    await asyncio.sleep(1)
-
+                    qr_ = True
+                
                 await self._2fa()
 
                 me = await self.app.get_me() 
@@ -162,4 +175,5 @@ class Auth:
             self.app.disconnect()
 
             return sys.exit(64)
+        
         return me, self.app

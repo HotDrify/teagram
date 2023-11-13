@@ -5,13 +5,11 @@ from inspect import iscoroutinefunction
 from types import ModuleType
 from typing import Callable
 
-
 def wrap_function_to_async(function: Callable) -> Callable:
-    """Обворачивает синхронные функции в асинхронные"""
+    """Wraps sync function to async"""
 
-    # Некоторые проверки для безопасности
-    assert (not iscoroutinefunction(function)), "Функция уже асинхронная!"
-    assert (not iscoroutine(function)), "Ожидается функция, получена корутина."
+    assert (not iscoroutinefunction(function)), "Function is async"
+    assert (not iscoroutine(function)), "Waiting for function, got corountine."
 
     pool = ThreadPoolExecutor()
 
@@ -25,13 +23,10 @@ def wrap_function_to_async(function: Callable) -> Callable:
 
 
 class WrapModuleToAsync:
-    """Делает то же самое что и wrap_function_to_async но обворачивает уже целые модули"""
-
     def __init__(self, mod: ModuleType):
         for attr in dir(mod):
             item = getattr(mod, attr)
 
-            # Проверяем полученный атрибут на асинхронность, если он не асинхронный, то обворачиваем
             if callable(item) and not iscoroutinefunction(item) and not iscoroutine(item):
                 wrapped = wrap_function_to_async(item)
                 setattr(self, attr, wrapped)

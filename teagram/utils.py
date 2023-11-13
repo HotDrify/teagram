@@ -1,22 +1,53 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 import asyncio
 import functools
 import random
+import requests
 import string
 import typing
 import yaml
 import time
 import os
 import io
+import re
+import subprocess
 
 from pathlib import Path
 
 import git
 import contextlib
 from types import FunctionType
+from urllib.parse import urlparse
 from typing import Any, List, Literal, Tuple, Union
-
-from telethon.tl.functions.channels import CreateChannelRequest
-from telethon import TelegramClient, types, events
+from telethon import (
+    TelegramClient, 
+    types, 
+    events, 
+    hints
+)
+from telethon.tl.functions.channels import (
+    CreateChannelRequest,
+    InviteToChannelRequest,
+    EditAdminRequest,
+    EditPhotoRequest
+)
+from telethon.types import (
+    Channel,
+    ChatAdminRights,
+    InputPeerNotifySettings,
+    UpdateNewChannelMessage
+)
+from telethon.tl.functions.account import UpdateNotifySettingsRequest
 from telethon.tl import custom
 
 from . import database, init_time
@@ -48,6 +79,13 @@ def escape_quotes(text: str, /) -> str:
     :return: Escaped text
     """
     return escape_html(text).replace('"', "&quot;")
+
+
+def get_args(message: Message) -> str:
+    return get_full_command(message)
+
+def get_args_raw(message: Message) -> str:
+    return get_full_command(message)[2]
 
 
 def get_full_command(message: Message) -> Union[
@@ -89,6 +127,14 @@ def get_full_command(message: Message) -> Union[
 
     return prefixes[0], command.lower(), args[-1] if args else ""
 
+def sublist(_list: list, row_length: int = 3) -> list:
+    """
+    Makes sublist in list
+    :param _list: `typing.List`
+    :return: List with sublist
+    """
+    return [_list[i:i + row_length] for i in range(0, len(_list), row_length)]
+
 def get_chat(message: Message) -> typing.Optional[int]:
     """
     Get chat id of message
@@ -96,6 +142,13 @@ def get_chat(message: Message) -> typing.Optional[int]:
     :return: int or None if not present
     """
     return (message.chat.id if message.chat else None or message._chat_peer)
+
+def get_chat_id(message: Message) -> typing.Optional[int]:
+    """
+    Same as get_chat
+    """
+
+    return get_chat(message)
 
 def get_topic(message: Message) -> typing.Optional[int]:
     """
@@ -130,7 +183,7 @@ def strtobool(val):
         return 0
     else:
         raise ValueError("invalid truth value %r" % (val,))
-
+    
 def validate(attribute):
     """Делает валидацию типа из строки (в int, bool)
         Validation type from string (in int, bool)"""
@@ -145,6 +198,10 @@ def validate(attribute):
 
     return attribute
 
+# https://github.com/hikariatama/Hikka/blob/master/hikka/_internal.py#L16-L17
+async def fw_protect():
+    await asyncio.sleep(random.randint(1000, 3000) / 1000)
+
 async def create_group(
     app: TelegramClient,
     title: str,
@@ -152,7 +209,204 @@ async def create_group(
     megagroup: bool = False,
     broadcast: bool = False
 ):
+    await fw_protect()
     return await app(CreateChannelRequest(title, description, megagroup=megagroup, broadcast=broadcast))
+
+async def invite_inline_bot(
+    client: TelegramClient,
+    peer: hints.EntityLike,
+) -> None:
+    """
+    Invites inline bot to a chat
+    :param client: Client to use
+    :param peer: Peer to invite bot to
+    :return: None
+    :raise RuntimeError: If error occurred while inviting bot
+    """
+
+    try:
+        await client(InviteToChannelRequest(peer, [client.loader.inline.me.username]))
+    except Exception as e:
+        raise e
+
+    with contextlib.suppress(Exception):
+        await client(
+            EditAdminRequest(
+                channel=peer,
+                user_id=client.loader.inline.me.username,
+                admin_rights=ChatAdminRights(ban_users=True),
+                rank="Teagram",
+            )
+        )
+
+async def asset_channel(
+    client: TelegramClient,
+    title: str,
+    description: str,
+    *,
+    channel: bool = False,
+    silent: bool = False,
+    archive: bool = False,
+    invite_bot: bool = False,
+    avatar: typing.Optional[str] = None
+) -> typing.Tuple[Channel, bool]:
+    """
+    Create new channel (if needed) and return its entity
+    :param client: Telegram client to create channel by
+    :param title: Channel title
+    :param description: Description
+    :param channel: Whether to create a channel or supergroup
+    :param silent: Automatically mute channel
+    :param archive: Automatically archive channel
+    :param invite_bot: Add inline bot and assure it's in chat
+    :param avatar: Url to an avatar to set as pfp of created peer
+    :return: Peer and bool: is channel new or pre-existent
+    """
+    if not hasattr(client, "_channels_cache"):
+        client._channels_cache = {}
+
+    if (
+        title in client._channels_cache
+        and client._channels_cache[title]["exp"] > time.time()
+    ):
+        return client._channels_cache[title]["peer"], False
+
+    async for d in client.iter_dialogs():
+        if d.title == title:
+            client._channels_cache[title] = {"peer": d.entity, "exp": int(time.time())}
+            if invite_bot:
+                if all(
+                    participant.id != client.loader.inline.bot_id
+                    for participant in (
+                        await client.get_participants(d.entity, limit=100)
+                    )
+                ):
+                    await fw_protect()
+                    await invite_inline_bot(client, d.entity)
+
+            return d.entity, False
+
+    await fw_protect()
+
+    peer = (
+        await client(
+            CreateChannelRequest(
+                title,
+                description,
+                megagroup=not channel,
+            )
+        )
+    ).chats[0]
+
+    if invite_bot:
+        await fw_protect()
+        await invite_inline_bot(client, peer)
+
+    if silent:
+        await fw_protect()
+        await dnd(client, peer, archive)
+    elif archive:
+        await fw_protect()
+        await client.edit_folder(peer, 1)
+
+    if avatar:
+        await fw_protect()
+        await set_avatar(client, peer, avatar)
+
+    client._channels_cache[title] = {"peer": peer, "exp": int(time.time())}
+    return peer, True
+
+async def dnd(
+    client: TelegramClient,
+    peer: hints.Entity,
+    archive: bool = True,
+) -> bool:
+    """
+    Mutes and optionally archives peer
+    :param peer: Anything entity-link
+    :param archive: Archive peer, or just mute?
+    :return: `True` on success, otherwise `False`
+    """
+    try:
+        await client(
+            UpdateNotifySettingsRequest(
+                peer=peer,
+                settings=InputPeerNotifySettings(
+                    show_previews=False,
+                    silent=True,
+                    mute_until=2**31 - 1,
+                ),
+            )
+        )
+
+        if archive:
+            await fw_protect()
+            await client.edit_folder(peer, 1)
+    except Exception:
+        return False
+
+    return True
+
+def check_url(url: str) -> bool:
+    """
+    Statically checks url for validity
+    :param url: URL to check
+    :return: True if valid, False otherwise
+    """
+    try:
+        return bool(urlparse(url).netloc)
+    except Exception:
+        return False
+
+async def set_avatar(
+    client: TelegramClient,
+    peer: hints.Entity,
+    avatar: str,
+) -> bool:
+    """
+    Sets an entity avatar
+    :param client: Client to use
+    :param peer: Peer to set avatar to
+    :param avatar: Avatar to set
+    :return: True if avatar was set, False otherwise
+    """
+    if isinstance(avatar, str) and check_url(avatar):
+        f = (
+            await run_sync(
+                requests.get,
+                avatar,
+            )
+        ).content
+    elif isinstance(avatar, bytes):
+        f = avatar
+    else:
+        return False
+
+    await fw_protect()
+    res = await client(
+        EditPhotoRequest(
+            channel=peer,
+            photo=await client.upload_file(f, file_name="photo.png"),
+        )
+    )
+
+    await fw_protect()
+
+    try:
+        await client.delete_messages(
+            peer,
+            message_ids=[
+                next(
+                    update
+                    for update in res.updates
+                    if isinstance(update, UpdateNewChannelMessage)
+                ).message.id
+            ],
+        )
+    except Exception:
+        pass
+
+    return True
 
 async def answer(
     message: Union[Message, List[Message]],
@@ -182,7 +436,7 @@ async def answer(
     Example:
         response_text = "Thank you for your message!"
         await utils.answer(message, response_text)
-
+        
         response_image_path = "image.jpg"
         await utils.answer(message, response_image_path, photo=True, caption="Here's an image for you.")
     """
@@ -270,6 +524,22 @@ async def invoke_inline(
         reply_to=message.reply_to_msg_id or None
     )
 
+# https://github.com/hikariatama/Hikka/blob/master/hikka/utils.py#L862-L876
+def get_link(user: typing.Union[types.User, types.Channel], /) -> str:
+    """
+    Get telegram permalink to entity
+    :param user: User or channel
+    :return: Link to entity
+    """
+    return (
+        f"tg://user?id={user.id}"
+        if isinstance(user, types.User)
+        else (
+            f"tg://resolve?domain={user.username}"
+            if getattr(user, "username", None)
+            else ""
+        )
+    )
 
 def run_sync(func: FunctionType, *args, **kwargs) -> asyncio.Future:
     """
@@ -304,7 +574,7 @@ def get_ram() -> float:
     Returns:
         float: Memory usage in megabytes.
     """
-
+    
     try:
         import psutil
         process = psutil.Process(os.getpid())
@@ -335,7 +605,7 @@ def get_cpu() -> float:
         return cpu
     except:
         return 0
-
+    
 def get_display_name(entity: Union[types.User, types.Chat]) -> str:
     """
     Get display name of user or chat.
@@ -362,13 +632,8 @@ def get_platform() -> str:
     IS_DOCKER = "DOCKER" in os.environ
     IS_GOORM = "GOORM" in os.environ
     IS_WIN = "WINDIR" in os.environ
-    IS_TRIGGER = 'TRIGGEREARTH' in os.environ
-    IS_WSL = False
-
-    with contextlib.suppress(Exception):
-        from platform import uname
-        if "microsoft-standard" in uname().release:
-            IS_WSL = True
+    IS_ZACHOST = 'ZACHEMHOST' in os.environ
+    IS_WSL = 'WSL_DISTRO_NAME' in os.environ
 
     if IS_TERMUX:
         platform = "📱 Termux"
@@ -382,11 +647,11 @@ def get_platform() -> str:
         platform = "💻 Windows"
     elif IS_CODESPACES:
         platform = "👨‍💻 Github Codespaces"
-    elif IS_TRIGGER:
-        platform = "🌍 TriggerEarth"
+    elif IS_ZACHOST:
+        platform = "❔ Zachemhost"
     else:
         platform = "🖥️ VDS"
-
+    
     return platform
 
 def random_id(length: int = 10) -> str:
@@ -413,7 +678,7 @@ def get_langpack() -> Any:
     Returns:
         Any: The language pack.
     """
-    if not (lang := database.db.get('teagram.loader', 'lang')):
+    if not (lang := database.db.get('teagram.loader', 'lang', '')):
         database.db.set('teagram.loader', 'lang', 'en')
 
         get_langpack()
@@ -422,3 +687,27 @@ def get_langpack() -> Any:
             pack = yaml.safe_load(file)
 
         return pack
+
+def get_distro() -> str:
+    '''
+    Get linux distribution.
+
+    Returns:
+        str: Information about linux distro.
+    '''
+
+    result = subprocess.run(["lsb_release","-a"], capture_output=True, text=True)
+    info = result.stdout
+
+    pattern = r'Description:\s+(.+)'
+    match = re.search(pattern, info)
+    if match:
+        distro = match.group(1)
+        return distro
+    else:  
+        return
+
+
+
+
+

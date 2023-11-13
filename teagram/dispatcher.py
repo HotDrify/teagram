@@ -1,3 +1,14 @@
+#                            ██╗████████╗███████╗██╗░░░░░░█████╗░██╗░░░██╗███████╗
+#                            ██║╚══██╔══╝╚════██║██║░░░░░██╔══██╗╚██╗░██╔╝╚════██║
+#                            ██║░░░██║░░░░░███╔═╝██║░░░░░███████║░╚████╔╝░░░███╔═╝
+#                            ██║░░░██║░░░██╔══╝░░██║░░░░░██╔══██║░░╚██╔╝░░██╔══╝░░
+#                            ██║░░░██║░░░███████╗███████╗██║░░██║░░░██║░░░███████╗
+#                            ╚═╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+#                                            https://t.me/itzlayz
+#                           
+#                                    🔒 Licensed under the GNU AGPLv3
+#                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 import logging
 from inspect import getfullargspec, iscoroutine
 from types import FunctionType
@@ -12,7 +23,7 @@ from . import loader, utils
 import traceback
 
 class DispatcherManager:
-    """Менеджер диспетчера"""
+    """Dispatcher's manager"""
 
     def __init__(self, app: TelegramClient, manager: "loader.ModulesManager") -> None:
         self.app = app
@@ -21,9 +32,9 @@ class DispatcherManager:
     async def check_filters(
         self,
         func: FunctionType,
-        message: Union[types.Message, Message]
+        message: Union[types.Message, Message],
+        watcher: bool = False
     ) -> bool:
-        """Проверка фильтров"""
         if (custom_filters := getattr(func, "_filters", None)):
             coro = custom_filters(message)
             if iscoroutine(coro):
@@ -33,16 +44,13 @@ class DispatcherManager:
                 return False
         else:
             _users = self.manager._db.get('teagram.loader', 'users', [])
-
-            if not message.out and message.sender_id not in _users:
+            
+            if not message.out and message.sender_id not in _users and not watcher:
                 return False
 
         return True
 
     async def load(self) -> bool:
-        """Загружает менеджер диспетчера"""
-        logging.info("Загрузка диспетчера...")
-
         self.app.add_event_handler(
             self._handle_message,
             NewMessage
@@ -51,12 +59,9 @@ class DispatcherManager:
             self._handle_message,
             MessageEdited
         )
-
-        logging.info("Диспетчер успешно загружен")
         return True
 
-    async def _handle_message(self, message: types.Message) -> types.Message:
-        """Обработчик сообщений"""        
+    async def _handle_message(self, message: types.Message) -> types.Message:    
         await self._handle_watchers(message)
 
         prefix, command, args = utils.get_full_command(message)
@@ -92,10 +97,9 @@ class DispatcherManager:
         return message
 
     async def _handle_watchers(self, message: types.Message) -> types.Message:
-        """Обработчик вотчеров"""
         for watcher in self.manager.watcher_handlers:
             try:
-                if not await self.check_filters(watcher, message):
+                if not await self.check_filters(watcher, message, True):
                     continue
 
                 await watcher(message)
