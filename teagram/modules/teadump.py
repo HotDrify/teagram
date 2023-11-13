@@ -65,7 +65,10 @@ class DumpMod(loader.Module):
         if "windows" in platform.platform():
             ver = platform.platform()
         else:
-            ver = get_distro()
+            try:
+                ver = get_distro()
+            except FileNotFoundError:
+                pass
 
         return {
             "teagram.token": {
