@@ -127,7 +127,10 @@ class Main:
 
     async def main(self):
         try:
-            if os.geteuid() == 0:
+            if (
+                os.geteuid() == 0
+                and utils.get_platform() not in ["🐳 Docker"]
+            ):
                 self.log.warning("Please do not use root for userbot")
         except:
             pass
