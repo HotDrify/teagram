@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="tg://resolve?domain=UBteagram"> <img src="https://github.com/MuRuLOSE/teagram-assets/raw/main/teagram_banner2v1.png"> </a>
+    [![Teagram](https://github.com/MuRuLOSE/teagram-assets/raw/main/teagram_banner2v1.png)](tg://resolve?domain=UBteagram)
 </p>
 
 <p align="center">
