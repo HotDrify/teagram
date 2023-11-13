@@ -1,4 +1,4 @@
-import aiohttp
+import requests
 from .. import loader, utils
 
 @loader.module("Lumix", "itzlayz", 1.0)
@@ -35,23 +35,16 @@ class LumixMod(loader.Module):
                 message,
                 self.strings("not_found")
             )
-        
-        data = {"module": args.split()[0]}
 
         await utils.answer(
             message,
             self.strings("searching")
         )
-        async with aiohttp.ClientSession(trust_env=True) as session:
-            async with session.get(
-                f"{self.api}/search", 
-                params=data,
-                headers={
-                    "User-Agent": "Teagram-TL-Lumix",
-                    "X-Lumix": "Lumix"
-                }
-            ) as response:
-                text = await response.text()
+
+        text = (await utils.run_sync(
+            requests.get, 
+            f"{self.api}/view/{args.split()[0]}",
+        )).text
         
         if text == "Not found":
             return await utils.answer(
