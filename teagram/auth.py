@@ -53,12 +53,12 @@ class Auth:
 
             with open("./config.ini", "w") as file:
                 config.write(file)
-        
+
         return True
 
     async def _2fa(self) -> str:
         password = await self.app(GetPasswordRequest()) 
-        
+
         while True:
             twofa = getpass('Enter 2FA password: ')
             try:
@@ -100,7 +100,7 @@ class Auth:
 
     async def enter_code(self, phone: str, phone_code_hash: str) -> types.User:
         """Login in account"""
-        
+
         code = input("Enter confirmation code: ")
 
         try:
@@ -164,11 +164,11 @@ class Auth:
                 await self._2fa()
 
                 me = await self.app.get_me() 
-                    
+
             else:
                 phone, phone_code_hash = await self.send_code() 
                 await self.enter_code(phone, phone_code_hash)
-                
+
                 me: types.User = await self.app.get_me() 
         except errors.SessionRevokedError:
             logging.error("The session was terminated, delete the session and re-auth")

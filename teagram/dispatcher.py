@@ -28,7 +28,7 @@ class DispatcherManager:
     def __init__(self, app: TelegramClient, manager: "loader.ModulesManager") -> None:
         self.app = app
         self.manager = manager
-    
+
     async def check_filters(
         self,
         func: FunctionType,
@@ -72,10 +72,10 @@ class DispatcherManager:
         func = self.manager.command_handlers.get(command.lower())
         if not func:
             return
-    
+
         if not await self.check_filters(func, message):
             return
-        
+
         try:
             if (
                 len(vars_ := getfullargspec(func).args) > 2

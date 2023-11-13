@@ -31,7 +31,7 @@ class UpdateMod(loader.Module):
 
     def __init__(self):
         value = self.db.get('Updater', 'sendOnUpdate')
-        
+
         if value is None:
             value = True
 
@@ -98,10 +98,10 @@ class UpdateMod(loader.Module):
                 check_output('git stash', shell=True)
                 output = check_output('git pull', shell=True).decode()
 
-            
+
             if 'Already up to date.' in output:
                 return await utils.answer(message, self.strings['lastver'])
-            
+
             if 'requirements.txt' in output:
                 await utils.answer(message, self.strings['downloading'])
                 try:
@@ -118,7 +118,7 @@ class UpdateMod(loader.Module):
                     )
                 except:
                     pass
-            
+
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
 
