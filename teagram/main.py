@@ -138,8 +138,9 @@ class Main:
         app = auth.Auth(manual=False).app
         await app.connect()
 
+        print(self.args)
         if (
-            not getattr(self.args, 'disweb', '') and 
+            not getattr(self.args, 'disable_web', '') and 
             not await app.get_me()
         ):
             import socket
