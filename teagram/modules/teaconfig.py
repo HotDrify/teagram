@@ -197,7 +197,7 @@ class TeaConfigMod(loader.Module):
                 'text': option,
                 'callback': self.configure_value,
                 'args': (module, option)
-            } for option in self.lookup(module).config
+            } for option in self.lookup(module.lower()).config
         ] + [
             [
                 {
@@ -294,6 +294,7 @@ class TeaConfigMod(loader.Module):
 
         await self.inline.form(
             message=message,
-            text=self.strings('open'),
+            text="⚙ <b>Teagram | Config</b>",
             reply_markup=markup
         )
+        await message.delete()

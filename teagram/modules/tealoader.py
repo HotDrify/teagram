@@ -57,6 +57,18 @@ async def get_git_raw_link(repo_url: str):
 class LoaderMod(loader.Module):
     """Загрузчик модулей"""
     strings = {'name': 'loader'}
+
+    def prep_docs(self, module: str) -> str:
+        module = self.lookup(module)
+        prefix = self.get_prefix()[0]
+        return "\n".join(
+            "👉 <code>{}</code> {}".format(
+                prefix + command,
+                f"- <b>{module.command_handlers[command].__doc__}</b>" or ''
+            )
+            for command in module.command_handlers
+        )
+    
     async def repo_cmd(self, message: types.Message, args: str):
         """Установить репозиторий с модулями. Использование: repo <ссылка на репозиторий или reset>"""
         if not args:
@@ -165,7 +177,7 @@ class LoaderMod(loader.Module):
                 self.strings['loadedmod'].format(module_name)
                 if args != "all"
                 else self.strings['loaded'].format(count, len(modules))
-            )
+            ) + "\n" + self.prep_docs(module_name)
         )
 
     async def dlmod_cmd(self, message: Message, args: str):
@@ -193,7 +205,7 @@ class LoaderMod(loader.Module):
             
             await utils.answer(
                 message, 
-                self.strings['loadedmod'].format(module)
+                self.strings['loadedmod'].format(module) + "\n" + self.prep_docs(module)
             )
 
         except requests.exceptions.MissingSchema:
@@ -264,7 +276,11 @@ class LoaderMod(loader.Module):
             file.write(_file)
         
         await utils.answer(
-            message, self.strings['loadedmod'].format(module_name))
+            message, (
+                self.strings['loadedmod'].format(module_name) + 
+                "\n" + self.prep_docs(module)
+            )
+        )
 
     async def unloadmod_cmd(self,  message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
