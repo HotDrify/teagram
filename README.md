@@ -1,4 +1,4 @@
-[Teagram]([https://github.com/MuRuLOSE/teagram-assets/raw/main/teagram_banner2v1.png](https://raw.githubusercontent.com/MuRuLOSE/teagram-assets/main/teagram_banner2v1.png))](tg://resolve?domain=UBteagram)
+[![Teagram]([https://github.com/MuRuLOSE/teagram-assets/raw/main/teagram_banner2v1.png](https://raw.githubusercontent.com/MuRuLOSE/teagram-assets/main/teagram_banner2v1.png))](tg://resolve?domain=UBteagram)
 
 <p align="center">
     <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — userbot which uses <a href="https://github.com/LonamiWebs/Telethon">Telethon</a><br>
