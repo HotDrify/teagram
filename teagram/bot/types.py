@@ -1,12 +1,16 @@
+import logging
 import inspect
+
 from types import FunctionType
 from typing import Union
 
-from aiogram.types import CallbackQuery, InlineQuery, Message
+from aiogram.types import CallbackQuery, InlineQuery, Message, InlineKeyboardMarkup
 from telethon import TelegramClient
 
 from .. import database, types
 from .utils import Utils
+
+logger = logging.getLogger()
 
 class Item(Utils):
     """
@@ -51,3 +55,50 @@ class Item(Utils):
                 return False
 
         return True
+
+class InlineCall(CallbackQuery):
+    def __init__(
+        self,
+        call: CallbackQuery,
+        manager: 'types.bot.BotManager'
+    ):
+        self.inline_message_id = None
+        self.callback_query = call
+        self._bot = manager.bot
+
+        for orig in (
+            'id',
+            'from_user',
+            'message',
+            'inline_message_id',
+            'chat_instance',
+            'data'
+        ):
+            setattr(
+                self,
+                orig,
+                getattr(call, orig, None)
+            )
+
+    async def edit(
+        self,
+        text: str,
+        reply_markup: InlineKeyboardMarkup = None,
+        inline_message_id: str = None
+    ):
+        try:
+            return await self._bot.edit_message_text(
+                text,
+                inline_message_id=inline_message_id or self.inline_message_id,
+                reply_markup=reply_markup
+            )
+        except Exception:
+            logger.exception("Can't edit inline call")
+
+    async def delete(self):
+        try:
+            return await self._bot.delete_message(
+                message_id=self.message.message_id
+            )
+        except Exception:
+            logger.exception("Can't delete inline call")

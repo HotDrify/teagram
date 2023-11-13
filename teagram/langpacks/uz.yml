@@ -11,6 +11,7 @@ help:
   desc: "Ta'rif"
 
 manager:
+  inline_hello: "☕ <b>Teagram-TL - telethon asoslangan telegram userbot</b>"
   errorcmd: "❌ <b>Buyruqni bajarishda xato yuzaga keldi</b>: {}\n❔ <b>Jo'natmalar</b>:\n<code>{}</code>"
 
 info:
@@ -71,23 +72,21 @@ terminal:
   cmd: "Buyruq"
   output: "Chiqish"
 
-config:
-  noowner: "❌ Siz egasi emassiz"
-  opencfg: "Sozlamalarni oching"
-  cfg: "Sozlamalar"
-  chdef: '✔ Siz muvaffaqiyatli ravishda standart qiymatni o\'zgartirdingiz'
-  ch: 'O\'zgartirish'
-  attr: 'Atribut'
-  value: 'Qiymat'
-  def: 'Standart'
-  nospec: '<b>Belgilanmagan</b>'
-  back: 'Orqaga'
-  sure: "❔ <b>Atributni o'zgartirishga ishonchingiz komilmi?</b>"
-  confirm: "✔ Tasdiqlash"
-  decline: "❌ Bekor qilish"
-  specvalue: "Qiymatni kiriting"
-  errvalue: "❌ <b>Siz qiymatni kiritmadingiz</b>"
-  chvalue: '✔ <b>Siz atributni o\'zgartirdingiz!</b>'
+teaconfig:
+  open: "👉 Sozlamani oching"
+  back: "◀ Orqaga"
+  close: "🛑 Yopish"
+  keywords_error: "❌ <b>Tasdiqlash xatosi, iltimos, so'zlarini tekshiring</b>"
+  change: "✍ O'zgartirish"
+  sure_change: "❔ Haqiqatan ham qiymatni o'zgartirmoqchimisiz"
+  edit_value: "✔ <b>Siz muvaffaqiyatli o'zgartirdingiz</b>"
+  edit_default_value: "✔ <b>Siz muvaffaqiyatli o'zgartirdingiz (standart qiymat)</b>"
+  choose_module: "⚙ <b>Sozlamalarni tahrirlash uchun modulni tanlang</b>"
+  choose_value: "⚙ <b>Sozlamalarni tahrirlash uchun qiymatni tanlang</b>"
+  configure_value: "⚙ <b> <code>{}</code> parametrini tahrirlayapsiz - <code>{}</code></b>\n"
+  default_value: "<b>Standart qiymat: <code>{}</code></b>\n"
+  current_value: "<b>Hozirgi qiymat: <code>{}</code></b>\n\n"
+
 
 backup:
   docstring: '<b>⌛ Qanday vaqtdan keyin omborini olish (Soni sekundda)</b>'

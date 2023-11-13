@@ -4,8 +4,9 @@ import traceback
 from aiogram.types import (
     CallbackQuery, Message, InlineQuery, InlineQueryResultArticle, InlineQueryResultGif,
     InputTextMessageContent, InlineQueryResultPhoto, InlineQueryResultDocument,
-    InputMediaPhoto, InputMediaAnimation, InputMediaDocument)
-from .types import Item
+    InputMediaPhoto, InputMediaAnimation, InputMediaDocument, ChosenInlineResult,
+    InputFile)
+from .types import Item, InlineCall
 from .. import utils
 
 class Events(Item):
@@ -15,7 +16,9 @@ class Events(Item):
     """
     def __init__(self):
         super().__init__()
+
         self._units: dict
+        self.callback_units: dict
 
     async def _message_handler(self, message: Message) -> Message:
         """
@@ -31,11 +34,15 @@ class Events(Item):
         """
         if message.text == '/start':
             return await message.reply_photo(
-                photo='https://github.com/itzlayz/teagram-tl/blob/main/assets/bot_avatar.png?raw=true',
-                caption='☕ Добро пожаловать! Это инлайн бот <b>Teagram</b>\n'
-                '✒ Предлагаем вам настроить конфиг\n'
-                "✒ Используйте инлайн команду {}config".format(
-                    self._manager.get_prefix()[0]
+                photo=InputFile('assets/teagram_banner.png'),
+                caption=self._manager.strings['inline_hello'],
+                reply_markup=self._generate_markup(
+                    [
+                        {
+                            "text": "🐙 Github",
+                            "url": "https://github.com/itzlayz/teagram-tl"
+                        }
+                    ]
                 ),
                 parse_mode='html'
             )
@@ -66,54 +73,57 @@ class Events(Item):
         if call.from_user.id != self._manager.me.id:
            return
         
+        call = InlineCall(call, self)
         try:
-            if call.data == 'teagram_perm_delete':
-                call.data = '_loader_permdel'
-
-            if (unit := self._units[call.data]):
-                if unit.get('callback'):
-                    if (
-                        self._units.get('_loader_permdel', '') 
-                        and 'teagram_perm_delete' in str(unit)
-                    ):
-                        self._units.pop(call.data)
-                        from os import rmdir, remove
-
-                        try:
-                            remove(utils.BASE_PATH / 'config.ini')
-                            remove(utils.BASE_PATH / 'db.json')
-
-                            try:
-                                rmdir(utils.BASE_PATH / 'teagram')
-                            except:
-                                pass
-
-                            await call.answer('✔ Успешно...', True)
-                        except PermissionError:
-                            await call.answer('⚠ Недостаточно прав', True)
-                        except FileNotFoundError:
-                            await call.answer('⚠ Не удалось найти папку, удаляем сессию', True)
-                        except:
-                            await call.answer('⚠ Неизвестная ошибка, удаляем сессию', True)
-
-                        await self._app.log_out()
-                        return
-                    
+            if (func := self._units[call.data]):
+                if func.get('callback'):
                     try:
-                        await unit.callback(call)
+                        await func.callback(call)
                     except Exception as error:
                         logging.exception(error)
         except KeyError:
             pass
+        
+        try:
+            if (func := self._manager.callback_handlers[call.data]):
+                args = self.callback_units[call.data]
+                try:
+                    if args:
+                        if isinstance(args, (list, tuple)):
+                            await func(call, *args)
+                        else:
+                            await func(call, args)
+                    else:
+                        if len(inspect.getfullargspec(
+                            func
+                        ).args) == 2:
+                            await func(call)
+                except Exception as error:
+                    logging.exception(error)
 
-        for func in self._manager.callback_handlers.values():
-            if not await self._check_filters(func, func.__self__, call):
-                continue
+            return call
+        except KeyError:
+            pass
+        except:
+            traceback.print_exc()
 
-            try:
-                await func(call)
-            except Exception as error:
-                logging.exception(error)
+        try:
+            for key, func in self._manager.callback_handlers.items():
+                if not await self._check_filters(func, func.__self__, call):
+                    continue
+
+                try:
+                    if len(inspect.getfullargspec(func).args) == 2: 
+                        await func(call)
+                    else:
+                        if (
+                            args := self.callback_units.get(key, ())
+                        ):
+                            await func(call, args)
+                except Exception as error:
+                    logging.exception(error)
+        except RuntimeError:
+            pass
 
         return call
 
@@ -252,17 +262,13 @@ class Events(Item):
             traceback.print_exc()
         
         if not func:
-            if self.cfg[cmd]:
-                func = self._manager.inline_handlers.get('changing')
-                return await func(inline_query, args)
-
             return await inline_query.answer(
                 [
                     InlineQueryResultArticle(
                         id=utils.random_id(),
                         title="Error",
                         input_message_content=InputTextMessageContent(
-                            "❌ No such inline command")
+                            "❌ <b>No such inline command</b>")
                     )
                 ], cache_time=0
             )
@@ -279,3 +285,17 @@ class Events(Item):
             logging.exception(error)
 
         return inline_query
+
+    async def _chosen_inline_handler(self, chosen_inline_query: ChosenInlineResult):
+        query = chosen_inline_query.query
+        
+        if (input_handler := self.input_handlers.get(query, '')):
+            try:
+                await input_handler['handler'](
+                    InlineCall(chosen_inline_query, self),
+                    query,
+                    *input_handler.get("args", [])
+                )
+            except Exception:
+                logging.exception("Chosen inline handler error")
+                

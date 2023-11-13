@@ -1,4 +1,5 @@
 import logging
+import asyncio
 import time
 import sys
 import re
@@ -80,17 +81,21 @@ class TokenManager(Item):
             await conv.send_message(f"@{bot_username}")
             await conv.get_response()
 
-            await conv.send_file("assets/bot_avatar.png")
+            await conv.send_file("assets/teagram_bot.png")
             await conv.get_response()
+            
+            for message in [
+                "/setinline",
+                f"@{bot_username}",
+                "teagram-command",
+                "/setinlinefeedback",
+                f"@{bot_username}",
+                "Enabled"
+            ]:
+                await conv.send_message(message)
+                await conv.get_response()
 
-            await conv.send_message("/setinline")
-            await conv.get_response()
-
-            await conv.send_message(f"@{bot_username}")
-            await conv.get_response()
-
-            await conv.send_message("teagram-command")
-            await conv.get_response()
+                await asyncio.sleep(1)
 
             logger.info("Bot created successfully")
             return token

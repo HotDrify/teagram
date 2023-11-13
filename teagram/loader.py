@@ -342,6 +342,19 @@ class ModulesManager:
         self.aliases: dict = self._db.get(__name__, "aliases", {})
         self.strings: dict = utils.get_langpack().get('manager')
         self.translator = translation.Translator(self._db)
+        self.core_modules = [
+            'teabackup',
+            'teaconfig',
+            'teadump',
+            'teaeval',
+            'teahelp',
+            'teainfo',
+            'tealoader',
+            'teasettings',
+            'teaterminal',
+            'teatranslator',
+            'teaupdater'
+        ]
 
         self.dp: dispatcher.DispatcherManager = None
         self.bot_manager: bot.BotManager = None
@@ -478,7 +491,12 @@ class ModulesManager:
 
         return instance
 
-    async def load_module(self, module_source: str, origin: str = "<string>", did_requirements: bool = False) -> str:
+    async def load_module(
+        self, 
+        module_source: str, 
+        origin: str = "<string>", 
+        did_requirements: bool = False
+    ) -> str:
         module_name = f"teagram.modules.{utils.random_id()}"
 
         try:
@@ -540,7 +558,11 @@ class ModulesManager:
 
         return True
 
-    def unload_module(self, module_name: str = None, is_replace: bool = False) -> str:
+    def unload_module(
+        self, 
+        module_name: str = None, 
+        is_replace: bool = False
+    ) -> str:
         if is_replace:
             module = module_name
         else:
@@ -588,5 +610,15 @@ class ModulesManager:
 
     def lookup(self, name: str) -> Union[Module, None]:
         """Finds module by name"""
-        return next((module for module in self.modules if module.name.lower() in name.lower()), None)
-    
+        if not isinstance(name, str):
+            return None
+        
+        module = next((module for module in self.modules if module.name.lower() in name.lower()), None)
+        if not module:
+            module = next((module for module in self.modules if name.lower() in module.name.lower()), None)
+            if module:
+                return module
+            
+            return None
+        
+        return module

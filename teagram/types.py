@@ -41,24 +41,29 @@ class ModulesManager:
     """Manager of modules"""
 
     def __init__(self) -> None:
-        self.modules: List[Module]
-        self.loops: List[FunctionType]
-        self.watcher_handlers: List[FunctionType]
-        
-        self.command_handlers: Dict[str, FunctionType]
-        self.message_handlers: Dict[str, FunctionType]
-        self.inline_handlers: Dict[str, FunctionType]
-        self.callback_handlers: Dict[str, FunctionType]
+        self.modules: List[Module] 
+        self.watcher_handlers: List[FunctionType] 
 
-        self.aliases: dict
+        self.command_handlers: Dict[str, FunctionType] 
+        self.message_handlers: Dict[str, FunctionType] 
+        self.inline_handlers: Dict[str, FunctionType] 
+        self.callback_handlers: Dict[str, FunctionType] 
+        self.loops: List[FunctionType]
+
         self._local_modules_path: str
 
         self._client: TelegramClient
         self._db: database.Database
         self.me: types.User
 
-        self.dp: Dispatcher
+        self.aliases: dict 
+        self.strings: dict 
+        self.translator
+        self.core_modules: list
+
+        self.dp
         self.bot_manager: bot.BotManager
+        self.inline: bot.BotManager # same as bot_manager
 
 class WaitForDefault:
     pass

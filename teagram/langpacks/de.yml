@@ -11,6 +11,7 @@ help:
   desc: "Beschreibung"
 
 manager:
+  inline_hello: "☕ <b>Teagram-TL – Telegram-Userbot basierend auf Telethon</b>"
   errorcmd: "❌ <b>Fehler beim Ausführen des Befehls</b>: {}\n❔ <b>Logs</b>:\n<code>{}</code>"
 
 loader:
@@ -56,23 +57,21 @@ info:
   version: "Version"
   uptime: "Betriebszeit"
 
-config:
-  noowner: "❌ Du bist nicht der Besitzer"
-  opencfg: "Konfiguration öffnen"
-  cfg: "Konfiguration"
-  chdef: '✔ Du hast den Standardwert erfolgreich geändert'
-  ch: 'Ändern'
-  attr: 'Attribut'
-  value: 'Wert'
-  def: 'Standard'
-  nospec: '<b>Nicht angegeben</b>'
-  back: '🔄 Zurück'
-  sure: "❔ <b>Sind Sie sicher, dass Sie das Attribut ändern möchten?</b>"
-  confirm: " ✔ Bestätigen"
-  decline: "❌ Abbrechen"
-  specvalue: "Geben Sie einen Wert an"
-  errvalue: "❌ <b>Sie haben keinen Wert angegeben</b>"
-  chvalue: "✔ <b>Sie haben das Attribut geändert!</b>"
+teaconfig:
+  open: "👉 Konfiguration öffnen"
+  back: "◀ Zurück"
+  close: "🛑 Schließen"
+  keywords_error: "❌ <b>Validierungsfehler, bitte überprüfen Sie Schlüsselwörter</b>"
+  change: "✍ Ändern"
+  sure_change: "❔ Sind Sie sicher, dass Sie den Wert ändern möchten"
+  edit_value: "✔ <b>Sie haben den Wert erfolgreich geändert</b>"
+  edit_default_value: "✔ <b>Sie haben den Wert erfolgreich auf den Standardwert zurückgesetzt</b>"
+  choose_module: "⚙ <b>Modul zur Konfiguration auswählen</b>"
+  choose_value: "⚙ <b>Wert zur Konfiguration auswählen</b>"
+  configure_value: "⚙ <b> Bearbeiten des Parameters <code>{}</code> - <code>{}</code></b>\n"
+  default_value: "<b>Standardwert: <code>{}</code></b>\n"
+  current_value: "<b>Aktueller Wert: <code>{}</code></b>\n\n"
+
 
 updater:
   updating: "🛠 <b>Versuch des Updates...</b>"

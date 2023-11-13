@@ -56,7 +56,7 @@ class CloudDatabase:
                 ).__dict__["chats"][0].__dict__["id"]
 
                 photo = InputChatUploadedPhoto(await self._client.upload_file(
-                    file=BASE_PATH / 'assets' / 'channel_avatar.png'
+                    file=BASE_PATH / 'assets' / 'teagram_logs.png'
                     )
                 )
                 

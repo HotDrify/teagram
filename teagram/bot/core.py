@@ -43,6 +43,8 @@ class BotManager(Events, TokenManager):
         self._manager = manager
 
         self._token = self._db.get("teagram.bot", "token", None)
+        self.callback_units = {}
+        self.input_handlers = {}
         self._units = {}
         self.cfg = {}
 
@@ -97,14 +99,27 @@ class BotManager(Events, TokenManager):
                     except errors.UserIsBlockedError:
                         await self._app(UnblockRequest('@BotFather'))
 
-                    await conv.send_message("/setinline")
+                    await conv.send_message("/setuserpic")
                     await conv.get_response()
 
-                    await conv.send_message(name)
+                    await conv.send_message(f"@{name}")
                     await conv.get_response()
 
-                    await conv.send_message("~teagram~ $")
+                    await conv.send_file("assets/teagram_bot.png")
                     await conv.get_response()
+                    
+                    for message in [
+                        "/setinline",
+                        f"@{name}",
+                        "teagram-command",
+                        "/setinlinefeedback",
+                        f"@{name}",
+                        "Enabled"
+                    ]:
+                        await conv.send_message(message)
+                        await conv.get_response()
+
+                        await asyncio.sleep(1)
 
                     logger.info("Bot revoked successfully")
 
@@ -127,6 +142,7 @@ class BotManager(Events, TokenManager):
         self._dp.register_message_handler(self._message_handler, lambda _: True, content_types=["any"])
         self._dp.register_inline_handler(self._inline_handler, lambda _: True)
         self._dp.register_callback_query_handler(self._callback_handler, lambda _: True)
+        self._dp.register_chosen_inline_handler(self._chosen_inline_handler, lambda _: True)
 
     #     hikka compatibility
     async def invoke_unit(self, inline_id: str, message: Message) -> Message:
@@ -163,7 +179,7 @@ class BotManager(Events, TokenManager):
             'gif': gif,
             'top_msg_id': (
                 (message.reply_to.reply_to_top_id or message.reply_to.reply_to_msg_id) 
-                if message.reply_to else None
+                if (message.reply_to if message else None) else None
             ),
             **kwargs
         }

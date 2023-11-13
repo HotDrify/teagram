@@ -170,6 +170,8 @@ class Main:
         
         modules = loader.ModulesManager(app, self.db, me)
         bot: Bot = await modules.load(app)
+        
+        self.modules = modules
 
         prefix = self.db.get("teagram.loader", "prefixes", ["."])[0]
         restart = self.db.get("teagram.loader", "restart")

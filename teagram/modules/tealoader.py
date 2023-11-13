@@ -57,8 +57,8 @@ async def get_git_raw_link(repo_url: str):
 class LoaderMod(loader.Module):
     """Загрузчик модулей"""
     strings = {'name': 'loader'}
-    async def dlrepo_cmd(self, message: types.Message, args: str):
-        """Установить репозиторий с модулями. Использование: dlrepo <ссылка на репозиторий или reset>"""
+    async def repo_cmd(self, message: types.Message, args: str):
+        """Установить репозиторий с модулями. Использование: repo <ссылка на репозиторий или reset>"""
         if not args:
             return await utils.answer(
                 message, self.strings['noargs'])
@@ -79,8 +79,8 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, self.strings['yesurl'])
 
-    async def dlmod_cmd(self, message: types.Message, args: str):
-        """Загрузить модуль по ссылке. Использование: dlmod <ссылка или all или ничего>"""
+    async def dlrepo_cmd(self, message: types.Message, args: str):
+        """Загрузить модуль по ссылке. Использование: dlrepo <ссылка или all или ничего>"""
         modules_repo = self.db.get(
             "teagram.loader", "repo",
             "https://github.com/itzlayz/teagram-modules"
@@ -168,7 +168,7 @@ class LoaderMod(loader.Module):
             )
         )
 
-    async def loadraw_cmd(self, message: Message, args: str):
+    async def dlmod_cmd(self, message: Message, args: str):
         if not args:
             return await utils.answer(
                 message,

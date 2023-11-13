@@ -16,20 +16,12 @@ from aiogram import types
 from ..utils import random_id
 
 logger = logging.getLogger()
+Markup = typing.List[typing.Union[typing.List[typing.Dict], typing.Dict]]
 
 class Utils:
-    def __init__(self) -> None:
-        self.markup_keywords = [
-            "text", 
-            "callback", 
-            "url",
-            "input",
-            "login_url"
-        ]
-
     def _generate_markup(
             self, 
-            markup: typing.List[typing.Dict]
+            markup: Markup
             ) -> typing.Union[types.InlineKeyboardMarkup, None]:
         """
         Generates markup from list
@@ -40,7 +32,11 @@ class Utils:
             return None
 
         keyboard = types.InlineKeyboardMarkup()
-        for btn in markup:
+        for mark in markup:
+            if isinstance(mark, list):
+                continue
+
+            btn = mark
             try:
                 if btn.get('callback', ''):
                     callback = None
@@ -48,6 +44,9 @@ class Utils:
                     if callable(btn['callback']):
                         callback = random_id(20)
                         self._manager.callback_handlers[callback] = btn['callback']
+                        
+                        if btn.get('args', ''):
+                            self.callback_units[callback] = btn['args']
 
                     keyboard.add(
                         types.InlineKeyboardButton(
@@ -56,12 +55,35 @@ class Utils:
                         )
                     )
                 elif btn.get('input', ''):
-                    keyboard.add(
-                        types.InlineKeyboardButton(
-                            btn['text'],
-                            switch_inline_query=btn['input']
+                    if btn.get('handler', ''):
+                        _id = random_id(5)
+                        self.input_handlers[_id] = {
+                            'input': btn['input'],
+                            'handler': btn['handler'], 
+                            'args': btn['args']
+                        }
+
+                        keyboard.add(
+                            types.InlineKeyboardButton(
+                                btn['text'],
+                                switch_inline_query_current_chat=_id+" "
+                            )
                         )
-                    )
+                    else:
+                        if not btn.get('switch_query'):
+                            keyboard.add(
+                                types.InlineKeyboardButton(
+                                    btn['text'],
+                                    switch_inline_query_current_chat=btn['input']+" "
+                                )
+                            )
+                        else:
+                            keyboard.add(
+                                types.InlineKeyboardButton(
+                                    btn['text'],
+                                    switch_inline_query=btn['switch_query']
+                                )
+                            )
                 elif btn.get('url', ''):
                     keyboard.add(
                         types.InlineKeyboardButton(
@@ -79,4 +101,68 @@ class Utils:
             except KeyError as e:
                 logger.debug(f"Can't build button: {e}")
 
+        for row in markup:
+            line = []
+            if not isinstance(row, list):
+                continue
+
+            for button in row:
+                try:
+                    if button.get('callback', ''):
+                        callback = None
+
+                        if callable(button['callback']):
+                            callback = random_id(20)
+                            self._manager.callback_handlers[callback] = button['callback']
+                        
+                            if button.get('args', ''):
+                                self.callback_units[callback] = button['args']
+
+                        line += [
+                            types.InlineKeyboardButton(
+                                button['text'],
+                                callback_data=callback or button['callback']
+                            )
+                        ]
+                    elif button.get('input', ''):
+                        if btn.get('handler', ''):
+                            _id = random_id(5)
+                            self.input_handlers[_id] = {
+                                'input': button['input'],
+                                'handler': button['handler'],
+                                'args': button['args']
+                            }
+                        
+                            line += [
+                                types.InlineKeyboardButton(
+                                    button['text'],
+                                    switch_inline_query_current_chat=_id
+                                )
+                            ]
+                        else:
+                            line += [
+                                types.InlineKeyboardButton(
+                                    button['text'],
+                                    switch_inline_query_current_chat=btn['input']
+                                )
+                            ]
+                    elif button.get('url', ''):
+                        line += [
+                            types.InlineKeyboardButton(
+                                button['text'],
+                                url=button['url']
+                            )
+                        ]
+                    elif button.get('login_url', ''):
+                        line += [
+                            types.InlineKeyboardButton(
+                                button['text'],
+                                login_url=button['login_url']
+                            )
+                        ]
+                except KeyError as e:
+                    logger.debug(f"Can't build button: {e}")
+        
+            keyboard.row(*line)
+        
         return keyboard

@@ -11,6 +11,7 @@ help:
   desc: "Description"
 
 manager:
+  inline_hello: "☕ <b>Teagram-TL - telegram userbot based on telethon</b>"
   errorcmd: "❌ <b>Error executing command</b>: {}\n❔ <b>Logs</b>:\n<code>{}</code>"
 
 info:
@@ -71,23 +72,20 @@ terminal:
   cmd: "Command"
   output: "Output"
 
-config:
-  noowner: "❌ You are not the owner"
-  opencfg: "Open config"
-  cfg: "Config"
-  chdef: '✔ You have successfully changed the default value'
-  ch: 'Change'
-  attr: 'Attribute'
-  value: 'Value'
-  def: 'Default'
-  nospec: '<b>Not specified</b>'
-  back: 'Back'
-  sure: "❔ <b>Are you sure you want to change the attribute?</b>"
-  confirm: "✔ Confirm"
-  decline: "❌ Cancel"
-  specvalue: "Specify a value"
-  errvalue: "❌ <b>You did not specify a value</b>"
-  chvalue: '✔ <b>You changed the attribute!</b>'
+teaconfig:
+  open: "👉 Open config"
+  back: "◀ Back"
+  close: "🛑 Close"
+  keywords_error: "❌ <b>Validation error, please check keywords</b>"
+  change: "✍ Change"
+  sure_change: "❔ Are you sure to change value"
+  edit_value: "✔ <b>You successfully changed value</b>"
+  edit_default_value: "✔ <b>You successfully changed value to default</b>"
+  choose_module: "⚙ <b>Choose module to configure</b>"
+  choose_value: "⚙ <b>Choose value to configure</b>"
+  configure_value: "⚙ <b> Editing <code>{}</code>'s param - <code>{}</code></b>\n"
+  default_value: "<b>Default value: <code>{}</code></b>\n"
+  current_value: "<b>Current value: <code>{}</code></b>\n\n"
 
 backup:
   docstring: '<b>⌛ Time after which the backup will be made (In seconds)</b>'

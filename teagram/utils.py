@@ -127,6 +127,14 @@ def get_full_command(message: Message) -> Union[
 
     return prefixes[0], command.lower(), args[-1] if args else ""
 
+def sublist(_list: list, row_length: int = 3) -> list:
+    """
+    Makes sublist in list
+    :param _list: `typing.List`
+    :return: List with sublist
+    """
+    return [_list[i:i + row_length] for i in range(0, len(_list), row_length)]
+
 def get_chat(message: Message) -> typing.Optional[int]:
     """
     Get chat id of message
