@@ -57,7 +57,7 @@ class SettingsMod(loader.Module):
         
         if not self._logger.logs[lvl]:
             return await utils.answer(
-                message, f"Нету логов на {lvl} уровне!" # Будет переведено, лейз не абижайся(
+                message, self.strings["no_logs_at_lvl"] # Будет переведено, лейз не абижайся(
             )
         
         logs = '\n'.join(
