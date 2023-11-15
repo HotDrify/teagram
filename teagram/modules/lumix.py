@@ -14,7 +14,7 @@ class LumixMod(loader.Module):
         "not_found": "❌ <b>Module not found</b>",
     }
     def __init__(self):
-        self.api = "http://teagram.ddns.net:5810"
+        self.api = "http://lumix.myddns.org:5810"
 
     def prep_docs(self, module: str) -> str:
         module = self.lookup(module)
