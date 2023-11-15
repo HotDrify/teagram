@@ -256,10 +256,13 @@ def loop(interval: Union[int, float], autostart: bool = True):
     return decorator
 
 
-def command(docs: str = None, *args, **kwargs) -> FunctionType:
+def command(docs: str = None, alias: str = None, *args, **kwargs) -> FunctionType:
     def decorator(func: FunctionType):
         if docs:
             func.__doc__ = docs
+
+        if alias:
+            setattr(func, "alias", alias)
 
         setattr(func, 'is_command', True)
 
@@ -458,6 +461,10 @@ class ModulesManager:
             for loop in self.loops:
                 if not getattr(loop, 'method', ''):
                     setattr(loop, 'method', instance)
+
+        for name, func in instance.command_handlers.copy().items():
+            if getattr(func, 'alias', ''):
+                self.aliases[func.alias] = name
 
         return instance
 

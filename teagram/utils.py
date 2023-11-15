@@ -104,11 +104,13 @@ def get_full_command(message: Message) -> Union[
         ]: A tuple containing the prefix, command, and arguments.
 
     Example:
+    .. code-block:: python
         message_text = "/command arg1 arg2"
         message = Message(text=message_text)
         result = get_full_command(message)
-        #  result also can be if you didn't set prefix: ("", "command", "arg1 arg2")
-        # For the example message_text, result will be: ("/", "command", "arg1 arg2")
+
+    Result also can be if you didn't set prefix:  ("", "command", "arg1 arg2")
+    For the example message_text, result will be: ("/", "command", "arg1 arg2")
     """
 
     message.text = str(message.text)
