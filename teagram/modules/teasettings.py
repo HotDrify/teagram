@@ -54,7 +54,12 @@ class SettingsMod(loader.Module):
         lvl = logging.getLevelName(args)
         if isinstance(lvl, int):
             lvl = _levelToName.get(lvl)
-
+        
+        if not self._logger.logs[lvl]:
+            return await utils.answer(
+                message, f"Нету логов на {lvl} уровне!" # Будет переведено, лейз не абижайся(
+            )
+        
         logs = '\n'.join(
             self._logger.format(log) for log in self._logger.logs[lvl]
         ).encode('utf-8')
@@ -66,7 +71,7 @@ class SettingsMod(loader.Module):
                     name=logging.getLevelName(lvl)
                 ) + self.levels
             )
-
+        
         logs = io.BytesIO(logs)
         logs.name = "teagram.log"
 
