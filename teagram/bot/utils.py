@@ -124,7 +124,7 @@ class Utils:
                             )
                         ]
                     elif button.get('input', ''):
-                        if btn.get('handler', ''):
+                        if button.get('handler', ''):
                             _id = random_id(5)
                             self.input_handlers[_id] = {
                                 'input': button['input'],
@@ -142,7 +142,7 @@ class Utils:
                             line += [
                                 types.InlineKeyboardButton(
                                     button['text'],
-                                    switch_inline_query_current_chat=btn['input']
+                                    switch_inline_query_current_chat=button['input']
                                 )
                             ]
                     elif button.get('url', ''):

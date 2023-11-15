@@ -139,7 +139,7 @@ class Main:
         await app.connect()
 
         if (
-            not getattr(self.args, 'disweb', '') and 
+            not getattr(self.args, 'disable_web', '') and 
             not await app.get_me()
         ):
             import socket
