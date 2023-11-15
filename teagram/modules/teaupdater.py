@@ -8,6 +8,8 @@
 #                           
 #                                    🔒 Licensed under the GNU AGPLv3
 #                                 https://www.gnu.org/licenses/agpl-3.0.html
+from .. import loader, utils, validators
+from ..types import Config, ConfigValue
 
 import os
 import sys
@@ -15,10 +17,8 @@ import time
 import atexit
 
 from telethon import types
+from telethon.tl.functions.messages import UpdateDialogFilterRequest, GetDialogFiltersRequest
 from subprocess import check_output, run
-from .. import loader, utils, validators
-from ..types import Config, ConfigValue
-from loguru import logger
 
 from aiogram import Bot
 from aiogram.utils.exceptions import CantParseEntities, BotBlocked, Unauthorized
@@ -40,12 +40,65 @@ class UpdateMod(loader.Module):
             )
         )
 
+    async def folder(self):
+        folders = await self.client(GetDialogFiltersRequest())
+        for folder in folders:
+            if getattr(folder, 'title', '') == 'Teagram':
+                return
+
+        if len(folders) == 1 and not getattr(folders[0], 'id', ''):
+            folder_id = 2
+        else:
+            try:
+                folder_id = (
+                    max(
+                        folders,
+                        key=lambda x: x.id,
+                    ).id
+                    + 1
+                )
+            except ValueError:
+                folder_id = 2
+
+        peers = []
+
+        async for dialog in self.client.iter_dialogs(ignore_migrated=True):
+            if (
+                dialog.is_channel and 
+                dialog.name in ["teagram-logs"] or
+                dialog.entity.id in [1511409614]
+            ):
+                peers.append(
+                    (await self.client.get_input_entity(dialog.entity))
+                )
+        
+        try:
+            await self.client(
+                UpdateDialogFilterRequest(
+                    folder_id,
+                    types.DialogFilter(
+                        folder_id,
+                        title="Teagram",
+                        pinned_peers=peers,
+                        include_peers=peers,
+                        exclude_peers=[]
+                    )
+                )
+            )
+        except Exception as error:
+            self.logger.warning(
+                "Error while creating teagram's folder\n" +
+                "Send this error to support chat:\n" +
+                str(error)
+            )
+
     async def on_load(self):
-        if not self.config.get('sendOnUpdate'):
+        await self.folder()
+        if not self.get('sendOnUpdate'):
             return
 
-        bot: Bot = self.bot.bot
-        me = await self.client.get_me()
+        bot: Bot = self.inline.bot
+        me = await self.manager.me
 
         try:
             _me = await bot.get_me()
@@ -55,7 +108,7 @@ class UpdateMod(loader.Module):
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
 
             atexit.register(restart)
-            logger.error("Bot is unauthorized, restarting.")
+            self.logger.error("Bot is unauthorized, restarting.")
             return sys.exit(0)
 
         last = None
@@ -70,7 +123,7 @@ class UpdateMod(loader.Module):
                     f"{self.strings['hupdate']} (<a href='https://github.com/itzlayz/teagram-tl/commit/{last}'>{last[:6]}...</a>)"
                 )
         except BotBlocked:
-            logger.error(f'Updater | {self.strings["nodialog"]} ({_me.username})')
+            self.logger.error(f'Updater | {self.strings["nodialog"]} ({_me.username})')
 
         except CantParseEntities:
             await bot.send_message(
@@ -92,7 +145,6 @@ class UpdateMod(loader.Module):
             except:
                 check_output('git stash', shell=True)
                 output = check_output('git pull', shell=True).decode()
-
 
             if 'Already up to date.' in output:
                 return await utils.answer(message, self.strings['lastver'])
