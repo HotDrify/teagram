@@ -16,17 +16,17 @@ from .. import loader, utils
 class LumixMod(loader.Module):
     strings = {
         "name": "Lumix",
-        "searching": "🔎 <b>Searching module</b>",
+        "searching": "🔎 <b>Searching module...</b>",
         "installed": "✅ <b>Module successfully loaded</b>\n",
         "not_found": "❌ <b>Module not found</b>",
-        "installing": "📥 <b>Installing module</b>"
+        "installing": "📥 <b>Installing module...</b>"
     }
     strings_ru = {
         "name": "Lumix",
-        "searching": "🔎 <b>Поиск модуля</b>",
+        "searching": "🔎 <b>Поиск модуля...</b>",
         "installed": "✅ <b>Модуль успешно установлен</b>\n",
         "not_found": "❌ <b>Модуль не найден</b>",
-        "installing": "📥 <b>Устанавливаем модуль</b>"
+        "installing": "📥 <b>Устанавливаем модуль...</b>"
     }
     def __init__(self):
         self.api = "http://lumix.myddns.me:5810"
