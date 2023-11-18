@@ -6,7 +6,7 @@ from getpass import getpass
 from typing import NoReturn, Tuple, Union
 
 from telethon.password import compute_check
-from teatelethon import TelegramClient, errors, types
+from telethon import TelegramClient, errors, types
 from telethon.tl.functions.account import GetPasswordRequest
 from telethon.tl.functions.auth import CheckPasswordRequest
 from telethon.tl import types as tltypes
