@@ -17,8 +17,96 @@ from ..utils import random_id
 
 logger = logging.getLogger()
 Markup = typing.List[typing.Union[typing.List[typing.Dict], typing.Dict]]
+Query = typing.List[typing.Dict]
 
 class Utils:
+    def _gen_inline_query(
+            self, 
+            query: Query
+            ) -> typing.Union[types.InlineQueryResult, None]:
+        """
+        Generates inline query from list
+        :param query: list with dicts
+        :return: `types.InlineQueryResult` or `None`
+        """
+        queries = []
+        for q in query:
+            if q.get('photo_url', ''):
+                queries.append(
+                    types.InlineQueryResultPhoto(
+                        id=random_id(),
+                        title=q.get('title', None),
+                        description=q.get('description', None),
+                        thumb_url=q['photo_url'],
+                        photo_url=q['photo_url'],
+                        photo_height=q.get("photo_height", None),
+                        photo_width=q.get("photo_width", None),
+                        input_message_content=types.InputMediaPhoto(
+                            q['photo_url'],
+                            q.get('caption', None),
+                            parse_mode=q.get('parse_mode', None)
+                        ),
+                        caption=q.get('caption', None)
+                    )
+                )
+            elif q.get('doc_url', ''):
+                queries.append(
+                    types.InlineQueryResultDocument(
+                        id=random_id(),
+                        title=q.get('title', None),
+                        description=q.get('description', None),
+                        document_url=q['doc_url'],
+                        thumb_url=q.get('thumb_url', None),
+                        thumb_height=q.get('thumb_height', None),
+                        thumb_width=q.get('thumb_width', None),
+                        input_message_content=types.InputMediaDocument(
+                            q['doc_url'],
+                            q.get('thumb_url', None),
+                            q.get('caption', None),
+                            parse_mode=q.get('parse_mode', None)
+                        ),
+                        caption=q.get('caption', None)
+                    )
+                )
+            elif q.get('gif_url', ''):
+                queries.append(
+                    types.InlineQueryResultGif(
+                        id=random_id(),
+                        title=q.get('title', None),
+                        description=q.get('description', None),
+                        gif_url=q.get('gif_url', None),
+                        gif_height=q.get('gif_height', None),
+                        gif_width=q.get('gif_width', None),
+                        gif_duration=q.get('gif_duration', None),
+                        input_message_content=types.InputMediaAnimation(
+                            q['gif_url'],
+                            q.get('thumb_url', None),
+                            q.get('caption', None),
+                            q.get('gif_width', None),
+                            q.get('gif_height', None),
+                            q.get('gif_duration', None),
+                            has_spoiler=q.get('spoiler', None),
+                            parse_mode=q.get('parse_mode', None)
+                        ),
+                        caption=q.get('caption', None)
+                    )
+                )
+            else:
+                queries.append(
+                    types.InlineQueryResultArticle(
+                        id=random_id(),
+                        title=q.get('title', None),
+                        description=q.get('description', None),
+                        input_message_content=types.InputTextMessageContent(
+                            q['text'],
+                            parse_mode=q.get('parse_mode', None),
+                            disable_web_page_preview=q.get('disable_web_page_preview', None)
+                        )
+                    )
+                )
+
+        return queries
+
     def _generate_markup(
             self, 
             markup: Markup

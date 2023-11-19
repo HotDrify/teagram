@@ -276,11 +276,20 @@ class Events(Item):
                 len(vars_ := inspect.getfullargspec(func).args) > 3
                 and vars_[3] == "args"
             ):
-                await func(inline_query, args)
+                possible = await func(inline_query, args)
             else:
-                await func(inline_query)
+                possible = await func(inline_query)
         except Exception as error:
             logging.exception(error)
+
+        if isinstance(possible, (list, tuple)):
+            try:
+                return await inline_query.answer(
+                    self._gen_inline_query(possible),
+                    cache_time=30
+                )
+            except Exception as error:
+                logging.exception(error)
 
         return inline_query
 
