@@ -68,7 +68,7 @@ function genqr(){
     port = `:${window.location.port}`
   }
 
-  fetch(`${window.location.href}qrcode${port}`, {method: "GET"})
+  fetch(`${window.location.href}qrcode`, {method: "GET"})
   .then(
       (response) => {return response.text()}
   ).then(
@@ -109,12 +109,7 @@ function updating_qr(){
   tries += 1
 
   if (__qr) {
-      let port = "";
-      if (window.location.port){
-        port = `:${window.location.port}`
-      }
-
-      fetch(`${window.location.href}checkqr${port}`, {method: "GET"})
+      fetch(`${window.location.href}checkqr`, {method: "GET"})
       .then(
           (response) => {return response.text()}
       ).then(
@@ -144,11 +139,7 @@ function updating_qr(){
 
 async function post(endpoint, headers) {
   try {
-      let port = "";
-      if (window.location.port){
-        port = `:${window.location.port}`
-      }
-      const response = await fetch(window.location.href + endpoint + port, {
+      const response = await fetch(window.location.href + endpoint, {
       method: 'POST',
       headers: headers,
     });
