@@ -29,8 +29,21 @@ class Utils:
         :param query: list with dicts
         :return: `types.InlineQueryResult` or `None`
         """
+        if isinstance(query, dict):
+            query = [query]
+
         queries = []
         for q in query:
+            q['text'] = q.get('text', q.get('message', ''))
+            if not q['text'] and not q.get('caption', ''):
+                logger.warning("Inline query needs text")
+
+            if q.get('reply_markup', ''):
+                if isinstance(q['reply_markup'], dict):
+                    q['reply_markup'] = self._generate_markup([q['reply_markup']])
+                elif isinstance(q['reply_markup'], list):
+                    q['reply_markup'] = self._generate_markup(q['reply_markup'])
+
             if q.get('photo_url', ''):
                 queries.append(
                     types.InlineQueryResultPhoto(

@@ -271,6 +271,7 @@ class Events(Item):
                 ], cache_time=0
             )
 
+        possible = None
         try:
             if (
                 len(vars_ := inspect.getfullargspec(func).args) > 3
@@ -282,7 +283,7 @@ class Events(Item):
         except Exception as error:
             logging.exception(error)
 
-        if isinstance(possible, (list, tuple)):
+        if isinstance(possible, (list, tuple, dict)):
             try:
                 return await inline_query.answer(
                     self._gen_inline_query(possible),

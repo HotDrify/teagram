@@ -213,19 +213,22 @@ def get_callback_handlers(instance: Module) -> Dict[str, FunctionType]:
         )
     }
 
+def get_inline_handlers(instance: Module) -> Dict[str, Callable]:
+    inline_handlers = {}
 
-def get_inline_handlers(instance: Module) -> Dict[str, FunctionType]:
-    return {
-        method_name[:-15].lower(): getattr(
-            instance, method_name
-        ) for method_name in dir(instance)
+    for method_name in dir(instance):
         if (
             callable(getattr(instance, method_name))
-            and len(method_name) > 15
-            and method_name.endswith("_inline_handler")
-        )
-    }
+            and (
+                (len(method_name) > 15 and method_name.endswith("_inline_handler"))
+                or hasattr(getattr(instance, method_name), "is_inline_handler")
+            )
+        ):
+            key = method_name[:-15].lower() if len(method_name) > 15 else method_name.lower()
+            value = getattr(instance, method_name.lower())
+            inline_handlers[key] = value
 
+    return inline_handlers
 
 def get_loops(instance: Module):
     loops = []
@@ -277,6 +280,17 @@ def command(docs: str = None, alias: str = None, *args, **kwargs) -> FunctionTyp
             setattr(func, "alias", alias)
         
         setattr(func, "is_command", True)
+        tag(*args, **kwargs)
+        return func
+
+    return decorator
+
+def inline_handler(docs: str = None, *args, **kwargs) -> FunctionType:
+    def decorator(func: FunctionType):
+        if docs:
+            func.__doc__ = docs
+        
+        setattr(func, "is_inline_handler", True)
         tag(*args, **kwargs)
         return func
 

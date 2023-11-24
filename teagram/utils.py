@@ -701,7 +701,4 @@ def get_distro() -> str:
     else:
         return
 
-
-
-
-
+rand = random_id
