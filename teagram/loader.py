@@ -242,19 +242,31 @@ def get_loops(instance: Module):
 
     return loops
 
+def tag(*args, **kwargs) -> FunctionType:
+    def decorator(func: FunctionType):
+        for arg in args:
+            setattr(func, arg, True)
+
+        for kwarg, value in kwargs.items():
+            setattr(func, kwarg, value)
+
+        return func
+
+    return decorator
 
 def loop(interval: Union[int, float], autostart: bool = True):
     def decorator(func: FunctionType):
         _loop = Loop(func, interval, autostart)
-        setattr(func, 'loop', True)
-        setattr(func, '_loop', _loop)
-        setattr(func, 'interval', interval)
-        setattr(func, 'autostart', autostart)
+        setattr(func, "loop", True)
+        tag(
+            _loop=_loop,
+            interval=interval,
+            autostart=autostart
+        )
 
         return _loop
 
     return decorator
-
 
 def command(docs: str = None, alias: str = None, *args, **kwargs) -> FunctionType:
     def decorator(func: FunctionType):
@@ -263,37 +275,23 @@ def command(docs: str = None, alias: str = None, *args, **kwargs) -> FunctionTyp
 
         if alias:
             setattr(func, "alias", alias)
-
-        setattr(func, 'is_command', True)
-
-        for arg in args:
-            setattr(func, arg, True)
-
-        for kwarg, value in kwargs.items():
-            setattr(func, kwarg, value)
-
+        
+        setattr(func, "is_command", True)
+        tag(*args, **kwargs)
         return func
 
     return decorator
 
 def watcher(*args, **kwargs) -> FunctionType:
     def decorator(func: FunctionType):
-        setattr(func, 'watcher', True)
-
-        for arg in args:
-            setattr(func, arg, True)
-
-        for kwarg, value in kwargs.items():
-            setattr(func, kwarg, value)
-
+        setattr(func, "watcher", True)
+        tag(*args, **kwargs)
         return func
 
     return decorator
 
 def inline_everyone(func: Callable) -> FunctionType:
-    setattr(func, 'inline_everyone', True)
-
-    return func
+    return setattr(func, 'inline_everyone', True)
 
 def on_bot(custom_filters: LambdaType) -> FunctionType:
     """
