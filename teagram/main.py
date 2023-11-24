@@ -15,12 +15,10 @@ from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequ
 from telethon.types import ChatAdminRights
 
 from aiogram import Bot
-import os, sys, time, logging, argparse, json
+import os, sys, time, logging
 
 logger = logging.getLogger()
-
-teagram = sys.modules['teagram']
-teagram.inline = teagram.bot # alias
+sys.modules['teagram.inline'] = sys.modules['teagram.bot']
 
 class TeagramStreamHandler(logging.StreamHandler):
     def __init__(self, *args, **kwargs):

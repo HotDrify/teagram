@@ -157,8 +157,8 @@ class BotManager(Events, TokenManager):
     
     async def form(
         self,
-        *,
         text: str = 'Teagram',
+        *,
         message: Message, 
         reply_markup: Union[InlineKeyboardMarkup, list, None] = None,
         callback: typing.Any = None,

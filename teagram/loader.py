@@ -516,9 +516,12 @@ class ModulesManager:
             except TypeError as error:
                 logger.error(traceback.format_exc())
                 return logger.warning("Installation packages not specified")
+            
+            if not requirements:
+                logger.error(traceback.format_exc())
+                return logger.warning("Installation packages not specified")
 
             logger.info(f"Installing packages: {', '.join(requirements)}...")
-
             try:
                 subprocess.run(
                     [

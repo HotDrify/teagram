@@ -4,6 +4,7 @@ import inspect
 from types import FunctionType
 from typing import Union
 
+from aiogram import types as aiotypes
 from aiogram.types import CallbackQuery, InlineQuery, Message, InlineKeyboardMarkup
 from telethon import TelegramClient
 
@@ -82,10 +83,40 @@ class InlineCall(CallbackQuery):
 
     async def edit(
         self,
-        text: str,
+        text: str = None,
+        photo: str = None,
+        gif: str = None,
+        file = None,
+        spoiler: bool = False,
         reply_markup: InlineKeyboardMarkup = None,
         inline_message_id: str = None
     ):
+        if not text and not (
+            photo or gif or file
+        ):
+            logger.warning("InlineCall needs text or media for edit")
+            return
+        
+        from io import BytesIO
+        media = None
+        if isinstance(file, BytesIO):
+            media = aiotypes.InputFile(file)
+
+        try:
+            if photo:
+                media = aiotypes.InputMediaPhoto(photo, text, parse_mode="html")
+            if gif:
+                media = aiotypes.InputMediaAnimation(
+                    photo, caption=text, parse_mode="html", has_spoiler=spoiler)
+        except Exception as error:
+            logger.exception("Can't delete inline call")
+        
+        if media:
+            return await self._bot.edit_message_media(
+                media, 
+                inline_message_id=inline_message_id or self.inline_message_id,
+                reply_markup=reply_markup
+            )
         try:
             return await self._bot.edit_message_text(
                 text,
@@ -97,7 +128,7 @@ class InlineCall(CallbackQuery):
 
     async def delete(self):
         try:
-            if self.message.chat:
+            if self.message and self.message.chat:
                 return await self._bot.delete_message(
                     chat_id=self.message.chat.id,
                     message_id=self.message.message_id
