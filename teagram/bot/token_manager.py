@@ -55,7 +55,7 @@ class TokenManager(Item):
                 return sys.exit(0)
 
 
-            await conv.send_message(f"Teagram UserBot of {utils.get_display_name(self._manager.me)[:45]}")
+            await conv.send_message(f"Teagram Userbot of {utils.get_display_name(self._manager.me)[:45]}")
             await conv.get_response()
             
             bot_username = f"teagram_{utils.random_id(6)}_bot"

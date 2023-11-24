@@ -70,7 +70,7 @@ class EvalMod(loader.Module):
 
         await utils.answer(
             message,
-            "<b>💻 Code</b>:\n"
+            "<b>🐍 Code</b>:\n"
             f"<code>{args}</code>\n"
             "<b>💻 Output</b>:\n"
             f"<code>{utils.escape_html(result)}</code>"

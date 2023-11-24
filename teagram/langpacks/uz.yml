@@ -78,6 +78,7 @@ teaconfig:
   close: "🛑 Yopish"
   keywords_error: "❌ <b>Tasdiqlash xatosi, iltimos, so'zlarini tekshiring</b>"
   change: "✍ O'zgartirish"
+  default: "🔄 Standart"
   sure_change: "❔ Haqiqatan ham qiymatni o'zgartirmoqchimisiz"
   edit_value: "✔ <b>Siz muvaffaqiyatli o'zgartirdingiz</b>"
   edit_default_value: "✔ <b>Siz muvaffaqiyatli o'zgartirdingiz (standart qiymat)</b>"
@@ -97,7 +98,8 @@ backup:
 settings:
   flushed: "<b>✅ Jurnallar tozalandi</b>"
   no_logs: "<b>❌ <b>Siz darajasini ko'rsatmadingiz yoki noto'g'ri log darajasini ko'rsatdingiz:</b>\n"
-  no_lvl: "<b>❌ <b>Noto'g'ri log darajasi {lvl} ({name})</b>"
+  no_lvl: "<b>❌ <b>Noto'g'ri log darajasi {lvl} ({name})</b>\n"
+  no_logs_at_lvl: "<b>⚠ {lvl} darajasida jurnallar yo'q!</b>"
   logs: "<b>📤 {lvl} ({name}) darajasidagi jurnallar</b>"
   wprefix: "<b>❔ Qaysi prefixni o'zgartirmoqchisiz?</b>"
   prefix: "<b>✅ Prefix {prefixes} ga o'zgartirildi</b>"

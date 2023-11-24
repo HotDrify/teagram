@@ -62,10 +62,7 @@ class LoaderMod(loader.Module):
         module = self.lookup(module)
         prefix = self.get_prefix()[0]
         return "\n".join(
-            "👉 <code>{}</code> {}".format(
-                prefix + command,
-                f"- <b>{module.command_handlers[command].__doc__}</b>" or ''
-            )
+            f"""👉 <code>{prefix + command}</code> {f"- <b>{module.command_handlers[command].__doc__}</b>" or ''}"""
             for command in module.command_handlers
         )
     
@@ -282,7 +279,8 @@ class LoaderMod(loader.Module):
             )
         )
 
-    async def unloadmod_cmd(self,  message: types.Message, args: str):
+    @loader.command(alias='ulm')
+    async def unloadmod(self,  message: types.Message, args: str):
         """Выгрузить модуль. Использование: unloadmod <название модуля>"""
         if not (module_name := self.manager.unload_module(args.strip())):
             return await utils.answer(
@@ -308,7 +306,8 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, self.strings['unloadedmod'].format(module_name))
     
-    async def reloadmod_cmd(self,  message: types.Message, args: str):
+    @loader.command(alias='rlm')
+    async def reloadmod(self,  message: types.Message, args: str):
         if not args:
             return await utils.answer(
                 message, self.strings['noargs'])
@@ -362,7 +361,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, self.strings['reloaded'].format(module))
     
-    @loader.command('Скинуть модуль из папки модулей')
+    @loader.command('Скинуть модуль из папки модулей', 'mlmod')
     async def showmod(self, message: types.Message, args):
         if not (mod := args.split()) or f'{mod[0]}.py' not in os.listdir(
             'teagram/modules'

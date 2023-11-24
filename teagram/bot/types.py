@@ -97,8 +97,12 @@ class InlineCall(CallbackQuery):
 
     async def delete(self):
         try:
-            return await self._bot.delete_message(
-                message_id=self.message.message_id
-            )
+            if self.message.chat:
+                return await self._bot.delete_message(
+                    chat_id=self.message.chat.id,
+                    message_id=self.message.message_id
+                )
+
+            return False
         except Exception:
             logger.exception("Can't delete inline call")

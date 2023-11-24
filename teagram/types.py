@@ -176,6 +176,9 @@ class Message(TeleMessage):
     """`telethon.tl.custom.Message`"""
     def __init__(self, *args, **kwargs):
         super.__init__(*args, **kwargs)
+
+    async def edit(self, *args, **kwargs):
+        return await super().edit(*args, **kwargs, parse_mode="html")
     
     def __str__(self):
         return self.text

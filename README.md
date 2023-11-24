@@ -1,10 +1,11 @@
-[![Teagram](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=Teagram+Userbot)](https://t.me/UBteagram)
+[![Teagram](https://github.com/MuRuLOSE/teagram-assets/raw/main/teagram_banner2v1.png)](https://t.me/UBteagram)
 
-<b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — userbot which uses <a href="https://github.com/LonamiWebs/Telethon">Telethon</a><br>
-Teagram based on <a href=https://github.com/sh1tn3t/sh1t-ub>sh1t-ub</a>
-
-Teagram is a telegram user bot with many features such as translator, terminal, eval, etc. <br>
-User bot allows you to create modules that do not require much knowledge
+<p align="center">
+    <b><a href="https://t.me/UBteagram">Teagram UserBot</a></b> — userbot which uses <a href="https://github.com/LonamiWebs/Telethon">Telethon</a><br>
+    Teagram based on <a href=https://github.com/sh1tn3t/sh1t-ub>sh1t-ub</a><br><br>
+    Teagram is a telegram userbot with many features such as translator, terminal, eval, etc.<br>
+    Userbot allows you to create modules that do not require much knowledge<br>
+</p>
 
 <h1>💻 Install</h1>
 
@@ -26,6 +27,6 @@ git clone https://github.com/itzlayz/teagram-tl && cd teagram-tl && pip install 
     <li>Login via website</li>
     <li>Inline bot</li>
     <li>Translations</li>
-    <li>Actual userbot with latest api version</li>
+    <li>Actual userbot with latest Telegram API version/li>
     <li>Compatible with hikka modules</li>
 </ul>

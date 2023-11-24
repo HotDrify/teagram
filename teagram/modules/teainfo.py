@@ -87,7 +87,7 @@ class InfoMod(loader.Module):
     async def info_cmd(self, message: Message):
         """Some information about userbot"""
         avatar = self.config.get('customImage')
-        davatar = 'https://github.com/itzlayz/teagram-tl/blob/main/assets/teagram_banner2.png?raw=true'
+        davatar = 'https://raw.githubusercontent.com/MuRuLOSE/teagram-assets/main/teagram_banner2v1.png'
 
         await self.inline.form(
             message=message,

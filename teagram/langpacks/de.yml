@@ -63,6 +63,7 @@ teaconfig:
   close: "🛑 Schließen"
   keywords_error: "❌ <b>Validierungsfehler, bitte überprüfen Sie Schlüsselwörter</b>"
   change: "✍ Ändern"
+  default: "🔄 Standard"
   sure_change: "❔ Sind Sie sicher, dass Sie den Wert ändern möchten"
   edit_value: "✔ <b>Sie haben den Wert erfolgreich geändert</b>"
   edit_default_value: "✔ <b>Sie haben den Wert erfolgreich auf den Standardwert zurückgesetzt</b>"
@@ -96,7 +97,8 @@ backup:
 settings:
   flushed: "<b>✅ Logs geleert</b>"
   no_logs: "<b>❌ Sie haben das Level nicht angegeben oder ein falsches Level angegeben:</b>\n"
-  no_lvl: "<b>❌ Falsches Level {lvl} ({name})</b>"
+  no_lvl: "<b>❌ Falsches Level {lvl} ({name})</b>\n"
+  no_logs_at_lvl: "<b>⚠ Keine Protokolle auf {lvl}-Ebene!</b>"
   logs: "<b>📤 Logs mit Level {lvl} ({name})</b>"
   wprefix: "<b>❔ Welchen Präfix soll ich setzen?</b>"
   prefix: "<b>✅ Präfix wurde auf {prefixes} gesetzt</b>"

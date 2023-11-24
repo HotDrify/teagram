@@ -104,11 +104,13 @@ def get_full_command(message: Message) -> Union[
         ]: A tuple containing the prefix, command, and arguments.
 
     Example:
+    .. code-block:: python
         message_text = "/command arg1 arg2"
         message = Message(text=message_text)
         result = get_full_command(message)
-        #  result also can be if you didn't set prefix: ("", "command", "arg1 arg2")
-        # For the example message_text, result will be: ("/", "command", "arg1 arg2")
+
+    Result also can be if you didn't set prefix:  ("", "command", "arg1 arg2")
+    For the example message_text, result will be: ("/", "command", "arg1 arg2")
     """
 
     message.text = str(message.text)
@@ -185,8 +187,7 @@ def strtobool(val):
         raise ValueError("invalid truth value %r" % (val,))
     
 def validate(attribute):
-    """Делает валидацию типа из строки (в int, bool)
-        Validation type from string (in int, bool)"""
+    """Validation type from string (in int, bool)"""
     if isinstance(attribute, str):
         try:
             attribute = int(attribute)
@@ -392,7 +393,7 @@ async def set_avatar(
 
     await fw_protect()
 
-    try:
+    with contextlib.suppress(Exception):
         await client.delete_messages(
             peer,
             message_ids=[
@@ -403,9 +404,6 @@ async def set_avatar(
                 ).message.id
             ],
         )
-    except Exception:
-        pass
-
     return True
 
 async def answer(
@@ -417,30 +415,19 @@ async def answer(
     caption: str = '',
     parse_mode: str = 'html',
     **kwargs
-) -> List[Message]:
+) -> Message:
     """
     Send a response to a message, with optional photo or document attachment.
 
-    Parameters:
-        message (Union[Message, List[Message]]): The original message or a list of messages to reply to.
-        response (Union[str, Any]): The response to send. It can be a text message, a path to a photo/document, or a file-like object.
-        photo (bool, optional): If True, a photo will be sent along with the response. Default is False.
-        document (bool, optional): If True, a document will be sent along with the response. Default is False.
-        caption (str, optional): Caption for the sent photo or document, if applicable.
-        parse_mode (str, optional): Parse mode for formatting text. Default is 'html'.
-        **kwargs: Additional keyword arguments for sending messages or files.
-
-    Returns:
-        List[Message]: A list of sent messages.
-
-    Example:
-        response_text = "Thank you for your message!"
-        await utils.answer(message, response_text)
-        
-        response_image_path = "image.jpg"
-        await utils.answer(message, response_image_path, photo=True, caption="Here's an image for you.")
+    :param message: Message or list with message
+    :param response: Text in message
+    :param photo: Send photo (bool)
+    :param document: Send document (bool) 
+    :param topic: Send in topic (bool) 
+    :param caption: Text under doc/photo
+    :param parse_mode: Markdown/HTML 
+    :return: `Message` 
     """
-    messages: List[Message] = []
     client: TelegramClient = message._client
     chat = get_chat(message)
 
@@ -481,24 +468,20 @@ async def answer(
                     **kwargs
                 )
 
-        messages.append(msg)
-
     if photo or document:       
-        messages.append(
-            await client.send_file(
-                chat, 
-                response,
-                caption=caption,
-                parse_mode=parse_mode,
-                reply_to=(get_topic(message) if topic else message.id),
-                **kwargs
-            )
+        msg = await client.send_file(
+            chat, 
+            response,
+            caption=caption,
+            parse_mode=parse_mode,
+            reply_to=(get_topic(message) if topic else message.id),
+            **kwargs
         )
 
         if message.out:
             await message.delete()
 
-    return messages
+    return msg
 
 async def invoke_inline(
     message: Message,
@@ -523,6 +506,21 @@ async def invoke_inline(
         get_chat(message),
         reply_to=message.reply_to_msg_id or None
     )
+
+# https://github.com/hikariatama/Hikka/blob/master/hikka/utils.py#L879C1-L886C63
+def chunks(_list: typing.List, n: int, /) -> typing.List[typing.List[typing.Any]]:
+    """
+    Split provided `_list` into chunks of `n`
+    :param _list: List to split
+    :param n: Chunk size
+    :return: List of chunks
+
+    For example:
+    .. code-block:: python
+    >>> chunks([1, 2, 3, 4, 5, 6], 2)
+    >>> [[1, 2], [3, 4], [5, 6]]
+    """
+    return [_list[i : i + n] for i in range(0, len(_list), n)]
 
 # https://github.com/hikariatama/Hikka/blob/master/hikka/utils.py#L862-L876
 def get_link(user: typing.Union[types.User, types.Channel], /) -> str:
@@ -636,23 +634,21 @@ def get_platform() -> str:
     IS_WSL = 'WSL_DISTRO_NAME' in os.environ
 
     if IS_TERMUX:
-        platform = "📱 Termux"
+        return "📱 Termux"
     elif IS_DOCKER:
-        platform = "🐳 Docker"
+        return "🐳 Docker"
     elif IS_GOORM:
-        platform = "💚 Goorm"
+        return "💚 Goorm"
     elif IS_WSL:
-        platform = "🧱 WSL"
+        return "🧱 WSL"
     elif IS_WIN:
-        platform = "💻 Windows"
+        return "💻 Windows"
     elif IS_CODESPACES:
-        platform = "👨‍💻 Github Codespaces"
+        return "👨‍💻 Github Codespaces"
     elif IS_ZACHOST:
-        platform = "❔ Zachemhost"
+        return "❔ Zachemhost"
     else:
-        platform = "🖥️ VDS"
-    
-    return platform
+        return "🖥️ VDS"
 
 def random_id(length: int = 10) -> str:
     """
@@ -700,11 +696,9 @@ def get_distro() -> str:
     info = result.stdout
 
     pattern = r'Description:\s+(.+)'
-    match = re.search(pattern, info)
-    if match:
-        distro = match.group(1)
-        return distro
-    else:  
+    if match := re.search(pattern, info):
+        return match.group(1)
+    else:
         return
 
 
