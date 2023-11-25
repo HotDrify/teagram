@@ -358,17 +358,16 @@ class ModulesManager:
         self.strings: dict = utils.get_langpack().get('manager')
         self.translator = translation.Translator(self._db)
         self.core_modules = [
-            'teabackup',
+            'backuper',
             'teaconfig',
-            'teadump',
-            'teaeval',
-            'teahelp',
-            'teainfo',
-            'tealoader',
-            'teasettings',
-            'teaterminal',
-            'teatranslator',
-            'teaupdater'
+            'dump',
+            'eval',
+            'help',
+            'info',
+            'loader',
+            'settings',
+            'terminal',
+            'updater'
         ]
 
         self.dp: dispatcher.DispatcherManager = None

@@ -18,7 +18,7 @@ from ..bot.types import InlineCall
 from aiogram import Bot
 from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
-@loader.module("TeaConfig", "teagram")
+@loader.module("Config", "teagram")
 class TeaConfigMod(loader.Module):
     strings = {'name': "teaconfig"}
     def __init__(self):

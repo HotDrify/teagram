@@ -1,13 +1,10 @@
-from datetime import datetime
 from types import FunctionType
 from typing import (
     Any, 
     Dict, 
     List, 
     Union, 
-    Callable, 
-    Awaitable, 
-    Optional
+    Callable
 )
 
 from telethon import TelegramClient, types
@@ -18,11 +15,7 @@ from . import database, bot
 from  dataclasses import dataclass, field
 from .validators import Integer, String, Boolean, ValidationError
 
-from aiogram import Dispatcher
 from ast import literal_eval
-
-import asyncio
-import inspect
 
 class Module:
     """Module's descripton"""

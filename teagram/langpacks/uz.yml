@@ -89,7 +89,7 @@ teaconfig:
   current_value: "<b>Hozirgi qiymat: <code>{}</code></b>\n\n"
 
 
-backup:
+Backuper:
   docstring: '<b>⌛ Qanday vaqtdan keyin omborini olish (Soni sekundda)</b>'
   attempt: '<b>👀 Ombor olish urinishi boshlanmoqda...</b>'
   done: "<b>✅ Muvaffaqiyatli yaratildi.</b>"

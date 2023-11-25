@@ -89,7 +89,7 @@ terminal:
   cmd: "Befehl"
   output: "Output"
 
-backup:
+Backuper:
   attemp: '<b>👀 Versuch eines Backups...</b>'
   done: "<b>✅ Erfolgreiches Backup</b>"
   error: "<b>🚫 Fehler, überprüfen Sie die Logs</b>"

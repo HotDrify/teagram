@@ -20,7 +20,7 @@ from ..bot import BotManager
 from telethon.tl.custom import Message
 from datetime import timedelta
 
-@loader.module(name="info", author='teagram')
+@loader.module(name="Info", author='teagram')
 class InfoMod(loader.Module):
     """Узнайте что такое юзербот, или информацию о вашем 🍵teagram"""
     strings = {'name': 'info'}

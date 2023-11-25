@@ -57,7 +57,7 @@ def create_backup(src: str, dest: str, db=False):
 @loader.module(name="Backuper", author='teagram')
 class BackupMod(loader.Module):
     """С помощью этого модуля вы сможете делать бекапы модов и всего ЮБ"""
-    strings = {'name': 'backup'}
+    strings = {'name': 'Backuper'}
 
     def __init__(self):
         self.config = Config(

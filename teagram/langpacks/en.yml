@@ -88,7 +88,7 @@ teaconfig:
   default_value: "<b>Default value: <code>{}</code></b>\n"
   current_value: "<b>Current value: <code>{}</code></b>\n\n"
 
-backup:
+Backuper:
   docstring: '<b>⌛ Time after which the backup will be made (In seconds)</b>'
   attempt: '<b>👀 Attempting backup...</b>'
   done: "<b>✅ Successfully created.</b>"
