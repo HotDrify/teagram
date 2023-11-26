@@ -31,7 +31,7 @@ class LumixMod(loader.Module):
         "installing": "📥 <b>Устанавливаем модуль...</b>"
     }
     def __init__(self):
-        self.api = "http://lumix.myddns.me:62671"
+        self.api = "http://lumix.myddns.me:41730"
 
     def prep_docs(self, module: str) -> str:
         module = self.lookup(module)
