@@ -630,7 +630,7 @@ def get_platform() -> str:
     IS_DOCKER = "DOCKER" in os.environ
     IS_GOORM = "GOORM" in os.environ
     IS_WIN = "WINDIR" in os.environ
-    IS_ZACHOST = 'ZACHEMHOST' in os.environ
+    IS_ZACHOST = 'zachemhost' in os.environ
     IS_WSL = 'WSL_DISTRO_NAME' in os.environ
 
     if IS_TERMUX:
