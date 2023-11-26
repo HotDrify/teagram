@@ -646,7 +646,7 @@ def get_platform() -> str:
     elif IS_CODESPACES:
         return "👨‍💻 Github Codespaces"
     elif IS_ZACHOST:
-        return "❔ Zachemhost"
+        return "❔ Zachem㉿Host"
     else:
         return "🖥️ VDS"
 

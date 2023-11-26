@@ -23,6 +23,12 @@ from subprocess import check_output, run
 from aiogram import Bot
 from aiogram.utils.exceptions import CantParseEntities, BotBlocked, Unauthorized
 
+no_git = False
+try:
+    import git
+except:
+    no_git = True
+
 @loader.module(name="Updater", author='teagram')
 class UpdateMod(loader.Module):
     """Get update from github"""
@@ -115,20 +121,19 @@ class UpdateMod(loader.Module):
 
         try:
             last = utils.git_hash()
-            diff = (await utils.run_sync(check_output, 'git rev-parse HEAD', shell=True)).decode().strip()
-
+            diff = git.Repo().rev_parse("HEAD")
             if last != diff:
+                version = f"<a href='https://github.com/itzlayz/teagram-tl/commit/{last}'>{last[:6]}...</a>"
                 await bot.send_message(
                     me.id,
-                    f"{self.strings['hupdate']} (<a href='https://github.com/itzlayz/teagram-tl/commit/{last}'>{last[:6]}...</a>)"
+                    f"{self.strings['hupdate']} ({version})"
                 )
         except BotBlocked:
             self.logger.error(f'Updater | {self.strings["nodialog"]} ({_me.username})')
-
         except CantParseEntities:
             await bot.send_message(
                 me.id,
-                f"{self.strings['hupdate']} (https://github.com/HotDrify/teagram/commit/{last})"
+                f"{self.strings['hupdate']} (https://github.com/itzlayz/teagram-tl/commit/{last})"
             )
         except Exception as error:
             await bot.send_message(
@@ -138,33 +143,17 @@ class UpdateMod(loader.Module):
             )
 
     async def update_cmd(self, message: types.Message):
+        if no_git:
+            return await utils.answer(
+                message, "❌ <b>No git</b>")
         try:
             await utils.answer(message, self.strings['updating'])
-            try:
-                output = check_output('git pull', shell=True).decode()
-            except:
-                check_output('git stash', shell=True)
-                output = check_output('git pull', shell=True).decode()
 
-            if 'Already up to date.' in output:
+            branch = git.Repo()
+            pull = branch.pull()
+
+            if not pull or "Already up to date." in pull:
                 return await utils.answer(message, self.strings['lastver'])
-
-            if 'requirements.txt' in output:
-                await utils.answer(message, self.strings['downloading'])
-                try:
-                    run(
-                        [
-                            "pip3",
-                            "install",
-                            "--upgrade",
-                            "--disable-pip-version-check",
-                            "--no-warn-script-location",
-                            "requirements.txt",
-                        ],
-                        check=True,
-                    )
-                except:
-                    pass
 
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")
