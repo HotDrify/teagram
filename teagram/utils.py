@@ -61,6 +61,7 @@ BASE_DIR = (
     else os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 )
 BASE_PATH = Path(BASE_DIR)
+supress = contextlib.suppress
 
 # from hikka
 def escape_html(text: str, /) -> str:  # sourcery skip

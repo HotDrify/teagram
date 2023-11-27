@@ -15,7 +15,7 @@ from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequ
 from telethon.types import ChatAdminRights
 
 from aiogram import Bot
-import os, sys, time, logging
+import os, sys, git, time, logging
 
 logger = logging.getLogger()
 sys.modules['teagram.inline'] = sys.modules['teagram.bot']
@@ -46,8 +46,6 @@ class TeagramStreamHandler(logging.StreamHandler):
         super().emit(record)
 
 class Main:
-    
-    
     def __init__(self, args) -> None:
         self.db = database.db
         self.args = args
@@ -67,60 +65,65 @@ class Main:
         logging.getLogger('telethon').setLevel(logging.WARNING)
         logging.getLogger('aiohttp').setLevel(logging.WARNING)
         logging.getLogger('aiogram').setLevel(logging.WARNING)
+    
+    async def inline(self, bot, app, db):
+        id = dict(await bot.get_me())["id"]
+        admin = ChatAdminRights(
+            post_messages=True,
+            ban_users=True,
+            edit_messages=True,
+            delete_messages=True
+        )
+
+        await app(
+            InviteToChannelRequest(
+                db.cloud.input_chat,
+                [id]
+            )
+        )
+
+        await app(
+            EditAdminRequest(
+                db.cloud.input_chat,
+                id, 
+                admin,
+                'Teagram'
+            )
+        )
 
     async def on_start(self, 
                       bot: Bot, 
                       db: database.Database, 
                       prefix: str, app):
+        _sha = git.Repo().rev_parse("HEAD")
+        version = f"""<a href="{_sha}">{__version__}</a>"""
 
         try:
-            await bot.send_message(
-                db.cloud.input_chat,
-                '☕ <b>Teagram userbot has started!</b>\n'
-                f'🤖 <b>Version: {__version__}</b>\n'
-                f'❔ <b>Prefix: {prefix}</b>',
+            await bot.send_photo(
+                chat_id=db.cloud.input_chat,
+                photo="https://raw.githubusercontent.com/itzlayz/teagram-tl/main/assets/teagram_banner.png",
+                caption='☕ <b>Teagram userbot has started!</b>\n'
+                f'🤖 <b>Version: {version}</b>\n'
+                f'❔ <b>Prefix: {prefix}</b>'
             )
 
-            try:
+            with utils.supress(Exception):
                 with open('teagram.log', 'r') as log:
-                    log = log.read()
+                    log = log.readlines()
+                    if len(log) > 1:
+                        await bot.send_message(
+                            db.cloud.input_chat,
+                            f'📁 <b>Logs</b>\n<code>{log}</code>'
+                        )
+        except Exception:
+            await self.inline(bot, app, db)
 
-                    await bot.send_message(
-                        db.cloud.input_chat,
-                        f'📁 <b>Logs</b>\n<code>{log}</code>'
-                    )
-            except:
-                pass
-        except:
-            id = dict(await bot.get_me())["id"]
-            admin = ChatAdminRights(
-                post_messages=True,
-                ban_users=True,
-                edit_messages=True,
-                delete_messages=True
-            )
-
-            await app(
-                InviteToChannelRequest(
-                    db.cloud.input_chat,
-                    [id]
-                )
-            )
-
-            await app(
-                EditAdminRequest(
-                    db.cloud.input_chat,
-                    id, 
-                    admin,
-                    'Teagram'
-                )
-            )
-
-            await bot.send_message(
-                db.cloud.input_chat,
-                '☕ <b>Teagram userbot has started!</b>\n'
-                f'🤖 <b>Version: {__version__}</b>\n'
-                f'❔ <b>Prefix: {prefix}</b>',
+            await bot.send_photo(
+                chat_id=db.cloud.input_chat,
+                photo="https://raw.githubusercontent.com/itzlayz/teagram-tl/main/assets/teagram_banner.png",
+                caption='☕ <b>Teagram userbot has started!</b>\n'
+                f'🤖 <b>Version: {version}</b>\n'
+                f'❔ <b>Prefix: {prefix}</b>'
             )
 
     async def main(self):
