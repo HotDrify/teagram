@@ -149,7 +149,7 @@ class UpdateMod(loader.Module):
         try:
             await utils.answer(message, self.strings['updating'])
 
-            branch = git.Repo()
+            branch = git.Repo().remotes.origin
             pull = branch.pull()
 
             if not pull or "Already up to date." in pull:
