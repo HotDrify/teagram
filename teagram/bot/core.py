@@ -159,6 +159,7 @@ class BotManager(Events, TokenManager):
         self,
         text: str = 'Teagram',
         *,
+        del_message: bool = True,
         message: Message, 
         reply_markup: Union[InlineKeyboardMarkup, list, None] = None,
         callback: typing.Any = None,
@@ -189,6 +190,8 @@ class BotManager(Events, TokenManager):
 
         try:
             await self.invoke_unit(unit_id, message)
+            if del_message:
+                await message.delete()
         except Exception as error:
             del self._units[unit_id]
 
@@ -197,6 +200,6 @@ class BotManager(Events, TokenManager):
             await utils.answer(
                 message,
                 f"❌ <code>{error}</code>"
-            )   
+            )
 
         return unit_id
