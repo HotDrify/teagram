@@ -168,7 +168,7 @@ class BotManager(Events, TokenManager):
         doc: Document = None,
         **kwargs
     ):
-        unit_id = callback or utils.random_id()
+        unit_id = (callback if isinstance(callback, str) else None) or utils.random_id()
         self._units[unit_id] = {
             'type': 'form',
             'title': 'Teagram',
