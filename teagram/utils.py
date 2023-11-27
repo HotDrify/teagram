@@ -250,7 +250,8 @@ async def asset_channel(
     silent: bool = False,
     archive: bool = False,
     invite_bot: bool = False,
-    avatar: typing.Optional[str] = None
+    avatar: typing.Optional[str] = None,
+    _folder = None
 ) -> typing.Tuple[Channel, bool]:
     """
     Create new channel (if needed) and return its entity

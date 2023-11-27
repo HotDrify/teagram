@@ -162,16 +162,16 @@ class StringLoader(SourceLoader):
     def get_data(self, _: str) -> str:
         return self.data
 
-
 def get_command_handlers(instance: Module) -> Dict[str, FunctionType]:
     command_handlers = {}
     for method_name in dir(instance):
-        if callable(getattr(instance, method_name)) and len(method_name) > 4:
+        iscmd = hasattr(getattr(instance, method_name), "is_command")
+        if callable(getattr(instance, method_name)) and (len(method_name) > 4 if not iscmd else True):
             if method_name.endswith("_cmd"):
                 command_handlers[method_name[:-4].lower()] = getattr(instance, method_name)
             elif method_name.endswith("cmd"):
                 command_handlers[method_name[:-3].lower()] = getattr(instance, method_name)
-            elif hasattr(getattr(instance, method_name), "is_command"):
+            elif iscmd:
                 method_name = method_name.replace('_cmd', '').replace('cmd', '')
                 command_handlers[method_name] = getattr(instance, method_name)
                 
@@ -495,8 +495,8 @@ class ModulesManager:
         spec.loader.exec_module(module)
 
         instance = None
-        for key, value in vars(module).items():
-            if key.endswith("Mod") and issubclass(value, Module):
+        for value in vars(module).values():
+            if isinstance(value, type) and issubclass(value, Module):
                 for module in self.modules:
                     if module.__class__.__name__ == value.__name__:
                         self.unload_module(module, True)
@@ -505,7 +505,7 @@ class ModulesManager:
                 instance = self._init_instance(value())
 
         if not instance:
-            logger.warn(f"Could not find module class ending with `Mod` ({module_name})")
+            logger.warn(f"Could not find module class ({module_name})")
 
         return instance
 
@@ -573,7 +573,16 @@ class ModulesManager:
     async def send_on_load(self, module: Module) -> bool:
         try:
             await module.on_load()
-            await module.client_ready(self._client, self._db)
+            _len = len(inspect.getfullargspec(module.client_ready).args)
+            if _len >= 2:
+                args = [self._client]
+                if _len == 3:
+                    args.append(self._db)
+                await module.client_ready(*args)
+            else:
+                await module.client_ready()
+
+            
         except Exception as error:
             return logger.exception(error)
 

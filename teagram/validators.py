@@ -63,6 +63,40 @@ class Integer(Validator):
         
         return value
 
+class Float(Validator):
+    """
+    Float validator
+    :param minimum: minimum value
+    :param maximum: minimum maximum
+    """
+
+    def __init__(
+        self,
+        *,
+        minimum: float = None,
+        maximum: float = None
+    ):
+        super().__init__(partial(
+            self._valid,
+            minimum=minimum,
+            maximum=maximum
+        ))
+
+    @staticmethod
+    def _valid(value: ALLOWED_TYPES, *, minimum: float = None, maximum: float = None) -> Union[float, None]:
+        try:
+            value = float(str(value).strip())
+        except ValueError:
+            raise ValidationError('Value must be a float')
+
+        if minimum and value < minimum:
+            raise ValidationError('Value must be greater than minimum')
+        
+        if maximum and value > maximum:
+            raise ValidationError('Value must be lower than maximum') 
+        
+        return value
+
 class String(Validator):
     """
     Строка/String

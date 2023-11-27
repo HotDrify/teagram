@@ -264,10 +264,6 @@ class LoaderMod(loader.Module):
 
             return await utils.answer(
                 message, self.strings['downdedreq'])
-
-        if not module_name:
-            return await utils.answer(
-                message, self.strings['errmod'])
         
         with open(f'teagram/modules/{module}.py', 'w', encoding="utf-8") as file:
             file.write(_file)
