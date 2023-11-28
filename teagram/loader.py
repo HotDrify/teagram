@@ -87,7 +87,10 @@ class Loop:
             if self.interval <= 0:
                 logger.exception('Interval must be higher than zero')
                 break
-
+            if not getattr(self, 'method', ''):
+                logger.error("No method")
+                break
+            
             try:
                 await self.func(self.method, *args, **kwargs)
             except Exception as error:
