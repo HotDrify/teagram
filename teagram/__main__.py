@@ -7,6 +7,7 @@ if sys.version_info < (3, 9, 0):
     sys.exit(1)
 
 from .main import Main
+from .logger import init_logging
 from contextlib import suppress
 
 parser = argparse.ArgumentParser()
@@ -17,6 +18,8 @@ parser.add_argument(
 )
 
 if __name__ == "__main__":
+    init_logging()
+    
     with suppress(KeyboardInterrupt):
         args = parser.parse_args()
         main = Main(args).main

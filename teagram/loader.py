@@ -45,7 +45,7 @@ logger = logging.getLogger()
 class Loop:
     def __init__(
         self,
-        func,
+        func: FunctionType,
         interval: Union[int, float],
         autostart: bool,
         *args,
@@ -58,6 +58,7 @@ class Loop:
         self.autostart = autostart
         self.status = False
         self.task = None
+        self.method = None
 
         if self.autostart:
             self.start(*args, **kwargs)
@@ -87,10 +88,10 @@ class Loop:
             if self.interval <= 0:
                 logger.exception('Interval must be higher than zero')
                 break
+
             if not getattr(self, 'method', ''):
-                logger.error("No method")
                 break
-            
+
             try:
                 await self.func(self.method, *args, **kwargs)
             except Exception as error:
@@ -379,16 +380,17 @@ class ModulesManager:
 
     async def load(self, app: TelegramClient) -> bool:
         setattr(app, 'loader', self)
+        
 
         self.dp = dispatcher.DispatcherManager(app, self)
         await self.dp.load()
 
         self.bot_manager = bot.BotManager(app, self._db, self)
         await self.bot_manager.load()
-
         self.inline = self.bot_manager
         self.me.phone = "sup"
-
+        
+        setattr(app, 'inline_bot', self.inline.bot)
         for local_module in filter(
             lambda file_name: file_name.endswith(".py")
             and not file_name.startswith("_"), os.listdir(self._local_modules_path)

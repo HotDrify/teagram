@@ -20,31 +20,6 @@ import os, sys, git, time, logging
 logger = logging.getLogger()
 sys.modules['teagram.inline'] = sys.modules['teagram.bot']
 
-class TeagramStreamHandler(logging.StreamHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.logs = {
-            'INFO': [],
-            'WARNING': [],
-            'ERROR': [],
-            'CRITICAL': [],
-            'DEBUG': [],
-            'NOTSET': []
-        }
-
-        with open("teagram.log", "w", encoding='utf-8') as l:
-            l.write("")
-
-    def emit(self, record):
-        lvl = logging.getLevelName(record.levelno)
-        self.logs[lvl].append(record)
-
-        with open("teagram.log", "a", encoding='utf-8') as l:
-            l.write(f'{self.format(record)}\n')
-        
-        super().emit(record)
-
 class Main:
     def __init__(self, args) -> None:
         self.db = database.db
@@ -54,17 +29,7 @@ class Main:
             '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
             '%Y-%m-%d %H:%M:%S'
         )
-        handler = TeagramStreamHandler()
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(fmt)
-
-        self.log = logging.getLogger()
-        self.log.addHandler(handler)
-        self.log.setLevel(logging.DEBUG)
-
-        logging.getLogger('telethon').setLevel(logging.WARNING)
-        logging.getLogger('aiohttp').setLevel(logging.WARNING)
-        logging.getLogger('aiogram').setLevel(logging.WARNING)
+        handler = logging.getLogger()
     
     async def inline(self, bot, app, db):
         id = dict(await bot.get_me())["id"]
@@ -171,6 +136,9 @@ class Main:
         me, app = await auth.Auth().authorize()
         self.db.init_cloud(app, me)
         await self.db.cloud.get_chat()
+
+        app.logchat = self.db.cloud.input_chat
+        logging.getLogger().handlers[0].client = app
         
         modules = loader.ModulesManager(app, self.db, me)
         bot: Bot = await modules.load(app)
