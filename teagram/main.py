@@ -76,9 +76,10 @@ class Main:
                 with open('teagram.log', 'r') as log:
                     log = log.readlines()
                     if len(log) > 1:
+                        logs = "\n".join(logs)
                         await bot.send_message(
                             db.cloud.input_chat,
-                            f'📁 <b>Logs</b>\n<code>{"\n".join(logs)}</code>'
+                            f'📁 <b>Logs</b>\n<code>{logs}</code>'
                         )
         except Exception:
             await self.inline(bot, app, db)
