@@ -155,6 +155,29 @@ class Utils:
                             callback_data=callback or btn['callback']
                         )
                     )
+                elif btn.get("action", ""):
+                    actions = ['answer', 'close']
+                    if btn['action'] not in actions:
+                        logger.warning(f"Invalid action {btn['action']}")
+                        continue
+                        
+                    data = None
+                    if btn['action'] == 'close':
+                        data = self.action_close()
+                    else:
+                        if btn.get("answer_text", ''):
+                            data = self.action_answer(btn['answer_text'])
+                        else:
+                            logger.warning("Answer action needs answer_text param")
+                            continue
+
+                    keyboard.add(
+                        types.InlineKeyboardButton(
+                            btn['text'],
+                            callback_data=data
+                        )
+                    )
+                    
                 elif btn.get('input', ''):
                     if btn.get('handler', ''):
                         _id = random_id(5)
@@ -266,3 +289,22 @@ class Utils:
             keyboard.row(*line)
 
         return keyboard
+
+    def action_close(self) -> str:
+        async def close(_self, call):
+            await call.delete()
+
+        callback_data = random_id(20)
+        self._manager.callback_handlers[callback_data] = close
+
+        return callback_data
+
+    def action_close(self, text) -> str:
+        async def answer(_self, call):
+            await call.answer(text)
+
+        callback_data = random_id(20)
+        self._manager.callback_handlers[callback_data] = answer
+
+        return callback_data
+    
