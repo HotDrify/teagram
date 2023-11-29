@@ -78,7 +78,7 @@ class Main:
                     if len(log) > 1:
                         await bot.send_message(
                             db.cloud.input_chat,
-                            f'📁 <b>Logs</b>\n<code>{log}</code>'
+                            f'📁 <b>Logs</b>\n<code>{"\n".join(logs)}</code>'
                         )
         except Exception:
             await self.inline(bot, app, db)
