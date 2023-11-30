@@ -61,11 +61,18 @@ class InlineCall(CallbackQuery):
     def __init__(
         self,
         call: CallbackQuery,
-        manager: 'types.bot.BotManager'
+        manager: 'types.bot.BotManager',
+        message = None
     ):
+        if message:
+            call.message = message
+            
+        CallbackQuery.__init__(self)
         self.inline_message_id = None
         self.callback_query = call
         self._bot = manager.bot
+        self.chat = getattr(call.message, 'chat', None)
+        self.chat_id = getattr(self.chat, 'id', None)
 
         for orig in (
             'id',
@@ -84,33 +91,39 @@ class InlineCall(CallbackQuery):
     async def edit(
         self,
         text: str = None,
+        reply_markup: InlineKeyboardMarkup = None,
         photo: str = None,
         gif: str = None,
         file = None,
         spoiler: bool = False,
-        reply_markup: InlineKeyboardMarkup = None,
         inline_message_id: str = None
     ):
         if not text and not (
             photo or gif or file
         ):
-            logger.warning("InlineCall needs text or media for edit")
+            logger.warning("InlineCall needs `text` or `media` for edit")
             return
         
-        from io import BytesIO
-        media = None
-        if isinstance(file, BytesIO):
-            media = aiotypes.InputFile(file)
-
-        try:
-            if photo:
-                media = aiotypes.InputMediaPhoto(photo, text, parse_mode="html")
-            if gif:
-                media = aiotypes.InputMediaAnimation(
-                    photo, caption=text, parse_mode="html", has_spoiler=spoiler)
-        except Exception as error:
-            logger.exception("Can't delete inline call")
         
+        media = None
+        if file or photo or gif:
+            from io import BytesIO
+            if isinstance(file, BytesIO):
+                media = aiotypes.InputMediaDocument(
+                    file, caption=text)
+
+            try:
+                if photo:
+                    media = aiotypes.InputMediaPhoto(
+                        photo, text, parse_mode="html",
+                        has_spoiler=spoiler)
+                if gif:
+                    media = aiotypes.InputMediaAnimation(
+                        photo, caption=text, parse_mode="html", has_spoiler=spoiler)
+            except:
+                logger.exception("Can't delete inline call")
+                return
+            
         if media:
             return await self._bot.edit_message_media(
                 media, 
