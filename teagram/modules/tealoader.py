@@ -302,7 +302,7 @@ class LoaderMod(loader.Module):
         return await utils.answer(
             message, self.strings['unloadedmod'].format(module_name))
     
-    @loader.command(alias='rlm')
+    @loader.command(alias='reload')
     async def reloadmod(self,  message: types.Message, args: str):
         if not args:
             return await utils.answer(

@@ -31,7 +31,7 @@ class TeagramLogs(logging.StreamHandler):
         self.buffer.append(record)
         super().emit(record)
         with utils.supress(Exception):
-            asyncio.ensure_future(
+            asyncio.get_running_loop().create_task(
                 self.logchat(record))
     
     async def logchat(self, record: logging.LogRecord, info=False):
@@ -39,6 +39,9 @@ class TeagramLogs(logging.StreamHandler):
         :param record: logRecord
         :param info: Pass info (bool)
         """
+        if record.levelname == "INFO" and not info:
+            return
+        
         if getattr(self, 'client', ''):
             emojis = {
                 'DEBUG': '🐞 <b>DEBUG</b>',
@@ -47,8 +50,7 @@ class TeagramLogs(logging.StreamHandler):
                 'ERROR': '🚨 <b>ERROR</b>',
                 'CRITICAL': '💥 <b>CRITICAL</b>'
             }
-            if record.levelname == "INFO" and not info:
-                return
+            
             
             await self.client.inline_bot.send_message(
                 self.client.logchat,
@@ -56,6 +58,7 @@ class TeagramLogs(logging.StreamHandler):
                 f"<code>{self.format(record)}</code>",
                 parse_mode="html"
             )
+            return 
     
 def init_logging():
     fmt = logging.Formatter(

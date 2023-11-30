@@ -48,14 +48,11 @@ class SettingsMod(loader.Module):
             return await utils.answer(
                 message, self.strings['no_logs'] + self.levels)
 
-        if not getattr(self, '_logger', ''):
-            self._logger = log.handlers[0]
-
-        lvl = logging.getLevelName(args)
-        if isinstance(lvl, int):
-            lvl = _levelToName.get(lvl)
+        lvl = args
+        if isinstance(lvl, str):
+            lvl = _nameToLevel.get(lvl)
         
-        if not self._logger.logs[lvl]:
+        if not self._logger.dumps(lvl):
             return await utils.answer(
                 message, self.strings["no_logs_at_lvl"].format(
                     lvl=lvl
@@ -63,8 +60,7 @@ class SettingsMod(loader.Module):
             )
         
         logs = '\n'.join(
-            self._logger.format(log) for log in self._logger.logs[lvl]
-        ).encode('utf-8')
+            self._logger.dumps(lvl)).encode('utf-8')
         
         if not logs:
             return await utils.answer(
