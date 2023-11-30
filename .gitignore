@@ -84,3 +84,5 @@ teagram.session-journal
 *.sqlite
 dump.json
 *.mp3
+*.ini
+*.json

@@ -31,8 +31,10 @@ class TeagramLogs(logging.StreamHandler):
         self.buffer.append(record)
         super().emit(record)
         with utils.supress(Exception):
-            asyncio.get_running_loop().create_task(
+            task = asyncio.get_running_loop().create_task(
                 self.logchat(record))
+            utils.disable_task_error(task)
+            
     
     async def logchat(self, record: logging.LogRecord, info=False):
         """

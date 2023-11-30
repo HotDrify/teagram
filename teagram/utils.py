@@ -200,6 +200,17 @@ def validate(attribute):
 
     return attribute
 
+def disable_task_error(task: asyncio.Task) -> None:
+    def pass_exc(task: asyncio.Task):
+        try:
+            task.cancel()
+        except:
+            pass
+        
+    task.add_done_callback(
+        functools.partial(pass_exc)
+    )
+
 # https://github.com/hikariatama/Hikka/blob/master/hikka/_internal.py#L16-L17
 async def fw_protect():
     await asyncio.sleep(random.randint(1000, 3000) / 1000)
