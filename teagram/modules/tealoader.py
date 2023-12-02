@@ -310,24 +310,11 @@ class LoaderMod(loader.Module):
 
         try:
             module = args.split(maxsplit=1)[0].replace('.py', '')
-
-            modules = [
-                'config',
-                'eval',
-                'help',
-                'info',
-                'terminal',
-                'tester',
-                'updater',
-                'loader'
-            ]
-
-            # for mod in modules:
-            #     if module == mod:
-            #         return await utils.answer(
-            #             message,
-            #             "❌ Нельзя перезагружать встроенные модули"
-            #         )
+            if module.lower() == "teaconfig":
+                return await utils.answer(
+                    message,
+                    "❌ Not bad"
+                )
 
             if f'{module}.py' not in os.listdir('teagram/modules'):
                 return await utils.answer(

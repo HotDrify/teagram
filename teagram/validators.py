@@ -136,8 +136,6 @@ class String(Validator):
         
         return value
 
-
-
 class Boolean(Validator):
     """Логическое значение/Logic value"""
 
@@ -186,3 +184,22 @@ class Choice(Validator):
             )
 
         return value
+    
+class Hidden(Validator):
+    """
+    Hidden validator, hides value in config
+    """
+    def __init__(self, validator: Validator = None):
+        validator = validator or String()
+        self._validator = validator
+        
+        super().__init__(
+            partial(
+                self._valid,
+                validator=validator
+            )
+        )
+    
+    @staticmethod
+    def _valid(value: ALLOWED_TYPES, /, *, validator: Validator):
+        return validator._valid(value)

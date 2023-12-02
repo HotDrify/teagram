@@ -11,7 +11,7 @@
 
 import typing
 
-from .. import loader, utils
+from .. import loader, utils, validators
 from ..validators import ValidationError
 from ..bot.types import InlineCall
 
@@ -28,6 +28,9 @@ class TeaConfigMod(loader.Module):
         if not (validator := getattr(config.config[option], 'validator')):
             return ""
 
+        if isinstance(validator, validators.Hidden):
+            return f"👥 <b>Hidden validator</b>"
+
         if not (keywords := getattr(validator.type, 'keywords', '')):
             return ""
 
@@ -35,6 +38,14 @@ class TeaConfigMod(loader.Module):
         text = ", ".join(f'<b>{key[0]}</b> - <code>{key[1]}</code>' for key in keys)
 
         return f"🔎 {text}"
+    
+    def hide(self, validator, value: str) -> str:
+        if not value:
+            return value
+        if isinstance(validator, validators.Hidden):
+            return "".join("*" for _ in range(len(value)))
+
+        return value
     
     async def change(
         self, 
@@ -188,7 +199,6 @@ class TeaConfigMod(loader.Module):
                 }
             ]
         ]
-
         await call.edit(
             self.strings("choose_value"),
             self.inline._generate_markup(markup)
@@ -203,6 +213,10 @@ class TeaConfigMod(loader.Module):
         config = self.lookup(module).config
         docstring = config.get_doc(option)
         default = config.get_default(option)
+        validator = getattr(
+            config.config[option], 
+            "validator", None
+        )
         value = config[option]
 
         if callable(docstring):
@@ -210,7 +224,7 @@ class TeaConfigMod(loader.Module):
 
         _id = utils.random_id(5)
         self._id = {"id": _id, "module": module.lower(), "option": option}
-        
+
         markup = [
             [
                 {
@@ -231,7 +245,8 @@ class TeaConfigMod(loader.Module):
                 }
             ]
         ]
-
+        
+        value = self.hide(validator, value)
         await call.edit(
             (
                 self.strings("configure_value").format(module, option) +
