@@ -79,6 +79,8 @@ teaconfig:
   keywords_error: "❌ <b>Validation error, please check keywords</b>"
   change: "✍ Change"
   default: "🔄 Default"
+  show: "🔎 Show"
+  hide: "👥 Hide"
   sure_change: "❔ Are you sure to change value"
   edit_value: "✔ <b>You successfully changed value</b>"
   edit_default_value: "✔ <b>You successfully changed value to default</b>"

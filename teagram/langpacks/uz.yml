@@ -79,6 +79,8 @@ teaconfig:
   keywords_error: "❌ <b>Tasdiqlash xatosi, iltimos, so'zlarini tekshiring</b>"
   change: "✍ O'zgartirish"
   default: "🔄 Standart"
+  show: "🔎 Show"
+  hide: "👥 Yashirish"
   sure_change: "❔ Haqiqatan ham qiymatni o'zgartirmoqchimisiz"
   edit_value: "✔ <b>Siz muvaffaqiyatli o'zgartirdingiz</b>"
   edit_default_value: "✔ <b>Siz muvaffaqiyatli o'zgartirdingiz (standart qiymat)</b>"

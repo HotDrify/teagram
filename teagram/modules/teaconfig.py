@@ -178,7 +178,59 @@ class TeaConfigMod(loader.Module):
             reply_markup=self.inline._generate_markup(
                 utils.sublist(markup))
         )
-        
+
+    async def show_value(
+        self,
+        call: InlineCall,
+        module: str,
+        option: str,
+        value: str
+    ):
+        config = self.lookup(module).config
+        docstring = config.get_doc(option)
+        default = config.get_default(option)
+        value = config[option]
+
+        if callable(docstring):
+            docstring = docstring()
+            
+        markup = [
+            [
+                {
+                    "text": self.strings("change"),
+                    "input": "set_value"
+                },
+                {
+                    "text": self.strings("default"),
+                    "callback": self.set_default_value,
+                    "args": (module, option)
+                },
+            ],
+            [
+                {
+                    "text": self.strings("hide"),
+                    "callback": self.configure_value,
+                    "args": (module, option)
+                }
+            ],
+            [
+                {
+                    "text": self.strings("back"), 
+                    "callback": self.configure,
+                    "args": (module)
+                }
+            ]
+        ]
+        await call.edit(
+            (
+                self.strings("configure_value").format(module, option) +
+                f"❔ {docstring}\n\n" +
+                self.strings("default_value").format(utils.escape_html(default)) +
+                self.strings("current_value").format(utils.escape_html(value)) +
+                self.keywords(config, option)
+            ),
+            self.inline._generate_markup(markup)
+        )
 
     async def configure(
         self, 
@@ -237,6 +289,19 @@ class TeaConfigMod(loader.Module):
                     "args": (module, option)
                 },
             ],
+            (
+                [
+                    {
+                        "text": self.strings("show"),
+                        "callback": self.show_value,
+                        "args": (module, option, value)
+                    }
+                ] if isinstance(
+                    validator,
+                    validators.Hidden
+                ) 
+                else []
+            ),
             [
                 {
                     "text": self.strings("back"), 
