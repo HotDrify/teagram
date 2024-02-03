@@ -206,7 +206,7 @@ def disable_task_error(task: asyncio.Task) -> None:
     def pass_exc(task: asyncio.Task):
         try:
             task.cancel()
-        except:
+        except Exception:
             pass
         
     task.add_done_callback(

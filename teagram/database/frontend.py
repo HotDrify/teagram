@@ -1,4 +1,4 @@
-from typing import KT, VT, Union
+from typing import KT, VT
 
 from lightdb import LightDB
 from telethon import TelegramClient, types

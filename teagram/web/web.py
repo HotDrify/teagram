@@ -186,7 +186,5 @@ class MainWeb:
         return _id, _hash
     
     def _shutdown(self):
-        self.logger.info("Wait for inline bot..")
-
         shutdown(self.port)
         asyncio.get_running_loop().stop()

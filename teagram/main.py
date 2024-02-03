@@ -56,22 +56,6 @@ class Main:
         self.db = database.db
         self.args = args
 
-        fmt = logging.Formatter(
-            '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-            '%Y-%m-%d %H:%M:%S'
-        )
-        handler = TeagramStreamHandler()
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(fmt)
-
-        self.log = logging.getLogger()
-        self.log.addHandler(handler)
-        self.log.setLevel(logging.DEBUG)
-
-        logging.getLogger('telethon').setLevel(logging.WARNING)
-        logging.getLogger('aiohttp').setLevel(logging.WARNING)
-        logging.getLogger('aiogram').setLevel(logging.WARNING)
-
     async def on_start(
         self, 
         bot: Bot, 
@@ -96,8 +80,10 @@ class Main:
                     )
             except Exception:
                 pass
+
+            return
         except Exception:
-            id = dict(await bot.get_me())["id"]
+            _id = dict(await bot.get_me())["id"]
             admin = ChatAdminRights(
                 post_messages=True,
                 ban_users=True,
@@ -108,14 +94,14 @@ class Main:
         await app(
             InviteToChannelRequest(
                 db.cloud.input_chat,
-                [id]
+                [_id]
             )
         )
 
         await app(
             EditAdminRequest(
                 db.cloud.input_chat,
-                id, 
+                _id, 
                 admin,
                 'Teagram'
             )

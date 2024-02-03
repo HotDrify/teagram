@@ -1,4 +1,6 @@
-import logging, asyncio
+import logging
+import asyncio
+
 from . import utils
 
 class TeagramLogs(logging.StreamHandler):
