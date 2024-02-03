@@ -368,7 +368,7 @@ class LoaderMod(loader.Module):
         atexit.register(restart)
         self.db.set(
             "teagram.loader", "restart", {
-                "msg": f"{((message.chat.id) if message.chat else 0 or message._chat_peer)}:{message.id}",
+                "msg": f"{utils.get_chat(message)}:{message.id}",
                 "start": time.time(),
                 "type": "restart"
             }

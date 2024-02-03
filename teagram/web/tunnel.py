@@ -52,7 +52,7 @@ class Tunnel:
             async def gettext():
                 for line in iter(self.stream.stdout.readline, ""):
                     line = (await line).decode()
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.3)
 
                     if (ur := re.search(r"tunneled.*?(https:\/\/.+)", line)):
                         nonlocal url

@@ -212,12 +212,7 @@ document.getElementById("enter").onclick = async () => {
   }  
 }
 
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-  document.body.classList.add(savedTheme);
-  let container = document.querySelector(".container")
-  container.classList.toggle("dark-theme")
-}
+container.classList.toggle("dark-theme")
 
 let themeToggle = document.getElementById("theme-toggle")
 themeToggle.addEventListener("click", function() {

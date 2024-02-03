@@ -29,7 +29,7 @@ class TeaConfigMod(loader.Module):
             return ""
 
         if isinstance(validator, validators.Hidden):
-            return f"👥 <b>Hidden validator</b>"
+            return "👥 <b>Hidden validator</b>"
 
         if not (keywords := getattr(validator.type, 'keywords', '')):
             return ""

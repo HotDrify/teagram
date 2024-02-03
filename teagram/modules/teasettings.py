@@ -17,9 +17,8 @@ import logging
 from logging import _nameToLevel, _levelToName
 from datetime import timedelta
 from telethon import types, TelegramClient
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from .. import loader, utils, bot
+from .. import loader, utils
 
 log = logging.getLogger()
 
@@ -38,7 +37,7 @@ class SettingsMod(loader.Module):
         """Отправляет логи. Использование: logs <уровень>"""
         try:
             args = int(args)
-        except:
+        except:  # noqa: E722
             args = args.strip().upper()
 
         if not args or (

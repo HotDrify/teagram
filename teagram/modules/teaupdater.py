@@ -64,7 +64,7 @@ class UpdateMod(loader.Module):
                     ).id
                     + 1
                 )
-            except ValueError:
+            except Exception:
                 folder_id = 2
 
         peers = []
