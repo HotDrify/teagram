@@ -8,6 +8,7 @@
 #                           
 #                                    🔒 Licensed under the GNU AGPLv3
 #                                 https://www.gnu.org/licenses/agpl-3.0.html
+
 from .. import loader, utils, validators
 from ..types import Config, ConfigValue
 
@@ -148,12 +149,31 @@ class UpdateMod(loader.Module):
                 message, "❌ <b>No git</b>")
         try:
             await utils.answer(message, self.strings['updating'])
+            try:
+                output = check_output('git pull', shell=True).decode()
+            except Exception:
+                check_output('git stash', shell=True)
+                output = check_output('git pull', shell=True).decode()
 
-            branch = git.Repo().remotes.origin
-            pull = branch.pull()
-
-            if not pull or "Already up to date." in pull:
+            if not output or "Already up to date." in output:
                 return await utils.answer(message, self.strings['lastver'])
+
+            if 'requirements.txt' in output:
+                await utils.answer(message, self.strings['downloading'])
+                try:
+                    run(
+                        [
+                            "pip3",
+                            "install",
+                            "--upgrade",
+                            "--disable-pip-version-check",
+                            "--no-warn-script-location",
+                            "requirements.txt",
+                        ],
+                        check=True,
+                    )
+                except:  # noqa: E722
+                    pass
 
             def restart() -> None:
                 os.execl(sys.executable, sys.executable, "-m", "teagram")

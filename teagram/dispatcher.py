@@ -84,7 +84,7 @@ class DispatcherManager:
                 await func(message, utils.get_full_command(message)[2])
             else:
                 await func(message)
-        except Exception as error:
+        except Exception:
             error = traceback.format_exc()
 
             logging.exception(error)

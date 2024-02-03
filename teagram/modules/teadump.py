@@ -3,10 +3,11 @@ from ..utils import BASE_PATH, BASE_DIR, get_distro
 from ..types import Config, ConfigValue
 
 import telethon
-import atexit
-import logging
-import json
 import platform
+
+import logging
+import atexit
+import json
 
 from git import Repo
 
@@ -26,14 +27,16 @@ def get_token():
     except KeyError:
         return False
 
-def get_git_info(commit: bool=False, url: bool=False, branch: bool=False):
+def get_git_info(commit: bool = False, url: bool = False, branch: bool = False):
     repo = REPO
 
     if commit:
         return repo.commit()
+
     if url:
         origin = repo.remotes.origin
         return origin.url
+
     if branch:
         return repo.active_branch.name
     
@@ -65,28 +68,30 @@ class DumpMod(loader.Module):
                 ver = get_distro()
             except FileNotFoundError:
                 pass
-
-        return {
-            "teagram.token": {
-                "token": get_token()
-            },
-            "teagram.modules": {
-                "modules": [mod.name for mod in self.manager.modules]
-            },
-            "teagram.version": {
-                "version":  __version__,
-                "telethon": telethon.__version__
-            },
-            "teagram.platform": {
-                "platform": utils.get_platform(),
-                "os": ver
-            },
-            "teagram.git": {
-                "url": get_git_info(url=True),
-                "commit": str(get_git_info(commit=True)),
-                "branch": str(get_git_info(branch=True))
-            }
-        }  
+        try:
+            return {
+                "teagram.token": {
+                    "token": get_token()
+                },
+                "teagram.modules": {
+                    "modules": [mod.name for mod in self.manager.modules]
+                },
+                "teagram.version": {
+                    "version":  __version__,
+                    "telethon": telethon.__version__
+                },
+                "teagram.platform": {
+                    "platform": utils.get_platform(),
+                    "os": ver
+                },
+                "teagram.git": {
+                    "url": get_git_info(url=True),
+                    "commit": str(get_git_info(commit=True)),
+                    "branch": str(get_git_info(branch=True))
+                }
+            } 
+        except TypeError:
+            pass
 
     async def dump_cmd(self, message):
         result = self.gen()

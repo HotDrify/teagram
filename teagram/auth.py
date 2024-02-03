@@ -31,7 +31,7 @@ class Auth:
         try:
             _id = config.get('telethon', 'api_id')
             _hash = config.get('telethon', 'api_hash')
-        except:
+        except Exception:
             _id = 123
             _hash = '_'
 
@@ -142,12 +142,12 @@ class Auth:
                             _qr = await qrcode.wait(15)
                             if isinstance(_qr, tltypes.User):
                                 break
-                    except:
+                    except Exception:
                         pass
 
                     try:
                         await qrcode.recreate()
-                    except:
+                    except Exception:
                         break
 
                     print('Settings > Devices > Scan QR Code (or Add device)\n')

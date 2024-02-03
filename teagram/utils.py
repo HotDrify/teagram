@@ -53,7 +53,6 @@ from telethon.tl import custom
 from . import database, init_time
 
 Message = Union[custom.Message, types.Message]
-git_hash = lambda: git.Repo().head.commit.hexsha
 _init_time = init_time
 BASE_DIR = (
     "/data"
@@ -62,6 +61,9 @@ BASE_DIR = (
 )
 BASE_PATH = Path(BASE_DIR)
 supress = contextlib.suppress
+
+def git_hash():
+    return git.Repo().head.commit.hexsha
 
 # from hikka
 def escape_html(text: str, /) -> str:  # sourcery skip
@@ -192,10 +194,10 @@ def validate(attribute):
     if isinstance(attribute, str):
         try:
             attribute = int(attribute)
-        except:
+        except:  # noqa: E722
             try:
                 attribute = bool(strtobool(attribute))
-            except:
+            except:  # noqa: E722
                 pass
 
     return attribute
@@ -473,7 +475,7 @@ async def answer(
                     parse_mode=parse_mode,
                     **kwargs
                 )
-            except: 
+            except:   # noqa: E722
                 msg = await message.reply(
                     response, 
                     parse_mode=parse_mode, 
@@ -593,7 +595,7 @@ def get_ram() -> float:
         for child in process.children(recursive=True):
             mem += child.memory_info()[0] / 2.0**20
         return round(mem, 1)
-    except:
+    except:  # noqa: E722
         return 0
 
 def get_cpu() -> float:
@@ -614,7 +616,7 @@ def get_cpu() -> float:
             cpu += child.cpu_percent()
 
         return cpu
-    except:
+    except:  # noqa: E722
         return 0
     
 def get_display_name(entity: Union[types.User, types.Chat]) -> str:

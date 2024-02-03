@@ -15,10 +15,41 @@ from telethon.tl.functions.channels import InviteToChannelRequest, EditAdminRequ
 from telethon.types import ChatAdminRights
 
 from aiogram import Bot
-import os, sys, git, time, logging
+
+import os
+import sys
+import time
+import logging
 
 logger = logging.getLogger()
-sys.modules['teagram.inline'] = sys.modules['teagram.bot']
+
+teagram = sys.modules['teagram']
+teagram.inline = teagram.bot # alias
+
+class TeagramStreamHandler(logging.StreamHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.logs = {
+            'INFO': [],
+            'WARNING': [],
+            'ERROR': [],
+            'CRITICAL': [],
+            'DEBUG': [],
+            'NOTSET': []
+        }
+
+        with open("teagram.log", "w", encoding='utf-8') as l:
+            l.write("")
+
+    def emit(self, record):
+        lvl = logging.getLevelName(record.levelno)
+        self.logs[lvl].append(record)
+
+        with open("teagram.log", "a", encoding='utf-8') as l:
+            l.write(f'{self.format(record)}\n')
+        
+        super().emit(record)
 
 class Main:
     def __init__(self, args) -> None:
@@ -29,16 +60,49 @@ class Main:
             '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
             '%Y-%m-%d %H:%M:%S'
         )
-        handler = logging.getLogger()
-    
-    async def inline(self, bot, app, db):
-        id = dict(await bot.get_me())["id"]
-        admin = ChatAdminRights(
-            post_messages=True,
-            ban_users=True,
-            edit_messages=True,
-            delete_messages=True
-        )
+        handler = TeagramStreamHandler()
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(fmt)
+
+        self.log = logging.getLogger()
+        self.log.addHandler(handler)
+        self.log.setLevel(logging.DEBUG)
+
+        logging.getLogger('telethon').setLevel(logging.WARNING)
+        logging.getLogger('aiohttp').setLevel(logging.WARNING)
+        logging.getLogger('aiogram').setLevel(logging.WARNING)
+
+    async def on_start(self, 
+                      bot: Bot, 
+                      db: database.Database, 
+                      prefix: str, app):
+
+        try:
+            await bot.send_message(
+                db.cloud.input_chat,
+                '☕ <b>Teagram userbot has started!</b>\n'
+                f'🤖 <b>Version: {__version__}</b>\n'
+                f'❔ <b>Prefix: {prefix}</b>',
+            )
+
+            try:
+                with open('teagram.log', 'r') as log:
+                    log = log.read()
+
+                    await bot.send_message(
+                        db.cloud.input_chat,
+                        f'📁 <b>Logs</b>\n<code>{log}</code>'
+                    )
+            except:
+                pass
+        except:
+            id = dict(await bot.get_me())["id"]
+            admin = ChatAdminRights(
+                post_messages=True,
+                ban_users=True,
+                edit_messages=True,
+                delete_messages=True
+            )
 
         await app(
             InviteToChannelRequest(
@@ -96,10 +160,10 @@ class Main:
         try:
             if (
                 os.geteuid() == 0
-                and utils.get_platform() not in ["🐳 Docker"]
+                and utils.get_platform().lower() not in "docker"
             ):
                 self.log.warning("Please do not use root for userbot")
-        except:
+        except:  # noqa: E722
             pass
 
         app = auth.Auth(manual=False).app
@@ -192,7 +256,7 @@ class Main:
                     )
                 ):
                     await app.edit_message(_id[0], _id[1], restarted_text, parse_mode='html')
-            except:
+            except:  # noqa: E722
                 await self.on_start(bot, self.db, prefix, app)
 
             self.db.pop("teagram.loader", "restart")

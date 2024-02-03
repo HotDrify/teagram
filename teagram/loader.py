@@ -94,7 +94,7 @@ class Loop:
 
             try:
                 await self.func(self.method, *args, **kwargs)
-            except Exception as error:
+            except Exception:
                 logger.error(traceback.format_exc())
 
             await asyncio.sleep(self.interval)
@@ -358,8 +358,9 @@ class ModulesManager:
         self._db: database.Database = db
         self.me: types.User = me
 
+        langpack = utils.get_langpack()
         self.aliases: dict = self._db.get(__name__, "aliases", {})
-        self.strings: dict = utils.get_langpack().get('manager')
+        self.strings: dict = langpack.get('manager')
         self.translator = translation.Translator(self._db)
         self.core_modules = [
             'backuper',
@@ -526,12 +527,12 @@ class ModulesManager:
             spec = ModuleSpec(module_name, StringLoader(
                 module_source, origin), origin=origin)
             instance = self.register_instance(module_name, spec=spec)
-        except ImportError as error:
+        except ImportError:
             if did_requirements:
                 return True
             try:
                 requirements = re.findall(r"# required:\s+([\w-]+(?:\s+[\w-]+)*)", module_source)
-            except TypeError as error:
+            except TypeError:
                 logger.error(traceback.format_exc())
                 return logger.warning("Installation packages not specified")
             

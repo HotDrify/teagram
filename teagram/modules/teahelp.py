@@ -10,7 +10,7 @@
 #                                 https://www.gnu.org/licenses/agpl-3.0.html
 
 from telethon import types
-from .. import __version__, loader, utils, validators
+from .. import loader, utils, validators
 from ..types import Config, ConfigValue
 
 @loader.module(name="Help", author='teagram')
@@ -28,13 +28,12 @@ class HelpMod(loader.Module):
                 validators.String()
             )
         )
-    
-    @loader.command()
-    async def corehelp(self, message: types.Message, args: str):
-        """Shows core modules"""
+
+    async def help_cmd(self, message: types.Message, args: str):
+        """Список всех модулей"""
         try:
-            self.bot_username = f'@{self.inline.me.username}'
-        except:
+            self.bot_username = f'@{(await self.bot.bot.get_me()).username}'
+        except:  # noqa: E722
             self.bot_username = self.strings['ebot']
 
         if not args:

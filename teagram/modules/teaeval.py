@@ -64,7 +64,7 @@ class EvalMod(loader.Module):
         if getattr(result, 'stringify', ''):
             try:
                 result = str(result.stringify())
-            except:
+            except:  # noqa: E722
                 pass
 
         await utils.answer(

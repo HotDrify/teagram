@@ -19,12 +19,11 @@ from typing import (
 )
 
 from telethon import TelegramClient, types
-from telethon.tl import types
 from telethon.tl.custom import Message as TeleMessage
 
 from . import database, bot
 from  dataclasses import dataclass, field
-from .validators import Integer, String, Boolean, ValidationError
+from .validators import Integer, String, Boolean, ValidationError, Validator
 
 from ast import literal_eval
 
@@ -104,7 +103,7 @@ class HikkaValue:
     default: Any = None
     doc: Union[Callable[[], str], str] = None
     value: Any = field(default_factory=WaitForDefault)
-    validator: validator = None
+    validator: Validator = None
 
     def __post_init__(self):
         if isinstance(self.value, WaitForDefault):
