@@ -120,7 +120,7 @@ class InlineCall(CallbackQuery):
                 if gif:
                     media = aiotypes.InputMediaAnimation(
                         photo, caption=text, parse_mode="html", has_spoiler=spoiler)
-            except:
+            except: # noqa: E722
                 logger.exception("Can't delete inline call")
                 return
             

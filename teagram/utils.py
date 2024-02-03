@@ -225,7 +225,13 @@ async def create_group(
     broadcast: bool = False
 ):
     await fw_protect()
-    return await app(CreateChannelRequest(title, description, megagroup=megagroup, broadcast=broadcast))
+    return await app(
+        CreateChannelRequest(
+            title, description, 
+            megagroup=megagroup, 
+            broadcast=broadcast
+        )
+    )
 
 async def invite_inline_bot(
     client: TelegramClient,

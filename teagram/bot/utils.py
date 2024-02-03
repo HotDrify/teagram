@@ -298,13 +298,3 @@ class Utils:
         self._manager.callback_handlers[callback_data] = close
 
         return callback_data
-
-    def action_close(self, text) -> str:
-        async def answer(_self, call):
-            await call.answer(text)
-
-        callback_data = random_id(20)
-        self._manager.callback_handlers[callback_data] = answer
-
-        return callback_data
-    

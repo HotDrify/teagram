@@ -103,7 +103,7 @@ class Events(Item):
             return call
         except KeyError:
             pass
-        except:
+        except:  # noqa: E722
             traceback.print_exc()
 
         try:
@@ -256,7 +256,7 @@ class Events(Item):
             return
         except KeyError:
             pass
-        except Exception as error:
+        except Exception:
             traceback.print_exc()
         
         if not func:

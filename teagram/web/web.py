@@ -52,12 +52,14 @@ api.mount(
 
 class MainWeb:
     def __init__(self):
-        self.config = Config(api, 
-                             host='0.0.0.0', 
-                             port=self.port,
-                             log_level=60)
+        self.config = Config(
+            api, 
+            host='0.0.0.0', 
+            port=self.port,
+            log_level=60
+        )
+
         self.server = Server(self.config)
-        
         self.login_data = {
             'id': 123,
             'hash': "___",

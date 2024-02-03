@@ -19,7 +19,7 @@ from typing import Union, NoReturn
 from .events import Events
 from .token_manager import TokenManager
 
-from .. import database, __version__, types, utils
+from .. import database, types, utils
 
 logger = logging.getLogger()
 
@@ -192,7 +192,7 @@ class BotManager(Events, TokenManager):
             await self.invoke_unit(unit_id, message)
             if del_message:
                 await message.delete()
-        except Exception as error:
+        except Exception:
             del self._units[unit_id]
 
             error = "\n".join(traceback.format_exc().splitlines()[1:])
