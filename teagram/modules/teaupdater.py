@@ -27,7 +27,7 @@ from aiogram.utils.exceptions import CantParseEntities, BotBlocked, Unauthorized
 no_git = False
 try:
     import git
-except:
+except:  # noqa: E722
     no_git = True
 
 @loader.module(name="Updater", author='teagram')

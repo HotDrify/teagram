@@ -39,14 +39,14 @@ class TeagramStreamHandler(logging.StreamHandler):
             'NOTSET': []
         }
 
-        with open("teagram.log", "w", encoding='utf-8') as l:
+        with open("teagram.log", "w", encoding='utf-8') as l:  # noqa: E741
             l.write("")
 
     def emit(self, record):
         lvl = logging.getLevelName(record.levelno)
         self.logs[lvl].append(record)
 
-        with open("teagram.log", "a", encoding='utf-8') as l:
+        with open("teagram.log", "a", encoding='utf-8') as l: # noqa: E741
             l.write(f'{self.format(record)}\n')
         
         super().emit(record)
@@ -72,11 +72,12 @@ class Main:
         logging.getLogger('aiohttp').setLevel(logging.WARNING)
         logging.getLogger('aiogram').setLevel(logging.WARNING)
 
-    async def on_start(self, 
-                      bot: Bot, 
-                      db: database.Database, 
-                      prefix: str, app):
-
+    async def on_start(
+        self, 
+        bot: Bot, 
+        db: database.Database, 
+        prefix: str, app
+    ):
         try:
             await bot.send_message(
                 db.cloud.input_chat,
@@ -93,9 +94,9 @@ class Main:
                         db.cloud.input_chat,
                         f'📁 <b>Logs</b>\n<code>{log}</code>'
                     )
-            except:
+            except Exception:
                 pass
-        except:
+        except Exception:
             id = dict(await bot.get_me())["id"]
             admin = ChatAdminRights(
                 post_messages=True,
@@ -119,42 +120,6 @@ class Main:
                 'Teagram'
             )
         )
-
-    async def on_start(self, 
-                      bot: Bot, 
-                      db: database.Database, 
-                      prefix: str, app):
-        _sha = git.Repo().rev_parse("HEAD")
-        version = f"""<a href="{_sha}">{__version__}</a>"""
-
-        try:
-            await bot.send_photo(
-                chat_id=db.cloud.input_chat,
-                photo="https://raw.githubusercontent.com/itzlayz/teagram-tl/main/assets/teagram_banner.png",
-                caption='☕ <b>Teagram userbot has started!</b>\n'
-                f'🤖 <b>Version: {version}</b>\n'
-                f'❔ <b>Prefix: {prefix}</b>'
-            )
-
-            with utils.supress(Exception):
-                with open('teagram.log', 'r') as log:
-                    log = log.readlines()
-                    if len(log) > 1:
-                        logs = "\n".join(logs)
-                        await bot.send_message(
-                            db.cloud.input_chat,
-                            f'📁 <b>Logs</b>\n<code>{logs}</code>'
-                        )
-        except Exception:
-            await self.inline(bot, app, db)
-
-            await bot.send_photo(
-                chat_id=db.cloud.input_chat,
-                photo="https://raw.githubusercontent.com/itzlayz/teagram-tl/main/assets/teagram_banner.png",
-                caption='☕ <b>Teagram userbot has started!</b>\n'
-                f'🤖 <b>Version: {version}</b>\n'
-                f'❔ <b>Prefix: {prefix}</b>'
-            )
 
     async def main(self):
         try:
