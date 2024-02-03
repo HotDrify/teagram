@@ -27,6 +27,6 @@ git clone https://github.com/itzlayz/teagram-tl && cd teagram-tl && pip install 
     <li>Login via website</li>
     <li>Inline bot</li>
     <li>Translations</li>
-    <li>Actual userbot with latest Telegram API version/li>
+    <li>Actual userbot with latest Telegram API version</li>
     <li>Compatible with hikka modules</li>
 </ul>
